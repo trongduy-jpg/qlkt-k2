@@ -1,0 +1,221 @@
+"","","QUY TRÌNH SẢN XUẤT-KIỂM SOÁT","","","","","","","","","","","","Số văn bản       : 
+Ngày hiệu lực  :","",""
+"","","SẢN PHẨM DÂY FRANCO","","","","","","","","","","","","Lần soát xét     :
+Trang                :","",""
+"Mục đích: Quy trình này được xây dựng và duy trì thực hiện nhằm mục đích kiểm soát việc tạo sản phẩm dây chuyền.
+Mô tả chi tiết","","","","","","","","","","","","","","","",""
+"BƯỚC CV","BỘ PHẬN THỰC HIỆN","LƯU ĐỒ","","","","","","","","","","MÔ TẢ","MMTB/ KÝ HIỆU ","TÀI LIỆU - HỒ SƠ","",""
+"Bước 1","KẾ HOẠCH SẢN XUẤT","","","","","","","","","","","- BP.KHSX lập lệnh sản xuất cho các đơn hàng được chuyển từ BP.KD
+ và đã được duyệt  giá từ BGĐ
+- BP.KHSX lập lệnh đề xuất NVL cho kế hoạch sản xuất đơn hàng đã được duyệt 
+và chuyển thông tin cho các bộ phận có liên quan nắm thông tin ","","","",""
+"","","","","","","Lệnh sản xuất","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 2","KHO CẤP PHÁT","","","","","","","","","","","- Căn cứ vào lệnh sản xuất đã được duyệt KCP cấp NVL cho Thợ kỹ thuật 
+tiến hành nấu chế NVL chuẩn bị cho giai đoạn sản xuất.
+- NVL sau khi chế tiến hành kiểm định đạt yêu cầu nhập kho cho SX.","","1. Quy trình chế đúc NVL","",""
+"","","","","","","Chuẩn bị NVL
+Nấu chế","","","","","","","","2. Phiếu kiểm định nguyên liệu","",""
+"","THỢ KỸ THUẬT","","","","","","","","","","","","","3. Phiếu nhập/xuất kho","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 3","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","- Thợ cán - kéo sợi nguyên liệu có đường kính và trọng lượng theo phiếu thông tin
+tự kiểm soát công việc của mình theo:
++ Thông số kiểm soát quy trình cán – kéo
++ Hướng dẫn vận hành máy - Ghi nhật ký máy.
++ Định mức hao hụt công đoạn
+- KTSX kiểm tra kích thước, độ xước, độ dẻo, sự đồng nhất về màu sắc, độ sạch, 
+độ khô... của cuộn chỉ trước khi tiến hành nhập kho.
++ Đạt: nhập kho
++ Không đạt: trả về Thợ  Cán - kéo sợi xử lý lại
+- Nguyên liệu Chỉ sợi  KCP nhập kho phải kiểm định tuổi theo quy
+ trình kiểm định nguyên liệu. KCP kiểm tra phiếu thông tin QC đạt sẽ 
+tiến hành nhập kho cuộn chỉ
+","3.1 Máy cán 2 đầu : cán chỉ và cán dát","1. Hướng dẫn vận hành máy cán -kéo sợi","",""
+"","","","","","","","","","","","","","SPB-2YXP-10P","2. Phiếu thông tin/đánh giá công đoạn","",""
+"","THỢ KÉO SỢI","","","","","","","","","","","","","3. Nhật ký máy","",""
+"","","","","","","","","","","","","","","4. Phiếu kiểm định nguyên liệu","",""
+"","KHO CẤP PHÁT","","","","","Cán - kéo sợi","","","","","","","3.2 Máy kéo chỉ  12 mắt","5. Phiếu nhập/xuất kho","",""
+"","","","","","","","","","","","","","IMG-12WD","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 4","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","
+
+- KCP cấp nguyên liệu Chỉ sợi cho Thợ đan theo phiếu thông tin
+- Thợ đan thực hiện phân bổ nguyên liệu trên máy đan dây theo từng đơn hàng đã 
+duyệt trong lệnh sản xuất, tự kiểm soát công việc của mình theo:
++ Thông số kiểm soát quy trình đan. 
++ Hướng dẫn vận hành máy - Ghi nhật ký máy.
++ Định mưc hao hụt công đoạn.
+- KTSX kiểm tra chất lượng dây đan về độ khít, các khớp đan chắc và đều, 
+độ dài đạt yêu cầu về mặt kỹ thuật và thông tin độ dài sản phẩm.
++ Đạt: KCP tiếp nhận lô dây đã đan
++ Không đạt: trả về Thợ đan dây xử lý lại","4.1 Máy đan khoen lật - phải - 0.19 đến 0.45mm
+","1. Hướng dẫn vận hành máy đan ","",""
+"","","","","","","","","","","","","","IMG-C-HS200","2. Phiếu thông tin/đánh giá công đoạn","",""
+"","THỢ ĐAN DÂY ","","","","","","","","","","","","","3. Nhật ký máy","",""
+"","","","","","","","","","","","","","4.2 Máy đan khoen lật - phải - 0.45 đến 0.80mm
+","4. Phiếu kiểm định nguyên liệu","",""
+"","KHO CẤP PHÁT","","","","","","","","","","","","IMG-C-HS200","5. Phiếu nhập/xuất kho","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","4.3 Máy đan khoen lật - trái - 0.19 đến 0.45mm
+","","",""
+"","","","","","","","","","","","","","IMG-C-HS200","","",""
+"","","","","","","Đan","","","","","","","","","",""
+"","","","","","","","","","","","","","4.4 Máy đan khoen lật - trái - 0.45 đến 0.80mm
+","","",""
+"","","","","","","","","","","","","","IMG-C-HS200","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","4.5 Máy đan chữ cong nhỏ - 0.19 đến 0.45 mm","","",""
+"","","","","","","","","","","","","","IMG-C-HS200","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","4.6 Máy đan chữ cong trung  - 0.45 đến 0.80 mm","","",""
+"","","","","","","","","","","","","","IMG-C-HS200","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","4.7 Máy ghép dây franco","","",""
+"","","","","","","","","","","","","","IMG-C-AG300","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 5","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","- KCP xuất chuyển lô dây đan cho Thợ hàn dây máy theo phiếu thông tin
+- Thợ hàn dây thực hiện hàn dây, tự kiểm soát công việc của mình theo:
++ Thông số kiểm soát quy trình hàn.
++ Hướng dẫn vận hành máy - Ghi nhật ký máy
++ Định mức hao hụt.
+Chú ý : phải hàn thử, kiểm tra mối hàn đầy,độ bền kéo sau hàn. Nếu cần thiết thì 
+chuyển công nhân dập thử trước khi hàn cả lô.
+- KTSX  kiểm tra lô dây sau khi hàn theo tiêu chuẩn dây chắc, đều , mối hàn đủ, không quá dư bột hàn hoặc khuyết lõm, dây sạch, khô
++ Đạt: KCP tiếp nhận lô dây để chuyển tiếp công đoạn hàn dây theo quy định
++ Không đạt: trả về Thợ hàn dây xử lý lại
+Lưu ý: dây máy BTP chỉ hàn nhập kho thì KTSX kiểm tra và ký xác nhận cho 
+nhập kho. Dây máy nhập kho phải có giấy kiểm định tuổi đạt .","5. Máy hàn băng tải","1. Hướng dẫn vận hành máy hàn dây","",""
+"","","","","","","","","","","","","","IMG-4M","2. Phiếu thông tin/đánh giá công đoạn","",""
+"","THỢ HÀN DÂY","","","","","","","","","","","","","3. Nhật ký máy","",""
+"","","","","","","","","","","","","","","4. Phiếu kiểm định nguyên liệu","",""
+"","KHO CẤP PHÁT","","","","","","","","","","","","","5. Phiếu nhập/xuất kho","",""
+"","","","","","","Hàn dây","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 6","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","- KCP xuất chuyển lô dây đã hàn cho Thợ nén - dập - dịu dây máy
+ theo lệnh sản xuất.
+- Thợ nén - dập - dịu trước khi nén, dập dây phải kiểm tra độ dòn , độ dịu 
+của dây để có chế độ hấp, dịu dây phù hợp.
+- Thợ nén - dập - dịu dây máy theo lệnh sản xuất, tự kiểm soát công việc theo:
++ Thông số kiểm soát quy trình nén - dập - dịu.
++ Hướng dẫn vận hành máy - Ghi nhật ký máy
++ Định mức hao hụt
+- KTSX kiểm tra lô dây sau khi nén, dập, dịu về độ dòn, độ dịu, và độ sạch, khô.
++ Đạt: KCP tiếp nhận lô dây và chuyển tiếp công đoạn theo quy định.
++ Không đạt: trả về Thợ nén - dập - dịu xử lý.
+
+","6.1 Máy làm khít dây","1. Hướng dẫn vận hành máy nén/dập","",""
+"","","","","","","","","","","","","","IMG-C-PS370","2. Phiếu thông tin/đánh giá công đoạn","",""
+"","THỢ NÉN-DẬP-DỊU","","","","","","","","","","","","","3. Nhật ký máy","",""
+"","","","","","","","","","","","","","6.2 Máy dập định hình","4. Phiếu kiểm định nguyên liệu","",""
+"","KHO CẤP PHÁT","","KTSX - QC","","","Nén - Dập - Dịu","","","KTSX - QC","","","","IMG-C-CHM","5. Phiếu nhập/xuất kho","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","6.3","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 7","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","- KCP xuất chuyển lô dây cần bào máy cho Thợ bào dây máy.
+- Trước kho bào Thợ bào phải kiểm tra bề mặt bào bóng, phẳng ; không 
+bào sót; chiều sâu bào và  kích thước dây bào đúng quy định.
+- Thợ bào máy thực hiên bào dây theo lệnh sản xuất, tự kiểm soát công việc theo:
++ Thông số kiểm soát quy trình bào máy. 
++ Hướng dẫn vận hành máy - Ghi nhật ký máy.
++ Định mức hao hụt.
+- KTSX kiểm tra lô dây bào bề mặt bào sáng, không sót, dây không bị lỗi, gẫy;
+kiểm số lượng và cắt size đúng yêu cầu.
++ Đạt:
+* Dây BTP dạng mét cho nhập kho và chuyển tiếp công đoạn xoắn dây
+* Dây không xoắn cho nhập kho và chuyển bước 9 đề hàn bas
++ Đạt: tiếp nhận nhập kho chuyển tiếp công đoạn  hoặc cho nhập kho dây 
+BTP dạng mét, KCP nhập kho BTP  dạng mét phải tiến hành kiểm định tuổi.
++ Không đạt: trả về bước bào xử lý lại","7. Máy bào dây","1. Hướng dẫn vận hành máy bào dây","","IMG-C-R2000"
+"","","","","","","","","","","","","","IMG-C-R2000","2. Phiếu thông tin/đánh giá công đoạn","",""
+"","THỢ BÀO MÁY","","","","","","","","","","","","","3. Nhật ký máy","",""
+"","","","","","","","","","","","","","","4. Phiếu kiểm định nguyên liệu","",""
+"","KHO CẤP PHÁT","","","","","","","","","","","","","5. Phiếu nhập/xuất kho","",""
+"","","","","","","Bào máy","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 8","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","- KCP xuất chuyển lô dây BTP dạng mét cho Thợ xoắn dây
+- Thợ xoắn dây theo lệnh sản xuất vào theo mã dây cần xoắn.
+- KTSX kiểm tra lô dây xoắn về độ xoắn đều , không lỗi cóc, giãn dây.
++ Đạt: nhập lô dây để hàn bas
++ Không đạt: trả về thợ xoắn xử lý lại
+- KCP tiếp nhận lô dây xoắn đạt, kiểm đếm số lượng sợi theo đúng quy định","","1. Phiếu thông tin/đánh giá công đoạn","",""
+"","","","","","","Xoắn dây","","","","","","","","2. Nhật ký máy","",""
+"","THỢ XOẮN DÂY","","","","","","","","","","","","","3. Phiếu kiểm định nguyên liệu","",""
+"","","","","","","","","","","","","","","4. Phiếu nhập/xuất kho","",""
+"","KHO CẤP PHÁT","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 9","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","- KCP xuất chuyển lô dây cho Thợ hàn bas, khoen
+- Thợ hàn bas, khoen thực hiện hàn gắn bas/khoen theo yêu cầu và tự kiểm soát hao hụt:
++ Thông số kiểm soát quy trình hàn – bấm bass.
++ Hướng  dẫn  vận  hành  máy-  Ghi  nhật  ký  máy.  
++ Định  mức công đoạn
+- Sau khi hàn bas/khoen chuyển gắn khóa và lắc bi đầu bas.
+- KTSX kiểm tra chất lượng lô dây hàn bas/khoen về độ chắc chắn, độ đẹp mối hàn.
++ Đạt: KCP tiếp nhận lô dây và chuyển sang công đoạn đánh bóng xi mạ theo quy trình
++ Không đạt: chuyển trả Thợ hàn bas/khoen xử lý lại","","1. Phiếu thông tin/đánh giá công đoạn","",""
+"","","","","","","","","","","","","","","2. Nhật ký máy","",""
+"","THỢ HÀN BAS, KHOEN","","","","","Hàn bas, khoen","","","","","","","","3. Phiếu kiểm định nguyên liệu","",""
+"","","","","","","","","","","","","","","4. Phiếu nhập/xuất kho","",""
+"","KHO CẤP PHÁT","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 10","KỸ THUẬT SẢN XUẤT","","","","","","","","","","","- KCP chuyển tiếp lô hàng cho Thợ đánh bóng xi mạ.
+- Thợ đánh bóng xi mạ thực hiện bombing các mã dây theo chỉ định ( dây xoắn,…) 
+để làm sạch và sáng dây và xi màu theo yêu cầu đơn hàng
+- Thực hiện theo hướng dẫn và quy định công việc bombing, xi mạ .
+- Tuân thủ quy tắc an toàn, bảo hộ lao động.
+- KTSX kiểm tra thành phẩm dây chuyền sau khi hoàn tất và xi mạ.
+- Đạt : ký đạt thành phẩm nhập kho.
+- Không đạt : trả về xử lý .","","","",""
+"","","","","","","","","","","","","","","","",""
+"","THỢ ĐÁNH BÓNG - XI MẠ","","","","","Hoàn tất 
+Đánh bóng - xi mạ","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","KHO CẤP PHÁT","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","","","","","","","","","","",""
+"Bước 11","KHO CẤP PHÁT","","","","","","","","","","","- KCP tiếp nhận lô hàng TP từ Thợ đánh bóng xi mạ và làm các thủ tục nhập kho tiếp theo
+- Nhập kho Phế phẩm, nguyên liệu nấu từ bột, dẻ dư tại các công đoạn 
+để tái sản xuất.","","","",""
+"","","","","","","","","","","","","","","","",""
+"","","","","","","Nhập kho TP","","","","","","","","","",""

@@ -1,0 +1,1890 @@
+[
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "Quy tắc nhập",
+    "tab_gid": 25075320,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/001-quy-tac-nhap.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "06.2026",
+    "tab_gid": 1532082036,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/002-06-2026.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "05.2026",
+    "tab_gid": 366731835,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/003-05-2026.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "04.2026",
+    "tab_gid": 1899442075,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/004-04-2026.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "03.2026",
+    "tab_gid": 1580950417,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/005-03-2026.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "02.2026",
+    "tab_gid": 1245591376,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/006-02-2026.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "01.2026",
+    "tab_gid": 684772952,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/007-01-2026.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "Danh mục thợ",
+    "tab_gid": 1074133312,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/008-danh-muc-tho.csv",
+    "columns_count": 8
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "Mã NVL",
+    "tab_gid": 1146526518,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/009-ma-nvl.csv",
+    "columns_count": 5
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "Đề xuất nấu bột",
+    "tab_gid": 1392140589,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/010-e-xuat-nau-bot.csv",
+    "columns_count": 5
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "Phiếu xuất",
+    "tab_gid": 468165361,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/011-phieu-xuat.csv",
+    "columns_count": 9
+  },
+  {
+    "spreadsheet_name": "01-nhat-ki-san-xuat-2026",
+    "spreadsheet_id": "1491_MPDdRuqR_SieRl06H9-sHkyX91jo8rC2Hz-xSVg",
+    "tab_name": "TH HH2025",
+    "tab_gid": 544958626,
+    "csv_file": "01-01-nhat-ki-san-xuat-2026/012-th-hh2025.csv",
+    "columns_count": 16
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "HUONG DAN",
+    "tab_gid": 1253388345,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/001-huong-dan.csv",
+    "columns_count": 4
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A.NHẬT KÝ SX",
+    "tab_gid": 86431264,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/002-a-nhat-ky-sx.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A.NHẬT KÝ SX-FILTER T05.2026",
+    "tab_gid": 977136438,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/003-a-nhat-ky-sx-filter-t05-2026.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A.NHẬT KÝ SX-FILTER T06.2026",
+    "tab_gid": 878765628,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/004-a-nhat-ky-sx-filter-t06-2026.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.BC.TONHOPTHO T06.2026",
+    "tab_gid": 1110318289,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/005-b-2-bc-tonhoptho-t06-2026.csv",
+    "columns_count": 69
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A.NHẬT KÝ SX-FILTER T01.2026",
+    "tab_gid": 87074989,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/006-a-nhat-ky-sx-filter-t01-2026.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.BC.TONHOPTHO...",
+    "tab_gid": 1909396719,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/007-b-2-bc-tonhoptho.csv",
+    "columns_count": 69
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A.NHẬT KÝ SX-FILTER T02.2026",
+    "tab_gid": 344138325,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/008-a-nhat-ky-sx-filter-t02-2026.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.BC.TONHOPTHO T02.2026",
+    "tab_gid": 542444732,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/009-b-2-bc-tonhoptho-t02-2026.csv",
+    "columns_count": 69
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A.NHẬT KÝ SX-FILTER T04.2026",
+    "tab_gid": 653464124,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/010-a-nhat-ky-sx-filter-t04-2026.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.BC.TONHOPTHO T04.2026",
+    "tab_gid": 213737013,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/011-b-2-bc-tonhoptho-t04-2026.csv",
+    "columns_count": 69
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.BC.TONHOPTHO T05.2026",
+    "tab_gid": 896002147,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/012-b-2-bc-tonhoptho-t05-2026.csv",
+    "columns_count": 69
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "C.2.MÃ NVL",
+    "tab_gid": 46457454,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/013-c-2-ma-nvl.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.BC.TONHOPTHO..",
+    "tab_gid": 337811787,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/014-b-2-bc-tonhoptho.csv",
+    "columns_count": 35
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.2ĐMKYQUY",
+    "tab_gid": 191389697,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/015-b-2-2-mkyquy.csv",
+    "columns_count": 4
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A1.1NK.NVL.L3",
+    "tab_gid": 1406874458,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/016-a1-1nk-nvl-l3.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A1.2XK.NVL.L3",
+    "tab_gid": 1304414290,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/017-a1-2xk-nvl-l3.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.NXT-NVL.KCP",
+    "tab_gid": 360776923,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/018-b-nxt-nvl-kcp.csv",
+    "columns_count": 25
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "TỒN ĐẦU KỲ",
+    "tab_gid": 118142850,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/019-ton-au-ky.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "E.Xuất kho thành phẩm",
+    "tab_gid": 781532535,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/020-e-xuat-kho-thanh-pham.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.1.BCN-NVL",
+    "tab_gid": 681257198,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/021-b-1-bcn-nvl.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.2.BC.TONHOPTHO",
+    "tab_gid": 1720552102,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/022-b-2-bc-tonhoptho.csv",
+    "columns_count": 29
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "TỒN CUỐI KỲ",
+    "tab_gid": 1225657050,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/023-ton-cuoi-ky.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A2.2XK.SPBH.L3",
+    "tab_gid": 11722236,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/024-a2-2xk-spbh-l3.csv",
+    "columns_count": 13
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A2.1NK.SPBH.L3",
+    "tab_gid": 1782895800,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/025-a2-1nk-spbh-l3.csv",
+    "columns_count": 13
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A3. NXT.PKKHOA",
+    "tab_gid": 2083935248,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/026-a3-nxt-pkkhoa.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "1.1.PXKL3",
+    "tab_gid": 305586238,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/027-1-1-pxkl3.csv",
+    "columns_count": 7
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "1.2.PNKL3",
+    "tab_gid": 764156384,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/028-1-2-pnkl3.csv",
+    "columns_count": 7
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.3.BC.TK BTP",
+    "tab_gid": 1593351017,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/029-b-3-bc-tk-btp.csv",
+    "columns_count": 34
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "1.1.QUY TRÌNH SX DÂY BI",
+    "tab_gid": 1822545219,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/030-1-1-quy-trinh-sx-day-bi.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "1.2.QUY TRÌNH SX DÂY CHỮ CONG",
+    "tab_gid": 186672504,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/031-1-2-quy-trinh-sx-day-chu-cong.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "1.3.QUY TRÌNH SX DÂY KHOEN LẬT",
+    "tab_gid": 1812033198,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/032-1-3-quy-trinh-sx-day-khoen-lat.csv",
+    "columns_count": 17
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": " 1.4.QUY TRÌNH SX DÂY FRANCO",
+    "tab_gid": 628551424,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/033-1-4-quy-trinh-sx-day-franco.csv",
+    "columns_count": 17
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "A.NHẬT KÝ SX 1",
+    "tab_gid": 0,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/034-a-nhat-ky-sx-1.csv",
+    "columns_count": 22
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Copy of 1.2.1.PXK.CP",
+    "tab_gid": 1356669475,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/035-copy-of-1-2-1-pxk-cp.csv",
+    "columns_count": 7
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "IN 2.2.NNAU 1",
+    "tab_gid": 1556494810,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/036-in-2-2-nnau-1.csv",
+    "columns_count": 9
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Copy of 2.1.XNAU",
+    "tab_gid": 1695125988,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/037-copy-of-2-1-xnau.csv",
+    "columns_count": 7
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Copy of 2.2.NNAU",
+    "tab_gid": 2106830857,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/038-copy-of-2-2-nnau.csv",
+    "columns_count": 9
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Tồn bi",
+    "tab_gid": 1294066239,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/039-ton-bi.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "C.1.DANH MỤC THỢ ",
+    "tab_gid": 897054542,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/040-c-1-danh-muc-tho.csv",
+    "columns_count": 8
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Copy of A2.NKSX.XK 1",
+    "tab_gid": 856620703,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/041-copy-of-a2-nksx-xk-1.csv",
+    "columns_count": 7
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "B.3.TH.TINH HAO",
+    "tab_gid": 1760275514,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/042-b-3-th-tinh-hao.csv",
+    "columns_count": 11
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "C.3.DMHH",
+    "tab_gid": 515005337,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/043-c-3-dmhh.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "D. Danh mục chung",
+    "tab_gid": 462124623,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/044-d-danh-muc-chung.csv",
+    "columns_count": 4
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Copy of B.1.BCN-NVL",
+    "tab_gid": 450413147,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/045-copy-of-b-1-bcn-nvl.csv",
+    "columns_count": 13
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "D.1.LENHSX",
+    "tab_gid": 1583364972,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/046-d-1-lenhsx.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Copy of C.2.MÃ NVL",
+    "tab_gid": 2000134187,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/047-copy-of-c-2-ma-nvl.csv",
+    "columns_count": 4
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "D.2.PDX.NVL",
+    "tab_gid": 1755686630,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/048-d-2-pdx-nvl.csv",
+    "columns_count": 7
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "D.3.PN/X.SX",
+    "tab_gid": 2019784109,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/049-d-3-pn-x-sx.csv",
+    "columns_count": 2
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "D.4.PQC.SX",
+    "tab_gid": 1904313836,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/050-d-4-pqc-sx.csv",
+    "columns_count": 10
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "D.5.BB.TONHOPTHO",
+    "tab_gid": 1772485786,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/051-d-5-bb-tonhoptho.csv",
+    "columns_count": 11
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "D.7.BBKK.CCDC",
+    "tab_gid": 82129407,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/052-d-7-bbkk-ccdc.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "IN Phiếu nhập-xuất",
+    "tab_gid": 810059530,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/053-in-phieu-nhap-xuat.csv",
+    "columns_count": 7
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Note: DS Tum",
+    "tab_gid": 831597499,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/054-note-ds-tum.csv",
+    "columns_count": 3
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "H. Kho bột bào",
+    "tab_gid": 2112050453,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/055-h-kho-bot-bao.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "File theo dõi bạc tồn sổ sách",
+    "tab_gid": 522200613,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/056-file-theo-doi-bac-ton-so-sach.csv",
+    "columns_count": 11
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Danh sách nhận nguyên liệu",
+    "tab_gid": 1378672739,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/057-danh-sach-nhan-nguyen-lieu.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "Danh sách SP Xi",
+    "tab_gid": 1447323802,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/058-danh-sach-sp-xi.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "E.KHOKYGUI",
+    "tab_gid": 1290405179,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/059-e-khokygui.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "F. Danh sách vụn",
+    "tab_gid": 1758381241,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/060-f-danh-sach-vun.csv",
+    "columns_count": 8
+  },
+  {
+    "spreadsheet_name": "02-bao-cao-ton-hop-tho-2026",
+    "spreadsheet_id": "1P0SkLvCyBoIoExN693hHct7O2dOB18_SrmxbfdRNVUo",
+    "tab_name": "G. PHA CHẾ",
+    "tab_gid": 1800601672,
+    "csv_file": "02-02-bao-cao-ton-hop-tho-2026/061-g-pha-che.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "4.1 KẾ HOẠCH RA DÂY",
+    "tab_gid": 1041031969,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/001-4-1-ke-hoach-ra-day.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "4.2 KẾ HOẠCH XỎ DÂY BI",
+    "tab_gid": 1729368416,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/002-4-2-ke-hoach-xo-day-bi.csv",
+    "columns_count": 39
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "1. [B204] CHI TIẾT CÔNG VIỆC SX NGÀY",
+    "tab_gid": 0,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/003-1-b204-chi-tiet-cong-viec-sx-ngay.csv",
+    "columns_count": 34
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": " 2.[B204] BÁO CÁO KẾT QUẢ SẢN XUẤT",
+    "tab_gid": 2126948561,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/004-2-b204-bao-cao-ket-qua-san-xuat.csv",
+    "columns_count": 32
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "1.2 [B204] CHI TIẾT KẾ HOẠCH SX NGÀY",
+    "tab_gid": 809649351,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/005-1-2-b204-chi-tiet-ke-hoach-sx-ngay.csv",
+    "columns_count": 31
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "2.[B204] BÁO CÁO KẾ HOẠCH SẢN XUẤT",
+    "tab_gid": 925964910,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/006-2-b204-bao-cao-ke-hoach-san-xuat.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "5.DANH MỤC",
+    "tab_gid": 1493186389,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/007-5-danh-muc.csv",
+    "columns_count": 23
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "4. TỔNG KẾT CÁC ĐƠN HÀNG",
+    "tab_gid": 1660430151,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/008-4-tong-ket-cac-on-hang.csv",
+    "columns_count": 43
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "3. NVL-BTP Tồn kho",
+    "tab_gid": 272550926,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/009-3-nvl-btp-ton-kho.csv",
+    "columns_count": 22
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "Copy of 4. TỔNG KẾT CÁC ĐƠN HÀNG",
+    "tab_gid": 1334769152,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/010-copy-of-4-tong-ket-cac-on-hang.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "5.1 DANH MỤC CHUNG",
+    "tab_gid": 1107301894,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/011-5-1-danh-muc-chung.csv",
+    "columns_count": 12
+  },
+  {
+    "spreadsheet_name": "03-ke-hoach-san-xuat-ngay-l3-2026",
+    "spreadsheet_id": "1wD0iA68Z70-nI-SbrnIq3LTgCBIKC0AW4P40xthmRTk",
+    "tab_name": "5.1 Danh mục chung 1",
+    "tab_gid": 1111694827,
+    "csv_file": "03-03-ke-hoach-san-xuat-ngay-l3-2026/012-5-1-danh-muc-chung-1.csv",
+    "columns_count": 12
+  },
+  {
+    "spreadsheet_name": "04-trang-thai-nvl-va-don-hang",
+    "spreadsheet_id": "1UlTNmfoUAeSY_uXhmByJvCo6Y2G0UGABdxoxc4-M6Yw",
+    "tab_name": "Trạng thái NVL",
+    "tab_gid": 0,
+    "csv_file": "04-04-trang-thai-nvl-va-don-hang/001-trang-thai-nvl.csv",
+    "columns_count": 11
+  },
+  {
+    "spreadsheet_name": "04-trang-thai-nvl-va-don-hang",
+    "spreadsheet_id": "1UlTNmfoUAeSY_uXhmByJvCo6Y2G0UGABdxoxc4-M6Yw",
+    "tab_name": "Kế hoạch NVL",
+    "tab_gid": 689584770,
+    "csv_file": "04-04-trang-thai-nvl-va-don-hang/002-ke-hoach-nvl.csv",
+    "columns_count": 9
+  },
+  {
+    "spreadsheet_name": "04-trang-thai-nvl-va-don-hang",
+    "spreadsheet_id": "1UlTNmfoUAeSY_uXhmByJvCo6Y2G0UGABdxoxc4-M6Yw",
+    "tab_name": "Sheet7",
+    "tab_gid": 825944030,
+    "csv_file": "04-04-trang-thai-nvl-va-don-hang/003-sheet7.csv",
+    "columns_count": 8
+  },
+  {
+    "spreadsheet_name": "05-theo-doi-tien-do-don-hang-2025-2026",
+    "spreadsheet_id": "1fqPBXcwGRRM4cDlHyCdAay--RYclYSXEspCH-PZGD3Y",
+    "tab_name": "1. CHI TIẾT ĐƠN HÀNG",
+    "tab_gid": 0,
+    "csv_file": "05-05-theo-doi-tien-do-don-hang-2025-2026/001-1-chi-tiet-on-hang.csv",
+    "columns_count": 24
+  },
+  {
+    "spreadsheet_name": "05-theo-doi-tien-do-don-hang-2025-2026",
+    "spreadsheet_id": "1fqPBXcwGRRM4cDlHyCdAay--RYclYSXEspCH-PZGD3Y",
+    "tab_name": "NEW-CHI TIẾT ĐƠN HÀNG",
+    "tab_gid": 1280243151,
+    "csv_file": "05-05-theo-doi-tien-do-don-hang-2025-2026/002-new-chi-tiet-on-hang.csv",
+    "columns_count": 25
+  },
+  {
+    "spreadsheet_name": "05-theo-doi-tien-do-don-hang-2025-2026",
+    "spreadsheet_id": "1fqPBXcwGRRM4cDlHyCdAay--RYclYSXEspCH-PZGD3Y",
+    "tab_name": "LINK/FILE",
+    "tab_gid": 1521775224,
+    "csv_file": "05-05-theo-doi-tien-do-don-hang-2025-2026/003-link-file.csv",
+    "columns_count": 2
+  },
+  {
+    "spreadsheet_name": "05-theo-doi-tien-do-don-hang-2025-2026",
+    "spreadsheet_id": "1fqPBXcwGRRM4cDlHyCdAay--RYclYSXEspCH-PZGD3Y",
+    "tab_name": "2. TỔNG HỢP TIẾN ĐỘ ĐƠN HÀNG",
+    "tab_gid": 1112305050,
+    "csv_file": "05-05-theo-doi-tien-do-don-hang-2025-2026/004-2-tong-hop-tien-o-on-hang.csv",
+    "columns_count": 22
+  },
+  {
+    "spreadsheet_name": "05-theo-doi-tien-do-don-hang-2025-2026",
+    "spreadsheet_id": "1fqPBXcwGRRM4cDlHyCdAay--RYclYSXEspCH-PZGD3Y",
+    "tab_name": "3. TỔNG HỢP TRẠNG THÁI ĐƠN HÀNG",
+    "tab_gid": 692615401,
+    "csv_file": "05-05-theo-doi-tien-do-don-hang-2025-2026/005-3-tong-hop-trang-thai-on-hang.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "Kế hoạch thực hiện đơn hàng ",
+    "tab_gid": 868071318,
+    "csv_file": "06-06-de-xuat-nvl-2026/001-ke-hoach-thuc-hien-on-hang.csv",
+    "columns_count": 20
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "PO2401057-750Y-1",
+    "tab_gid": 935594193,
+    "csv_file": "06-06-de-xuat-nvl-2026/002-po2401057-750y-1.csv",
+    "columns_count": 29
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "DH241003 750W/610Y",
+    "tab_gid": 169225638,
+    "csv_file": "06-06-de-xuat-nvl-2026/003-dh241003-750w-610y.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "TỔNG HỢP ĐỀ XUẤT NVL",
+    "tab_gid": 495977755,
+    "csv_file": "06-06-de-xuat-nvl-2026/004-tong-hop-e-xuat-nvl.csv",
+    "columns_count": 23
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH1.KH.28/05-750R",
+    "tab_gid": 902464177,
+    "csv_file": "06-06-de-xuat-nvl-2026/005-ch1-kh-28-05-750r.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH1.KH.25/05-750Y",
+    "tab_gid": 1911481001,
+    "csv_file": "06-06-de-xuat-nvl-2026/006-ch1-kh-25-05-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH1.SR.chưa đề xuất-750Y",
+    "tab_gid": 258400159,
+    "csv_file": "06-06-de-xuat-nvl-2026/007-ch1-sr-chua-e-xuat-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "TEST.SR.20/05-BẠC",
+    "tab_gid": 56044081,
+    "csv_file": "06-06-de-xuat-nvl-2026/008-test-sr-20-05-bac.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH1.SR.08/10-750Y",
+    "tab_gid": 331828099,
+    "csv_file": "06-06-de-xuat-nvl-2026/009-ch1-sr-08-10-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "chưa đề xuất",
+    "tab_gid": 2114426997,
+    "csv_file": "06-06-de-xuat-nvl-2026/010-chua-e-xuat.csv",
+    "columns_count": 28
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "chưa đề xuất (KS/05)",
+    "tab_gid": 134111561,
+    "csv_file": "06-06-de-xuat-nvl-2026/011-chua-e-xuat-ks-05.csv",
+    "columns_count": 28
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "KDS.KH.04/05-610Y",
+    "tab_gid": 849144986,
+    "csv_file": "06-06-de-xuat-nvl-2026/012-kds-kh-04-05-610y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH3.KH.22/04-750Y",
+    "tab_gid": 829235556,
+    "csv_file": "06-06-de-xuat-nvl-2026/013-ch3-kh-22-04-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH1.SR.17/04-750W/750Y",
+    "tab_gid": 8354333,
+    "csv_file": "06-06-de-xuat-nvl-2026/014-ch1-sr-17-04-750w-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "PSX L2+CH1.SR.18/04-750W",
+    "tab_gid": 1755587041,
+    "csv_file": "06-06-de-xuat-nvl-2026/015-psx-l2-ch1-sr-18-04-750w.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "PSX L2.SR.18/04-750W",
+    "tab_gid": 1922479308,
+    "csv_file": "06-06-de-xuat-nvl-2026/016-psx-l2-sr-18-04-750w.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "PSX L2.SR.13/04-750W",
+    "tab_gid": 875704113,
+    "csv_file": "06-06-de-xuat-nvl-2026/017-psx-l2-sr-13-04-750w.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH3.KH.12/03-750Y",
+    "tab_gid": 573247525,
+    "csv_file": "06-06-de-xuat-nvl-2026/018-ch3-kh-12-03-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH1.KH.31/03-750Y",
+    "tab_gid": 1144565863,
+    "csv_file": "06-06-de-xuat-nvl-2026/019-ch1-kh-31-03-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH1.SR.24/03-750W",
+    "tab_gid": 1299743584,
+    "csv_file": "06-06-de-xuat-nvl-2026/020-ch1-sr-24-03-750w.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "PSX L2.SR.16/03-750Y",
+    "tab_gid": 1648994850,
+    "csv_file": "06-06-de-xuat-nvl-2026/021-psx-l2-sr-16-03-750y.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "CH2.KHÁCH.04/02-750W",
+    "tab_gid": 601869670,
+    "csv_file": "06-06-de-xuat-nvl-2026/022-ch2-khach-04-02-750w.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "KDS.KTQ.09/01-750W",
+    "tab_gid": 469591024,
+    "csv_file": "06-06-de-xuat-nvl-2026/023-kds-ktq-09-01-750w.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "KDS.KTQ.09/01",
+    "tab_gid": 1409425735,
+    "csv_file": "06-06-de-xuat-nvl-2026/024-kds-ktq-09-01.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "KDS.HAINHO.08/01",
+    "tab_gid": 675846107,
+    "csv_file": "06-06-de-xuat-nvl-2026/025-kds-hainho-08-01.csv",
+    "columns_count": 27
+  },
+  {
+    "spreadsheet_name": "06-de-xuat-nvl-2026",
+    "spreadsheet_id": "16c3VtKwiLwkpYg_TlQGfY-7rTZZPXC-f3ugNUSm0gvk",
+    "tab_name": "KDS.KLA.08/01",
+    "tab_gid": 1091691939,
+    "csv_file": "06-06-de-xuat-nvl-2026/026-kds-kla-08-01.csv",
+    "columns_count": 29
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "1.NKSX-VÀNG-KT",
+    "tab_gid": 1629171065,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/001-1-nksx-vang-kt.csv",
+    "columns_count": 48
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "2.NKSX-BAC-KT",
+    "tab_gid": 1547991341,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/002-2-nksx-bac-kt.csv",
+    "columns_count": 48
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "2.1.KHSX-BAC-TLKT",
+    "tab_gid": 416070087,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/003-2-1-khsx-bac-tlkt.csv",
+    "columns_count": 48
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "1.1.KHSX-VÀNG-TLKT",
+    "tab_gid": 1857819663,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/004-1-1-khsx-vang-tlkt.csv",
+    "columns_count": 48
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "2.KHSX-TLKT",
+    "tab_gid": 817144759,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/005-2-khsx-tlkt.csv",
+    "columns_count": 48
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "3.1.TONGHOP- ĐH DAY",
+    "tab_gid": 1036477430,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/006-3-1-tonghop--h-day.csv",
+    "columns_count": 13
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "2.1.TONGHOP-ĐH KH",
+    "tab_gid": 1423403776,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/007-2-1-tonghop--h-kh.csv",
+    "columns_count": 38
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "2.2.TONGHOP-ĐH-SR",
+    "tab_gid": 472330101,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/008-2-2-tonghop--h-sr.csv",
+    "columns_count": 38
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "Copy of 2.KHSX-TLKT",
+    "tab_gid": 1563319840,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/009-copy-of-2-khsx-tlkt.csv",
+    "columns_count": 48
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "DHAG-25/08/12-KD Sỉ (Hoàn thành)",
+    "tab_gid": 82156974,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/010-dhag-25-08-12-kd-si-hoan-thanh.csv",
+    "columns_count": 29
+  },
+  {
+    "spreadsheet_name": "07-ke-hoach-san-xuat-2026-tlkt",
+    "spreadsheet_id": "1jSBKnBiPLour4V_1mLtzb6wIcOBlMZuDggTySAr4hHo",
+    "tab_name": "DHAG-25/08/09-KD Sỉ (Hoàn thành)",
+    "tab_gid": 1162199435,
+    "csv_file": "07-07-ke-hoach-san-xuat-2026-tlkt/011-dhag-25-08-09-kd-si-hoan-thanh.csv",
+    "columns_count": 28
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "3a. Mẫu biểu QTPK",
+    "tab_gid": 1306490333,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/001-3a-mau-bieu-qtpk.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "Tổng hợp gốc",
+    "tab_gid": 1365082151,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/002-tong-hop-goc.csv",
+    "columns_count": 22
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "A. BC HIỆU QUẢ PK-2026",
+    "tab_gid": 1163088631,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/003-a-bc-hieu-qua-pk-2026.csv",
+    "columns_count": 34
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "B. CP PK2026",
+    "tab_gid": 165472453,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/004-b-cp-pk2026.csv",
+    "columns_count": 12
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "Thống kê PK",
+    "tab_gid": 1221416474,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/005-thong-ke-pk.csv",
+    "columns_count": 16
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "Tổng hợp PK-AU",
+    "tab_gid": 1926404063,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/006-tong-hop-pk-au.csv",
+    "columns_count": 41
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "Tổng hợp PK-AU-L2",
+    "tab_gid": 183879676,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/007-tong-hop-pk-au-l2.csv",
+    "columns_count": 41
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PK-PT26-0101",
+    "tab_gid": 1806808521,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/008-pk-pt26-0101.csv",
+    "columns_count": 20
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0303",
+    "tab_gid": 230863862,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/009-pkau-26-0303.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0302",
+    "tab_gid": 1795441270,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/010-pkau-26-0302.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0301",
+    "tab_gid": 25023282,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/011-pkau-26-0301.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0205",
+    "tab_gid": 287034093,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/012-pkau-26-0205.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "Tổng hợp PK-AU-L3",
+    "tab_gid": 2082452407,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/013-tong-hop-pk-au-l3.csv",
+    "columns_count": 41
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "Tổng hợp PK-PT",
+    "tab_gid": 1454153498,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/014-tong-hop-pk-pt.csv",
+    "columns_count": 25
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0204",
+    "tab_gid": 928466240,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/015-pkau-26-0204.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0203",
+    "tab_gid": 44788430,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/016-pkau-26-0203.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0202",
+    "tab_gid": 562660349,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/017-pkau-26-0202.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0201",
+    "tab_gid": 109129353,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/018-pkau-26-0201.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0108",
+    "tab_gid": 1968689944,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/019-pkau-26-0108.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0107",
+    "tab_gid": 834286525,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/020-pkau-26-0107.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0106",
+    "tab_gid": 1623198182,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/021-pkau-26-0106.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0105",
+    "tab_gid": 1441562742,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/022-pkau-26-0105.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0104",
+    "tab_gid": 970521312,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/023-pkau-26-0104.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0103",
+    "tab_gid": 1262559666,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/024-pkau-26-0103.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0102",
+    "tab_gid": 995876857,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/025-pkau-26-0102.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PKAU-26/0101",
+    "tab_gid": 771381642,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/026-pkau-26-0101.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "PK-DTV",
+    "tab_gid": 698290156,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/027-pk-dtv.csv",
+    "columns_count": 26
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "BCPK-THINH",
+    "tab_gid": 171690341,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/028-bcpk-thinh.csv",
+    "columns_count": 1
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "BCPK-1504KCP",
+    "tab_gid": 578355260,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/029-bcpk-1504kcp.csv",
+    "columns_count": 12
+  },
+  {
+    "spreadsheet_name": "08-bao-cao-tong-hop-ket-qua-pk-2026",
+    "spreadsheet_id": "1Jd22fV2hWeFJGSXAPi1aIpSD1I7knqHyRUIVH1ss4NM",
+    "tab_name": "BCPK-0104KCP",
+    "tab_gid": 1081646897,
+    "csv_file": "08-08-bao-cao-tong-hop-ket-qua-pk-2026/030-bcpk-0104kcp.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "09-ke-hoach-nvl-don-hang",
+    "spreadsheet_id": "1vSVco9fr0Zi8fdguthrtac-4nDB5sJqEPNXMMM7HOj8",
+    "tab_name": "Kế hoạch NVL tháng",
+    "tab_gid": 0,
+    "csv_file": "09-09-ke-hoach-nvl-don-hang/001-ke-hoach-nvl-thang.csv",
+    "columns_count": 11
+  },
+  {
+    "spreadsheet_name": "09-ke-hoach-nvl-don-hang",
+    "spreadsheet_id": "1vSVco9fr0Zi8fdguthrtac-4nDB5sJqEPNXMMM7HOj8",
+    "tab_name": "Đề xuất NVL tuần 23",
+    "tab_gid": 498248001,
+    "csv_file": "09-09-ke-hoach-nvl-don-hang/002-e-xuat-nvl-tuan-23.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "09-ke-hoach-nvl-don-hang",
+    "spreadsheet_id": "1vSVco9fr0Zi8fdguthrtac-4nDB5sJqEPNXMMM7HOj8",
+    "tab_name": "Đề xuất NVL tuần 24",
+    "tab_gid": 469549650,
+    "csv_file": "09-09-ke-hoach-nvl-don-hang/003-e-xuat-nvl-tuan-24.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "Trang tính1",
+    "tab_gid": 0,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/001-trang-tinh1.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "Trang tính4",
+    "tab_gid": 432061305,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/002-trang-tinh4.csv",
+    "columns_count": 13
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "NVL  2021",
+    "tab_gid": 1699233452,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/003-nvl-2021.csv",
+    "columns_count": 11
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "NVL: 24K [2026]",
+    "tab_gid": 1287800636,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/004-nvl-24k-2026.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "NVL: BAC [2026]",
+    "tab_gid": 988371200,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/005-nvl-bac-2026.csv",
+    "columns_count": 12
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "NVL: PT [2026]",
+    "tab_gid": 961872697,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/006-nvl-pt-2026.csv",
+    "columns_count": 14
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "Bảng kê vàng phân kim",
+    "tab_gid": 266625477,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/007-bang-ke-vang-phan-kim.csv",
+    "columns_count": 10
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "TH GIÁ NVL CÁC THÁNG",
+    "tab_gid": 1156301427,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/008-th-gia-nvl-cac-thang.csv",
+    "columns_count": 5
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "BC NXT 24K 2023",
+    "tab_gid": 1274981829,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/009-bc-nxt-24k-2023.csv",
+    "columns_count": 15
+  },
+  {
+    "spreadsheet_name": "10-theo-doi-mua-nvl-vang-bac-pt-2026",
+    "spreadsheet_id": "1ziJN8BX52V0HqLUZOayGnIZXl_eADglWzuJSGgx7GY4",
+    "tab_name": "NXT NVL & SPBH kho tổng.",
+    "tab_gid": 169314396,
+    "csv_file": "10-10-theo-doi-mua-nvl-vang-bac-pt-2026/010-nxt-nvl-spbh-kho-tong.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "05.26",
+    "tab_gid": 951943788,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/001-05-26.csv",
+    "columns_count": 16
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "04.26",
+    "tab_gid": 176712207,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/002-04-26.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "03.26",
+    "tab_gid": 146283551,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/003-03-26.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "02.26",
+    "tab_gid": 1884392691,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/004-02-26.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "01.26",
+    "tab_gid": 2052760725,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/005-01-26.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "Bảng so sánh",
+    "tab_gid": 253380986,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/006-bang-so-sanh.csv",
+    "columns_count": 9
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "1222",
+    "tab_gid": 417194813,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/007-1222.csv",
+    "columns_count": 5
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "1122",
+    "tab_gid": 522625176,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/008-1122.csv",
+    "columns_count": 5
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "1022",
+    "tab_gid": 914837641,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/009-1022.csv",
+    "columns_count": 5
+  },
+  {
+    "spreadsheet_name": "11-de-xuat-duyet-gia-tinh-hao-2026",
+    "spreadsheet_id": "1TVGEP5yVZqv5Z5R3T3eAdex9hl0jUFBMqJxgvXUQVkY",
+    "tab_name": "0922",
+    "tab_gid": 0,
+    "csv_file": "11-11-de-xuat-duyet-gia-tinh-hao-2026/010-0922.csv",
+    "columns_count": 5
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "DANH MỤC THÁNG",
+    "tab_gid": 494329138,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/001-danh-muc-thang.csv",
+    "columns_count": 11
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.3. PHIẾU GIAO NHẬN",
+    "tab_gid": 162373625,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/002-a-3-phieu-giao-nhan.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "LỌC- A.1 BC HAO HỤT THEO ĐỐI TƯỢNG",
+    "tab_gid": 1285314915,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/003-loc--a-1-bc-hao-hut-theo-oi-tuong.csv",
+    "columns_count": 26
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.2.BC HAO HỤT THEO CÔNG ĐOẠN _ 6.25 DMM",
+    "tab_gid": 734047678,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/004-a-2-bc-hao-hut-theo-cong-oan-_-6-25-dmm.csv",
+    "columns_count": 50
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "E.2 DMHH",
+    "tab_gid": 731627054,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/005-e-2-dmhh.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "B. DỮ LIỆU TỔNG",
+    "tab_gid": 2131921666,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/006-b-du-lieu-tong.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "E. 1 DANH MỤC THỢ",
+    "tab_gid": 1924400273,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/007-e-1-danh-muc-tho.csv",
+    "columns_count": 8
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "C.DUYỆT GIÁ ",
+    "tab_gid": 616448289,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/008-c-duyet-gia.csv",
+    "columns_count": 8
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.1 BC HAO HỤT THEO ĐỐI TƯỢNG",
+    "tab_gid": 1846436565,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/009-a-1-bc-hao-hut-theo-oi-tuong.csv",
+    "columns_count": 44
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.1 BC HAO HỤT THEO ĐỐI TƯỢNG (new version)",
+    "tab_gid": 1986783066,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/010-a-1-bc-hao-hut-theo-oi-tuong-new-version.csv",
+    "columns_count": 44
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.2 BC TỔNG HỢP HAO HỤT THEO ĐỐI TƯỢNG",
+    "tab_gid": 1434082917,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/011-a-2-bc-tong-hop-hao-hut-theo-oi-tuong.csv",
+    "columns_count": 25
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.1 CĐ: NẤU DMCM",
+    "tab_gid": 1403316488,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/012-d2-1-c-nau-dmcm.csv",
+    "columns_count": 34
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D1.3 CĐ: CÁN KÉO",
+    "tab_gid": 2130884075,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/013-d1-3-c-can-keo.csv",
+    "columns_count": 23
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "SỐ LIỆU 10K-17K-23K-AG",
+    "tab_gid": 623971599,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/014-so-lieu-10k-17k-23k-ag.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D1.1 CĐ: ĐAN DÂY",
+    "tab_gid": 330066284,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/015-d1-1-c-an-day.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D1.2 CĐ: KHẮC BI",
+    "tab_gid": 1035560363,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/016-d1-2-c-khac-bi.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.5 CĐ: BAO",
+    "tab_gid": 1255089161,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/017-d2-5-c-bao.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.2 CĐ: DKB",
+    "tab_gid": 1088355882,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/018-d2-2-c-dkb.csv",
+    "columns_count": 23
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.2.BC HAO HỤT THEO CÔNG ĐOẠN_1/2.25 DMC",
+    "tab_gid": 1838732379,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/019-a-2-bc-hao-hut-theo-cong-oan_1-2-25-dmc.csv",
+    "columns_count": 38
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.2.BC HAO HỤT THEO CÔNG ĐOẠN _ 5.25 DMM",
+    "tab_gid": 422315481,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/020-a-2-bc-hao-hut-theo-cong-oan-_-5-25-dmm.csv",
+    "columns_count": 41
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "BCTH BAO + KHAC",
+    "tab_gid": 512507711,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/021-bcth-bao-khac.csv",
+    "columns_count": 20
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D1.2 CĐ: KHẮC BI-VUNNAUBOT",
+    "tab_gid": 1603605691,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/022-d1-2-c-khac-bi-vunnaubot.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.2.BC HAO HỤT THEO CÔNG ĐOẠN_3.25 DMC",
+    "tab_gid": 1175117262,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/023-a-2-bc-hao-hut-theo-cong-oan_3-25-dmc.csv",
+    "columns_count": 38
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "A.2.BC HAO HỤT THEO CÔNG ĐOẠN _ 4.25 DMM",
+    "tab_gid": 1612339778,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/024-a-2-bc-hao-hut-theo-cong-oan-_-4-25-dmm.csv",
+    "columns_count": 39
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D1.2 CĐ: BAO-BOT",
+    "tab_gid": 273115468,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/025-d1-2-c-bao-bot.csv",
+    "columns_count": 20
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "2 BC Hao hụt theo hình thức nấu chế",
+    "tab_gid": 1810918994,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/026-2-bc-hao-hut-theo-hinh-thuc-nau-che.csv",
+    "columns_count": 22
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "E.2 DMHHM",
+    "tab_gid": 440895952,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/027-e-2-dmhhm.csv",
+    "columns_count": 6
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "B. CĐ: NẤU- CÔNG ĐOẠN DMC",
+    "tab_gid": 1570574124,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/028-b-c-nau--cong-oan-dmc.csv",
+    "columns_count": 33
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.1 CĐ: NẤU LỌC",
+    "tab_gid": 1588953576,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/029-d2-1-c-nau-loc.csv",
+    "columns_count": 31
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "B. DỮ LIỆU LỌC THEO CÔNG ĐOẠN",
+    "tab_gid": 55653006,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/030-b-du-lieu-loc-theo-cong-oan.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.13 CĐ: XMA",
+    "tab_gid": 1504758364,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/031-d2-13-c-xma.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "CĐ: NẤU+TUOI",
+    "tab_gid": 1418684940,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/032-c-nau-tuoi.csv",
+    "columns_count": 25
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "CĐ: NẤU-TUOI",
+    "tab_gid": 564994200,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/033-c-nau-tuoi.csv",
+    "columns_count": 25
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.3 CĐ: KDA",
+    "tab_gid": 715896744,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/034-d2-3-c-kda.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.4 CĐ: BAS",
+    "tab_gid": 1350737449,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/035-d2-4-c-bas.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.7 CĐ: DẬP",
+    "tab_gid": 316531918,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/036-d2-7-c-dap.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.8 CĐ: NÉN",
+    "tab_gid": 1973771179,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/037-d2-8-c-nen.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.6 CĐ: BH",
+    "tab_gid": 227280831,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/038-d2-6-c-bh.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.9 CĐ: HBT",
+    "tab_gid": 827497357,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/039-d2-9-c-hbt.csv",
+    "columns_count": 20
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.10 CĐ: GEP",
+    "tab_gid": 1638949184,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/040-d2-10-c-gep.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.11 CĐ: QUAY BI",
+    "tab_gid": 1131208086,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/041-d2-11-c-quay-bi.csv",
+    "columns_count": 23
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.15 CĐ: SXK",
+    "tab_gid": 1377248210,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/042-d2-15-c-sxk.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.12 CĐ: DLL",
+    "tab_gid": 1031315432,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/043-d2-12-c-dll.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "12-bao-cao-tong-hop-hao-hut-2026",
+    "spreadsheet_id": "1VfEcEiKvhCBdN6Tu8z78iTjhTbMkEPiDNJobOhOcEBQ",
+    "tab_name": "D2.14 CĐ: HUY",
+    "tab_gid": 1417894216,
+    "csv_file": "12-12-bao-cao-tong-hop-hao-hut-2026/044-d2-14-c-huy.csv",
+    "columns_count": 19
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "Dữ liệu tổng",
+    "tab_gid": 0,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/001-du-lieu-tong.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "1. BC NXT-QUY.2026",
+    "tab_gid": 1672699906,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/002-1-bc-nxt-quy-2026.csv",
+    "columns_count": 30
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "2. BÁO CÁO TỔNG HỢP NXT NĂM",
+    "tab_gid": 288502884,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/003-2-bao-cao-tong-hop-nxt-nam.csv",
+    "columns_count": 12
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "3. THEO DÕI LUÂN CHUYỂN NL24K",
+    "tab_gid": 170606031,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/004-3-theo-doi-luan-chuyen-nl24k.csv",
+    "columns_count": 12
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "4. BÁO CÁO QUẢN TRỊ NVL VÀNG QUÝ-2026",
+    "tab_gid": 1050606138,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/005-4-bao-cao-quan-tri-nvl-vang-quy-2026.csv",
+    "columns_count": 21
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "5. BÁO CÁO QUẢN TRỊ NVL PT QUÝ-2026",
+    "tab_gid": 1626239033,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/006-5-bao-cao-quan-tri-nvl-pt-quy-2026.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "6. BÁO CÁO QUẢN TRỊ NVL BẠC QUÝ-2026",
+    "tab_gid": 222014147,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/007-6-bao-cao-quan-tri-nvl-bac-quy-2026.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "8. BẢNG THEO DÕI GIỎ HÀNG KÊNH SĨ 2026",
+    "tab_gid": 1519721105,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/008-8-bang-theo-doi-gio-hang-kenh-si-2026.csv",
+    "columns_count": 18
+  },
+  {
+    "spreadsheet_name": "13-bao-cao-nxt-nvl-2026",
+    "spreadsheet_id": "1desC8ZaPg41aYlJFqZ462JUbnD1eSSsBYEXGkovM1uc",
+    "tab_name": "7. BẢNG THEO DÕI PHỤ LIỆU BẠC NTO/HỘI",
+    "tab_gid": 1954015295,
+    "csv_file": "13-13-bao-cao-nxt-nvl-2026/009-7-bang-theo-doi-phu-lieu-bac-nto-hoi.csv",
+    "columns_count": 19
+  }
+]
