@@ -286,7 +286,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
+      <div className="grid gap-4">
         <section className="rounded-md border border-line bg-white/94 p-4 shadow-sm">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -396,17 +396,18 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
             </div>
           </div>
         </section>
-
-        <aside className="rounded-md border border-line bg-white/94 p-4 shadow-sm">
-          {selectedLine ? (
-            <WorkerBoxDetail line={selectedLine} onClose={() => setIsDetailOpen(false)} />
-          ) : (
-            <div className="flex h-full min-h-[360px] items-center justify-center rounded-md border border-dashed border-line bg-paper/60 p-6 text-center text-sm text-zinc-500">
-              Chọn một dòng trong bảng để xem chi tiết đối soát.
-            </div>
-          )}
-        </aside>
       </div>
+
+      {isDetailOpen && selectedLine ? (
+        <div className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm" onClick={() => setIsDetailOpen(false)} />
+      ) : null}
+      <aside
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-lg overflow-y-auto border-l border-line bg-white p-5 shadow-2xl transition-transform duration-200 ${
+          isDetailOpen && selectedLine ? "translate-x-0" : "pointer-events-none translate-x-full"
+        }`}
+      >
+        {selectedLine ? <WorkerBoxDetail line={selectedLine} onClose={() => setIsDetailOpen(false)} /> : null}
+      </aside>
     </section>
   );
 }
