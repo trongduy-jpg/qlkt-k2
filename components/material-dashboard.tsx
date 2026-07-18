@@ -1878,7 +1878,7 @@ export function MaterialDashboard() {
   }
 
   function renderProductionFormOverlay() {
-    if (!isProductionFormOpen) return null;
+    if (!isProductionFormOpen || editingProductionCode) return null;
 
     return (
       <div className="fixed inset-0 z-40 bg-ink/35 px-4 py-6 backdrop-blur-sm">
@@ -2142,6 +2142,162 @@ export function MaterialDashboard() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function renderInlineProductionEditForm() {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-md border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-sm text-zinc-700">
+          Đang sửa LSX {editingProductionCode}. Trạng thái vận hành và tiến độ thực tế sẽ tiếp tục cập nhật trong Nhật ký NVL.
+        </div>
+
+        <div className="rounded-md border border-line bg-white p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Thông tin đầu đơn</p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <FieldShell label="Mã LSX">
+              <input
+                className={fieldControlClass}
+                value={productionHeaderDraft.code}
+                onChange={(event) => updateProductionHeaderDraft("code", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="Mã hàng">
+              <input
+                className={fieldControlClass}
+                value={productionHeaderDraft.sku}
+                onChange={(event) => updateProductionHeaderDraft("sku", event.target.value)}
+              />
+            </FieldShell>
+            <div className="col-span-2">
+              <FieldShell label="Tên hàng / diễn giải">
+                <input
+                  className={fieldControlClass}
+                  value={productionHeaderDraft.productName}
+                  onChange={(event) => updateProductionHeaderDraft("productName", event.target.value)}
+                />
+              </FieldShell>
+            </div>
+            <FieldShell label="Nơi nhận">
+              <SelectControl value={productionHeaderDraft.destination} onChange={(value) => updateProductionHeaderDraft("destination", value)}>
+                {productionOrderDestinations.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+            <FieldShell label="Số lượng">
+              <input
+                className={fieldControlClass}
+                min="0"
+                type="number"
+                value={productionHeaderDraft.qtyPiece || ""}
+                onChange={(event) => updateProductionHeaderDraft("qtyPiece", Number(event.target.value))}
+              />
+            </FieldShell>
+            <FieldShell label="Khách hàng">
+              <input
+                className={fieldControlClass}
+                value={productionHeaderDraft.customerName}
+                onChange={(event) => updateProductionHeaderDraft("customerName", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="SR/KH">
+              <SelectControl value={productionHeaderDraft.salesType} onChange={(value) => updateProductionHeaderDraft("salesType", value)}>
+                {productionOrderSalesTypeOptions.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+            <FieldShell label="Trạng thái LSX">
+              <SelectControl value={productionHeaderDraft.deliveryStatus} onChange={(value) => updateProductionHeaderDraft("deliveryStatus", value)}>
+                {productionOrderDeliveryStatusOptions.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+            <FieldShell label="SL đã giao">
+              <input
+                className={fieldControlClass}
+                min="0"
+                type="number"
+                value={productionHeaderDraft.deliveredQty || ""}
+                onChange={(event) => updateProductionHeaderDraft("deliveredQty", Number(event.target.value))}
+              />
+            </FieldShell>
+          </div>
+        </div>
+
+        <div className="rounded-md border border-line bg-white p-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Kế hoạch sản xuất</p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <FieldShell label="Ngày kế hoạch">
+              <input
+                className={fieldControlClass}
+                type="date"
+                value={productionHeaderDraft.plannedDate}
+                onChange={(event) => updateProductionHeaderDraft("plannedDate", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="Deadline đơn hàng">
+              <input
+                className={fieldControlClass}
+                type="date"
+                value={productionHeaderDraft.deadlineDate}
+                onChange={(event) => updateProductionHeaderDraft("deadlineDate", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="NVL dự kiến">
+              <SelectControl value={productionHeaderDraft.plannedMaterial} onChange={(value) => updateProductionHeaderDraft("plannedMaterial", value)}>
+                {materials.map((material) => (
+                  <option key={material.id} value={material.name}>{material.name}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+            <FieldShell label="Loại nguyên liệu">
+              <SelectControl value={productionHeaderDraft.materialSpec} onChange={(value) => updateProductionHeaderDraft("materialSpec", value)}>
+                {productionOrderMaterialSpecOptions.map((item) => (
+                  <option key={item.value} value={item.value}>{item.label}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+            <FieldShell label="Ngày HT">
+              <input
+                className={fieldControlClass}
+                type="date"
+                value={productionHeaderDraft.completedDate}
+                onChange={(event) => updateProductionHeaderDraft("completedDate", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="TL hoàn tất (GR)">
+              <input
+                className={fieldControlClass}
+                min="0"
+                type="number"
+                value={productionHeaderDraft.completedWeightGram || ""}
+                onChange={(event) => updateProductionHeaderDraft("completedWeightGram", Number(event.target.value))}
+              />
+            </FieldShell>
+            <div className="col-span-2">
+              <FieldShell label="Quy cách (Độ dài/Đường kính)">
+                <input
+                  className={fieldControlClass}
+                  value={productionHeaderDraft.specification}
+                  onChange={(event) => updateProductionHeaderDraft("specification", event.target.value)}
+                />
+              </FieldShell>
+            </div>
+          </div>
+          <div className="mt-3">
+            <FieldShell label="Diễn giải tiến độ thực">
+              <textarea
+                className={`${fieldControlClass} min-h-20 resize-y`}
+                value={productionHeaderDraft.actualProgressNote}
+                onChange={(event) => updateProductionHeaderDraft("actualProgressNote", event.target.value)}
+              />
+            </FieldShell>
           </div>
         </div>
       </div>
@@ -2910,148 +3066,188 @@ export function MaterialDashboard() {
 
           {isProduction ? (
             <>
-              {isProductionDetailOpen && !isProductionFormOpen && selectedOrderDetail && selectedOrderSummary ? (
-                <div className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm" onClick={() => setIsProductionDetailOpen(false)} />
+              {isProductionDetailOpen && !(isProductionFormOpen && !editingProductionCode) && selectedOrderDetail && selectedOrderSummary ? (
+                <div
+                  className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm"
+                  onClick={() => (isProductionFormOpen && editingProductionCode ? cancelProductionHeaderEdit() : setIsProductionDetailOpen(false))}
+                />
               ) : null}
               <aside
-                className={`fixed inset-y-0 right-0 z-50 w-full max-w-xl overflow-y-auto border-l border-line bg-white p-5 shadow-2xl transition-transform duration-200 ${
-                  isProductionDetailOpen && !isProductionFormOpen && selectedOrderDetail && selectedOrderSummary ? "translate-x-0" : "pointer-events-none translate-x-full"
+                className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col border-l border-line bg-white shadow-2xl transition-transform duration-200 ${
+                  isProductionDetailOpen && !(isProductionFormOpen && !editingProductionCode) && selectedOrderDetail && selectedOrderSummary
+                    ? "translate-x-0"
+                    : "pointer-events-none translate-x-full"
                 }`}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-5 py-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-brass">Chi tiết LSX</p>
-                    <p className="mt-1 text-sm text-zinc-600">Chỉ mở khi user chọn một lệnh sản xuất để giữ màn danh sách sạch hơn.</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-brass">
+                      {isProductionFormOpen && editingProductionCode ? "Sửa LSX" : "Chi tiết LSX"}
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-600">
+                      {isProductionFormOpen && editingProductionCode
+                        ? "Chỉnh sửa trực tiếp, bấm Cập nhật LSX để lưu."
+                        : "Chỉ mở khi user chọn một lệnh sản xuất để giữ màn danh sách sạch hơn."}
+                    </p>
                   </div>
                   <button
-                    className="inline-flex size-9 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
+                    className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
                     type="button"
-                    onClick={() => setIsProductionDetailOpen(false)}
-                    title="Đóng chi tiết"
+                    onClick={() => (isProductionFormOpen && editingProductionCode ? cancelProductionHeaderEdit() : setIsProductionDetailOpen(false))}
+                    title="Đóng"
                   >
                     <X size={17} />
                   </button>
                 </div>
 
+                <div className="flex-1 overflow-y-auto px-5 py-4">
+                  {selectedOrderDetail && selectedOrderSummary ? (
+                    isProductionFormOpen && editingProductionCode ? (
+                      renderInlineProductionEditForm()
+                    ) : (
+                      <div className="space-y-4">
+                        <div className="rounded-md border border-line bg-paper p-4">
+                          <div className="flex flex-col gap-3">
+                            <div>
+                              <h4 className="text-xl font-bold text-ink">{selectedOrderDetail.code}</h4>
+                              <p className="mt-1 text-sm text-zinc-500">{selectedOrderDetail.sku}</p>
+                              {selectedOrderDetail.productName ? <p className="mt-2 text-sm text-zinc-700">{selectedOrderDetail.productName}</p> : null}
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${deliveryStatusClass[selectedOrderDetail.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
+                                Trạng thái LSX: {selectedOrderDetail.deliveryStatus || "-"}
+                              </span>
+                              <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${statusClass[selectedOrderDetail.operationalStatus]}`}>
+                                Trạng thái vận hành: {selectedOrderDetail.operationalStatus}
+                              </span>
+                              <span className="rounded-md border border-line bg-white px-2 py-1 text-xs font-semibold text-zinc-600">
+                                {selectedOrderDetail.movementCount} giao dịch
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <InfoMetric label="Tổng xuất" value={formatGram(selectedOrderMovementStats.issued)} />
+                          <InfoMetric label="Tổng nhập" value={formatGram(selectedOrderMovementStats.returned)} />
+                          <InfoMetric label="Bột" value={formatGram(selectedOrderMovementStats.powder)} />
+                          <InfoMetric label="Hao hụt" value={formatGram(selectedOrderMovementStats.loss)} />
+                        </div>
+
+                        <div className="grid gap-3 xl:grid-cols-2">
+                          <DetailGroup
+                            title="Tổng quan đơn"
+                            items={[
+                              ["Khách hàng", selectedOrderDetail.customerName || "-"],
+                              ["Mã hàng", selectedOrderDetail.sku || "-"],
+                              ["Số lượng", selectedOrderDetail.qtyPiece !== null ? String(selectedOrderDetail.qtyPiece) : "-"],
+                              ["SR/KH", selectedOrderDetail.salesType || "-"]
+                            ]}
+                          />
+
+                          <DetailGroup
+                            title="Kế hoạch"
+                            items={[
+                              ["Ngày kế hoạch", selectedOrderDetail.plannedDate || "-"],
+                              ["Deadline", selectedOrderDetail.deadlineDate || "-"],
+                              ["Ngày HT", selectedOrderDetail.completedDate || "-"],
+                              ["SL đã giao", selectedOrderDetail.deliveredQty !== null ? String(selectedOrderDetail.deliveredQty) : "-"]
+                            ]}
+                          />
+                        </div>
+
+                        <div className="rounded-md border border-line bg-paper p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Vận hành hiện tại</p>
+                            <span className="rounded-full border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-600">
+                              {selectedOrderDetail.movementCount} giao dịch
+                            </span>
+                          </div>
+                          <div className="mt-3">
+                            <DetailInlineList
+                              items={[
+                                ["Nơi nhận", selectedOrderDetail.destination || "-"],
+                                ["Công đoạn", selectedOrderDetail.stage || "-"],
+                                ["Thợ", selectedOrderDetail.worker || "Chưa phân công"],
+                                ["NVL dự kiến", selectedOrderDetail.plannedMaterial || "-"],
+                                ["Loại nguyên liệu", selectedOrderDetail.materialSpec || "-"],
+                                ["Tuổi vàng", selectedOrderDetail.goldAgeValue > 0 ? String(selectedOrderDetail.goldAgeValue) : "-"],
+                                ["NVL đã phát sinh", selectedOrderDetail.movementMaterials.length ? selectedOrderDetail.movementMaterials.join(", ") : "Chưa có"],
+                                ["Thợ đã nhận", selectedOrderDetail.movementWorkers.length ? selectedOrderDetail.movementWorkers.join(", ") : "Chưa có"]
+                              ]}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="rounded-md border border-line bg-paper p-4">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tiến độ thực</p>
+                          <p className="mt-2 text-sm leading-6 text-zinc-700">
+                            {selectedOrderDetail.actualProgressNote || "Chưa cập nhật diễn giải tiến độ."}
+                          </p>
+                        </div>
+
+                        {isClosedStatus(selectedOrderSummary.status) ? (
+                          <div className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-700">
+                            LSX đã chốt. Hệ thống đang khóa thêm, sửa trạng thái và xóa giao dịch để bảo vệ số liệu kế toán.
+                          </div>
+                        ) : null}
+                      </div>
+                    )
+                  ) : (
+                    <div className="mt-6 rounded-md border border-dashed border-line bg-paper px-4 py-8 text-center text-sm text-zinc-500">
+                      Chọn một LSX từ danh sách để xem chi tiết.
+                    </div>
+                  )}
+                </div>
+
                 {selectedOrderDetail && selectedOrderSummary ? (
-                  <div className="mt-4 space-y-4">
-                    <div className="rounded-md border border-line bg-paper p-4">
-                      <div className="flex flex-col gap-3">
-                        <div>
-                          <h4 className="text-xl font-bold text-ink">{selectedOrderDetail.code}</h4>
-                          <p className="mt-1 text-sm text-zinc-500">{selectedOrderDetail.sku}</p>
-                          {selectedOrderDetail.productName ? <p className="mt-2 text-sm text-zinc-700">{selectedOrderDetail.productName}</p> : null}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${deliveryStatusClass[selectedOrderDetail.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
-                            Trạng thái LSX: {selectedOrderDetail.deliveryStatus || "-"}
-                          </span>
-                          <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${statusClass[selectedOrderDetail.operationalStatus]}`}>
-                            Trạng thái vận hành: {selectedOrderDetail.operationalStatus}
-                          </span>
-                          <span className="rounded-md border border-line bg-white px-2 py-1 text-xs font-semibold text-zinc-600">
-                            {selectedOrderDetail.movementCount} giao dịch
-                          </span>
-                        </div>
+                  <div className="shrink-0 border-t border-line bg-white px-5 py-4">
+                    {isProductionFormOpen && editingProductionCode ? (
+                      <div className="flex gap-2">
+                        <button
+                          className="flex-1 rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
+                          type="button"
+                          onClick={cancelProductionHeaderEdit}
+                        >
+                          Hủy
+                        </button>
+                        <button
+                          className="flex-1 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white"
+                          type="button"
+                          onClick={saveProductionHeader}
+                        >
+                          Cập nhật LSX
+                        </button>
                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <InfoMetric label="Tổng xuất" value={formatGram(selectedOrderMovementStats.issued)} />
-                      <InfoMetric label="Tổng nhập" value={formatGram(selectedOrderMovementStats.returned)} />
-                      <InfoMetric label="Bột" value={formatGram(selectedOrderMovementStats.powder)} />
-                      <InfoMetric label="Hao hụt" value={formatGram(selectedOrderMovementStats.loss)} />
-                    </div>
-
-                    <div className="grid gap-3 xl:grid-cols-2">
-                      <DetailGroup
-                        title="Tổng quan đơn"
-                        items={[
-                          ["Khách hàng", selectedOrderDetail.customerName || "-"],
-                          ["Mã hàng", selectedOrderDetail.sku || "-"],
-                          ["Số lượng", selectedOrderDetail.qtyPiece !== null ? String(selectedOrderDetail.qtyPiece) : "-"],
-                          ["SR/KH", selectedOrderDetail.salesType || "-"]
-                        ]}
-                      />
-
-                      <DetailGroup
-                        title="Kế hoạch"
-                        items={[
-                          ["Ngày kế hoạch", selectedOrderDetail.plannedDate || "-"],
-                          ["Deadline", selectedOrderDetail.deadlineDate || "-"],
-                          ["Ngày HT", selectedOrderDetail.completedDate || "-"],
-                          ["SL đã giao", selectedOrderDetail.deliveredQty !== null ? String(selectedOrderDetail.deliveredQty) : "-"]
-                        ]}
-                      />
-                    </div>
-
-                    <div className="rounded-md border border-line bg-paper p-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Vận hành hiện tại</p>
-                        <span className="rounded-full border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-600">
-                          {selectedOrderDetail.movementCount} giao dịch
-                        </span>
+                    ) : (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <button
+                          className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500"
+                          type="button"
+                          onClick={startEditProductionOrder}
+                          disabled={isClosedStatus(selectedOrderSummary.status)}
+                        >
+                          Sửa LSX
+                        </button>
+                        <button
+                          className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
+                          type="button"
+                          onClick={viewSelectedOrderMovements}
+                        >
+                          Mở NK NVL
+                        </button>
+                        <button
+                          className="rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white sm:col-span-2 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                          type="button"
+                          onClick={closeSelectedProductionOrder}
+                          disabled={isClosedStatus(selectedOrderSummary.status)}
+                        >
+                          Chốt LSX
+                        </button>
                       </div>
-                      <div className="mt-3">
-                        <DetailInlineList
-                          items={[
-                            ["Nơi nhận", selectedOrderDetail.destination || "-"],
-                            ["Công đoạn", selectedOrderDetail.stage || "-"],
-                            ["Thợ", selectedOrderDetail.worker || "Chưa phân công"],
-                            ["NVL dự kiến", selectedOrderDetail.plannedMaterial || "-"],
-                            ["Loại nguyên liệu", selectedOrderDetail.materialSpec || "-"],
-                            ["Tuổi vàng", selectedOrderDetail.goldAgeValue > 0 ? String(selectedOrderDetail.goldAgeValue) : "-"],
-                            ["NVL đã phát sinh", selectedOrderDetail.movementMaterials.length ? selectedOrderDetail.movementMaterials.join(", ") : "Chưa có"],
-                            ["Thợ đã nhận", selectedOrderDetail.movementWorkers.length ? selectedOrderDetail.movementWorkers.join(", ") : "Chưa có"]
-                          ]}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="rounded-md border border-line bg-paper p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tiến độ thực</p>
-                      <p className="mt-2 text-sm leading-6 text-zinc-700">
-                        {selectedOrderDetail.actualProgressNote || "Chưa cập nhật diễn giải tiến độ."}
-                      </p>
-                    </div>
-
-                    {isClosedStatus(selectedOrderSummary.status) ? (
-                      <div className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-700">
-                        LSX đã chốt. Hệ thống đang khóa thêm, sửa trạng thái và xóa giao dịch để bảo vệ số liệu kế toán.
-                      </div>
-                    ) : null}
-
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <button
-                        className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500"
-                        type="button"
-                        onClick={startEditProductionOrder}
-                        disabled={isClosedStatus(selectedOrderSummary.status)}
-                      >
-                        Sửa LSX
-                      </button>
-                      <button
-                        className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
-                        type="button"
-                        onClick={viewSelectedOrderMovements}
-                      >
-                        Mở NK NVL
-                      </button>
-                      <button
-                        className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500"
-                        type="button"
-                        onClick={closeSelectedProductionOrder}
-                        disabled={isClosedStatus(selectedOrderSummary.status)}
-                      >
-                        Chốt LSX
-                      </button>
-                    </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="mt-6 rounded-md border border-dashed border-line bg-paper px-4 py-8 text-center text-sm text-zinc-500">
-                    Chọn một LSX từ danh sách để xem chi tiết.
-                  </div>
-                )}
+                ) : null}
               </aside>
             </>
           ) : null}
