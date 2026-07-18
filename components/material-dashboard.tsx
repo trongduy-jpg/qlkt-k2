@@ -2562,58 +2562,9 @@ export function MaterialDashboard() {
             ))}
           </nav>
 
-          <div className="mt-8 rounded-md border border-line bg-paper p-4">
-            <div className="flex items-center gap-2 text-sm font-semibold text-ink">
-              <Database size={16} />
-              Supabase
-            </div>
-            <p className="mt-2 text-sm leading-6 text-zinc-600">
-              {isSupabaseConfigured
-                ? "Đã cấu hình Supabase. Dữ liệu đang đọc/ghi database thật."
-                : "Chưa cấu hình env. Demo đang dùng dữ liệu mẫu trong source."}
-            </p>
-            {isLoadingRemote ? <p className="mt-2 text-xs font-semibold text-jade">Đang tải dữ liệu...</p> : null}
-            {databaseHealth ? (
-              <div className="mt-3 rounded-md border border-line/80 bg-white px-3 py-3 text-xs text-zinc-700">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold text-ink">Kiểm tra dữ liệu</span>
-                  <span
-                    className={`rounded-full px-2 py-0.5 font-semibold ${
-                      databaseHealth.usingRealSupabase ? "bg-emerald-50 text-emerald-700" : "bg-zinc-100 text-zinc-600"
-                    }`}
-                  >
-                    {databaseHealth.usingRealSupabase ? "Supabase thật" : "Demo local"}
-                  </span>
-                </div>
-
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <div className="rounded-md bg-paper px-2 py-2">
-                    <p className="text-[11px] uppercase tracking-wide text-zinc-500">LSX</p>
-                    <p className="mt-1 font-semibold text-ink">{databaseHealth.counts.productionOrders}</p>
-                  </div>
-                  <div className="rounded-md bg-paper px-2 py-2">
-                    <p className="text-[11px] uppercase tracking-wide text-zinc-500">NK NVL</p>
-                    <p className="mt-1 font-semibold text-ink">{databaseHealth.counts.materialMovements}</p>
-                  </div>
-                  <div className="rounded-md bg-paper px-2 py-2">
-                    <p className="text-[11px] uppercase tracking-wide text-zinc-500">NVL</p>
-                    <p className="mt-1 font-semibold text-ink">{databaseHealth.counts.materials}</p>
-                  </div>
-                  <div className="rounded-md bg-paper px-2 py-2">
-                    <p className="text-[11px] uppercase tracking-wide text-zinc-500">Thợ</p>
-                    <p className="mt-1 font-semibold text-ink">{databaseHealth.counts.workers}</p>
-                  </div>
-                </div>
-
-                <p className={`mt-3 font-semibold ${databaseHealth.hasOperationalData ? "text-emerald-700" : "text-amber-700"}`}>
-                  {databaseHealth.hasOperationalData
-                    ? "Đã có dữ liệu vận hành để test gần thực tế."
-                    : "Đã nối Supabase nhưng bảng nghiệp vụ chính còn ít hoặc chưa có dữ liệu test."}
-                </p>
-                {databaseHealth.errorMessage ? <p className="mt-2 text-[11px] text-red-700">{databaseHealth.errorMessage}</p> : null}
-              </div>
-            ) : null}
-          </div>
+          {isLoadingRemote ? (
+            <p className="mt-8 text-xs font-semibold text-jade">Đang tải dữ liệu...</p>
+          ) : null}
         </aside>
 
         <section className="px-5 py-5 md:px-8">
@@ -2667,7 +2618,7 @@ export function MaterialDashboard() {
             ))}
           </div>
 
-          <div className={`${isDashboard || isReport ? "grid" : "hidden"} mb-5 gap-4 rounded-md border border-line bg-white/94 p-4 shadow-sm md:grid-cols-4`}>
+          <div className={`${isReport ? "grid" : "hidden"} mb-5 gap-4 rounded-md border border-line bg-white/94 p-4 shadow-sm md:grid-cols-4`}>
             <div>
               <p className="text-xs uppercase text-zinc-500">Tổng xuất</p>
               <p className="mt-1 text-lg font-bold text-ink">{formatGram(totals.issued)}</p>
@@ -2781,7 +2732,7 @@ export function MaterialDashboard() {
                 </div>
               </div>
 
-              <div className="grid gap-3 xl:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-md border border-sky-200 bg-sky-50/70 p-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">LSX đang xử lý</p>
                   <p className="mt-2 text-2xl font-bold text-sky-900">{productionOverview.inProgressCount}</p>
@@ -2791,27 +2742,6 @@ export function MaterialDashboard() {
                   <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">LSX quá hạn</p>
                   <p className="mt-2 text-2xl font-bold text-rose-900">{productionOverview.overdueCount}</p>
                   <p className="mt-2 text-sm text-zinc-700">Cần rà soát deadline và tiến độ giao hàng.</p>
-                </div>
-                <div className="rounded-md border border-line bg-paper p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Điều hướng nhanh</p>
-                  <div className="mt-3 space-y-2">
-                    <button
-                      className="flex w-full items-center justify-between rounded-md border border-line bg-white px-3 py-2 text-left text-sm font-semibold text-ink hover:border-jade/60"
-                      type="button"
-                      onClick={() => setActiveModule("Lệnh sản xuất")}
-                    >
-                      <span>Lệnh sản xuất</span>
-                      <span className="text-xs text-zinc-500">{filteredOrderSummaries.length} LSX</span>
-                    </button>
-                    <button
-                      className="flex w-full items-center justify-between rounded-md border border-line bg-white px-3 py-2 text-left text-sm font-semibold text-ink hover:border-jade/60"
-                      type="button"
-                      onClick={() => setActiveModule("Nhật ký NVL")}
-                    >
-                      <span>Nhật ký NVL</span>
-                      <span className="text-xs text-zinc-500">{filteredOrders.length} dòng</span>
-                    </button>
-                  </div>
                 </div>
               </div>
 
