@@ -1182,6 +1182,19 @@ export function MaterialDashboard() {
     return filteredOrderSummaries.find((item) => item.code === selectedOrderCode) ?? filteredOrderSummaries[0] ?? null;
   }, [filteredOrderSummaries, selectedOrderCode]);
 
+  useEffect(() => {
+    if (!isProductionDetailOpen || !selectedOrderSummary) return;
+
+    if (isClosedStatus(selectedOrderSummary.status)) {
+      setEditingProductionCode(null);
+      return;
+    }
+
+    setEditingProductionCode(selectedOrderSummary.code);
+    setProductionHeaderDraft(buildProductionHeaderDraftFromSummary(selectedOrderSummary));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isProductionDetailOpen, selectedOrderSummary?.code, selectedOrderSummary?.status]);
+
   const selectedOrderMovements = useMemo(() => {
     if (!selectedOrderSummary) return [];
     return orders
@@ -1253,6 +1266,8 @@ export function MaterialDashboard() {
       movementCount: selectedOrderMovements.length
     };
   }, [productionHeaders, selectedOrderMovements, selectedOrderSummary]);
+
+  const isEditingSelectedOrder = Boolean(selectedOrderSummary && editingProductionCode === selectedOrderSummary.code);
 
   const productionOverview = useMemo(() => {
     const noMovementCount = filteredOrderSummaries.filter((summary) => summary.movementCount === 0).length;
@@ -1642,19 +1657,6 @@ export function MaterialDashboard() {
     }
   }
 
-  function startEditProductionOrder() {
-    if (!selectedOrderSummary) return;
-
-    if (isClosedStatus(selectedOrderSummary.status)) {
-      setRemoteError(`LSX ${selectedOrderSummary.code} đã chốt nên không thể chỉnh sửa thông tin gốc.`);
-      return;
-    }
-
-    setEditingProductionCode(selectedOrderSummary.code);
-    setProductionHeaderDraft(buildProductionHeaderDraftFromSummary(selectedOrderSummary));
-    setIsProductionFormOpen(true);
-  }
-
   function cancelProductionHeaderEdit() {
     setEditingProductionCode(null);
     setProductionHeaderDraft(createEmptyProductionOrderHeaderDraft());
@@ -1751,9 +1753,7 @@ export function MaterialDashboard() {
       }
       setProductionHeaderDraftCache(nextHeaderDraftCache);
       setSelectedOrderCode(nextHeader.code);
-      setEditingProductionCode(null);
-      setProductionHeaderDraft(createEmptyProductionOrderHeaderDraft());
-      setIsProductionFormOpen(false);
+      setEditingProductionCode(nextHeader.code);
       pushAudit("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`);
       await createAuditLog("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`, saved.id);
     } catch (error) {
@@ -2129,16 +2129,14 @@ export function MaterialDashboard() {
 
             <div className="flex flex-col gap-2 border-t border-emerald-200 bg-white/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-emerald-900">
-                {editingProductionCode ? `Đang sửa LSX ${editingProductionCode}.` : "Sau khi tạo LSX, chuyển sang Nhật ký NVL để cập nhật phát sinh và trạng thái vận hành."}
+                Sau khi tạo LSX, chuyển sang Nhật ký NVL để cập nhật phát sinh và trạng thái vận hành.
               </p>
               <div className="flex gap-2">
-                {editingProductionCode ? (
-                  <button className="rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-ink" type="button" onClick={cancelProductionHeaderEdit}>
-                    Hủy
-                  </button>
-                ) : null}
+                <button className="rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-ink" type="button" onClick={cancelProductionHeaderEdit}>
+                  Hủy
+                </button>
                 <button className="rounded-md bg-jade px-4 py-2 text-sm font-semibold text-white" type="button" onClick={saveProductionHeader}>
-                  {editingProductionCode ? "Cập nhật LSX" : "Lưu LSX"}
+                  Lưu LSX
                 </button>
               </div>
             </div>
@@ -2902,7 +2900,11 @@ export function MaterialDashboard() {
                   <button
                     className="inline-flex items-center justify-center gap-2 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white"
                     type="button"
-                    onClick={() => setIsProductionFormOpen((current) => !current)}
+                    onClick={() => {
+                      setEditingProductionCode(null);
+                      setProductionHeaderDraft(createEmptyProductionOrderHeaderDraft());
+                      setIsProductionFormOpen((current) => !current);
+                    }}
                   >
                     <Plus size={16} />
                     Tạo LSX
@@ -3067,10 +3069,7 @@ export function MaterialDashboard() {
           {isProduction ? (
             <>
               {isProductionDetailOpen && !(isProductionFormOpen && !editingProductionCode) && selectedOrderDetail && selectedOrderSummary ? (
-                <div
-                  className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm"
-                  onClick={() => (isProductionFormOpen && editingProductionCode ? cancelProductionHeaderEdit() : setIsProductionDetailOpen(false))}
-                />
+                <div className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm" onClick={() => setIsProductionDetailOpen(false)} />
               ) : null}
               <aside
                 className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-xl flex-col border-l border-line bg-white shadow-2xl transition-transform duration-200 ${
@@ -3081,19 +3080,17 @@ export function MaterialDashboard() {
               >
                 <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-5 py-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-brass">
-                      {isProductionFormOpen && editingProductionCode ? "Sửa LSX" : "Chi tiết LSX"}
-                    </p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-brass">Chi tiết LSX</p>
                     <p className="mt-1 text-sm text-zinc-600">
-                      {isProductionFormOpen && editingProductionCode
-                        ? "Chỉnh sửa trực tiếp, bấm Cập nhật LSX để lưu."
-                        : "Chỉ mở khi user chọn một lệnh sản xuất để giữ màn danh sách sạch hơn."}
+                      {isEditingSelectedOrder
+                        ? "Chỉnh sửa trực tiếp bên dưới, bấm Lưu LSX để lưu thay đổi."
+                        : "LSX đã chốt nên chỉ xem, không thể chỉnh sửa thông tin gốc."}
                     </p>
                   </div>
                   <button
                     className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
                     type="button"
-                    onClick={() => (isProductionFormOpen && editingProductionCode ? cancelProductionHeaderEdit() : setIsProductionDetailOpen(false))}
+                    onClick={() => setIsProductionDetailOpen(false)}
                     title="Đóng"
                   >
                     <X size={17} />
@@ -3102,7 +3099,7 @@ export function MaterialDashboard() {
 
                 <div className="flex-1 overflow-y-auto px-5 py-4">
                   {selectedOrderDetail && selectedOrderSummary ? (
-                    isProductionFormOpen && editingProductionCode ? (
+                    isEditingSelectedOrder ? (
                       renderInlineProductionEditForm()
                     ) : (
                       <div className="space-y-4">
@@ -3202,32 +3199,14 @@ export function MaterialDashboard() {
 
                 {selectedOrderDetail && selectedOrderSummary ? (
                   <div className="shrink-0 border-t border-line bg-white px-5 py-4">
-                    {isProductionFormOpen && editingProductionCode ? (
-                      <div className="flex gap-2">
+                    {isEditingSelectedOrder ? (
+                      <div className="grid gap-2 sm:grid-cols-2">
                         <button
-                          className="flex-1 rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
-                          type="button"
-                          onClick={cancelProductionHeaderEdit}
-                        >
-                          Hủy
-                        </button>
-                        <button
-                          className="flex-1 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white"
+                          className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
                           type="button"
                           onClick={saveProductionHeader}
                         >
-                          Cập nhật LSX
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        <button
-                          className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500"
-                          type="button"
-                          onClick={startEditProductionOrder}
-                          disabled={isClosedStatus(selectedOrderSummary.status)}
-                        >
-                          Sửa LSX
+                          Lưu LSX
                         </button>
                         <button
                           className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
@@ -3237,14 +3216,21 @@ export function MaterialDashboard() {
                           Mở NK NVL
                         </button>
                         <button
-                          className="rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white sm:col-span-2 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                          className="rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white sm:col-span-2"
                           type="button"
                           onClick={closeSelectedProductionOrder}
-                          disabled={isClosedStatus(selectedOrderSummary.status)}
                         >
                           Chốt LSX
                         </button>
                       </div>
+                    ) : (
+                      <button
+                        className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
+                        type="button"
+                        onClick={viewSelectedOrderMovements}
+                      >
+                        Mở NK NVL
+                      </button>
                     )}
                   </div>
                 ) : null}
