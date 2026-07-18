@@ -156,7 +156,7 @@ export async function loadProductionOrders(): Promise<ProductionOrder[]> {
         powder_gram,
         loss_gram,
         status,
-        production_orders(order_code, sku, product_name),
+        production_orders(order_code, sku),
         materials(name),
         workers(full_name)
       `)
@@ -165,7 +165,7 @@ export async function loadProductionOrders(): Promise<ProductionOrder[]> {
 
   if (result.error || !result.data) {
     console.error("Failed to load material movements", result.error);
-    return [];
+    throw new Error(`Không tải được nhật ký NVL: ${result.error?.message ?? "unknown error"}`);
   }
 
   return (result.data as unknown as MovementRow[]).map(movementRowToProductionOrder);

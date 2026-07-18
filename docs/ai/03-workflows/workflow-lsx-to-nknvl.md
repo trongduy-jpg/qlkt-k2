@@ -9,13 +9,16 @@ Dam bao user tao LSX o dung noi, sau do cap nhat phat sinh NVL o dung noi, va kh
 - User chi nhap thong tin dau don tai Lenh san xuat.
 - Khong nhap xuat/nhap gram trong LSX.
 
-### B. Hien thi hang cho
-- Moi LSX chua co giao dich NVL phai xuat hien trong khu "Hang cho cap nhat NVL".
-- Khu nay la compact list hoac bang, khong phai card lon trung lap.
+### B. Chot LSX tu dong nhay vao NK NVL
+- Khong con khu "Hang cho cap nhat NVL" rieng biet.
+- Khi user bam `Chot LSX`, he thong tu dong tao ban ghi giao dich NVL dau tien
+  (neu LSX chua co giao dich nao) va dieu huong thang vao tab "Nhat ky NVL",
+  focus san theo ma LSX vua chot.
+- User xem/cap nhat cac truong con thieu ngay tren dong lich su nay, roi cap nhat
+  trang thai (stageStatus) cho den khi hoan thanh - khong can buoc "bat dau" rieng.
 
-### C. Bat dau cap nhat NVL
-- Khi user bam `Bat dau cap nhat`, form NK NVL mo ra.
-- Form duoc prefill tu LSX neu day la lan dau.
+### C. Cap nhat NVL
+- Form NK NVL duoc prefill tu LSX/giao dich gan nhat, khong bao gio mo trang.
 
 ### D. Mo lai LSX da cap nhat
 - Neu LSX da co du lieu dang nhap do hoac da co giao dich, he thong khong duoc mo form trang.

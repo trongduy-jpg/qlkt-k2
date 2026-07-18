@@ -2625,12 +2625,7 @@ export function MaterialDashboard() {
                 </div>
               </div>
 
-              <div className="grid gap-3 xl:grid-cols-4">
-                <div className="rounded-md border border-amber-200 bg-amber-50/70 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">LSX chưa có giao dịch</p>
-                  <p className="mt-2 text-2xl font-bold text-amber-900">{productionOverview.noMovementCount}</p>
-                  <p className="mt-2 text-sm text-zinc-700">Các lệnh đã chốt nhưng chưa phát sinh dòng NVL nào.</p>
-                </div>
+              <div className="grid gap-3 xl:grid-cols-3">
                 <div className="rounded-md border border-sky-200 bg-sky-50/70 p-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">LSX đang xử lý</p>
                   <p className="mt-2 text-2xl font-bold text-sky-900">{productionOverview.inProgressCount}</p>
@@ -2768,14 +2763,10 @@ export function MaterialDashboard() {
                 </div>
               </div>
 
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-3 md:grid-cols-3">
                 <div className="rounded-md border border-line bg-paper px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tổng LSX</p>
                   <p className="mt-2 text-2xl font-bold text-ink">{productionOverview.total}</p>
-                </div>
-                <div className="rounded-md border border-amber-200 bg-amber-50/70 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">LSX chưa có giao dịch</p>
-                  <p className="mt-2 text-2xl font-bold text-amber-900">{productionOverview.noMovementCount}</p>
                 </div>
                 <div className="rounded-md border border-sky-200 bg-sky-50/70 px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Đang xử lý</p>
