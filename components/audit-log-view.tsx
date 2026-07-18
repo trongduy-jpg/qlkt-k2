@@ -17,7 +17,7 @@ export function AuditLogView({ isVisible, events }: AuditLogViewProps) {
     <section className={`${isVisible ? "block" : "hidden"} mt-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div className="flex items-center gap-2">
         <History className="text-jade" size={18} />
-        <h3 className="text-base font-bold text-ink">Audit log demo</h3>
+        <h3 className="text-base font-bold text-ink">Nhật ký thao tác (Audit log)</h3>
       </div>
       <div className="mt-4 grid gap-2">
         {events.length === 0 ? (

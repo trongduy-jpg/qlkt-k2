@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AuditLogView } from "@/components/audit-log-view";
-import { GoogleSheetFlowView } from "@/components/google-sheet-flow-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { PriceTableView } from "@/components/price-table-view";
 import { WorkerBoxView } from "@/components/worker-box-view";
@@ -2562,7 +2561,6 @@ export function MaterialDashboard() {
     ["Giá & định mức", CircleDollarSign],
     ["Tồn hộp thợ", Boxes],
     ["Báo cáo hao hụt", FileWarning],
-    ["Quy trình Google Sheet", Database],
     ["Audit log", History],
     ["Cấu hình", Settings2]
   ] as const;
@@ -2573,7 +2571,6 @@ export function MaterialDashboard() {
   const isPricing = activeModule === "Giá & định mức";
   const isReport = activeModule === "Báo cáo hao hụt";
   const isWorkerBox = activeModule === "Tồn hộp thợ";
-  const isGoogleSheetFlow = activeModule === "Quy trình Google Sheet";
   const isAudit = activeModule === "Audit log";
   const isSettings = activeModule === "Cấu hình";
   const draftOrderSummary = orderSummaries.find((summary) => summary.code === draft.code.trim());
@@ -2639,10 +2636,10 @@ export function MaterialDashboard() {
           <div className="content-shell">
           <header className="flex flex-col gap-4 border-b border-line pb-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-brass">Bản demo MVP</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-brass">Quản trị sản xuất</p>
               <h2 className="mt-1 text-2xl font-bold text-ink">Theo dõi tiến độ NVL và quản trị hao hụt</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">
-                Luồng thử nghiệm: LSX, xuất/nhập nguyên vật liệu, treo nợ/xác định, quy đổi hao hụt, quyết toán.
+                Quản lý lệnh sản xuất, xuất/nhập nguyên vật liệu, treo nợ/xác định, quy đổi hao hụt và quyết toán theo kỳ.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -2657,7 +2654,10 @@ export function MaterialDashboard() {
               <button
                 className="inline-flex items-center gap-2 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white shadow-sm"
                 type="button"
-                onClick={() => setStatus("Treo nợ")}
+                onClick={() => {
+                  setStatus("Treo nợ");
+                  setActiveModule("Nhật ký NVL");
+                }}
               >
                 <BadgeCheck size={16} />
                 Xem treo nợ
@@ -3712,8 +3712,6 @@ export function MaterialDashboard() {
               ) : null}
             </section>
           </div>
-
-          <GoogleSheetFlowView isVisible={isGoogleSheetFlow} />
 
           <AuditLogView isVisible={isAudit} events={auditEvents} />
 
