@@ -2369,6 +2369,24 @@ export function MaterialDashboard() {
 
   return (
     <main className="min-h-screen">
+      {remoteError ? (
+        <div className="fixed right-4 top-4 z-[100] w-full max-w-sm">
+          <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4 shadow-lg">
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-red-800">Có lỗi xảy ra</p>
+              <p className="mt-1 text-sm text-red-700">{remoteError}</p>
+            </div>
+            <button
+              className="inline-flex size-6 shrink-0 items-center justify-center rounded-md text-red-700 hover:bg-red-100"
+              type="button"
+              onClick={() => setRemoteError(null)}
+              title="Đóng thông báo lỗi"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        </div>
+      ) : null}
       <div className="shell-grid min-h-screen">
         <aside className="border-r border-line bg-white/88 px-5 py-6 backdrop-blur">
           <div className="flex items-center gap-3">
@@ -2408,7 +2426,6 @@ export function MaterialDashboard() {
                 : "Chưa cấu hình env. Demo đang dùng dữ liệu mẫu trong source."}
             </p>
             {isLoadingRemote ? <p className="mt-2 text-xs font-semibold text-jade">Đang tải dữ liệu...</p> : null}
-            {remoteError ? <p className="mt-2 text-xs font-semibold text-red-700">{remoteError}</p> : null}
             {databaseHealth ? (
               <div className="mt-3 rounded-md border border-line/80 bg-white px-3 py-3 text-xs text-zinc-700">
                 <div className="flex items-center justify-between gap-3">
