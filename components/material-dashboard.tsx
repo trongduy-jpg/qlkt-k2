@@ -48,6 +48,7 @@ import {
   applyProductionBusinessRules,
   buildProductionOrderCode,
   getCarryOverLossPeriod,
+  getStageLabel,
   isLargeWeightMovement,
   normalizeStageCode as normalizeProductionStageCode,
   shouldForceDirectCharge,
@@ -628,7 +629,7 @@ function mergeMovementWithContext(
     productName: pickText(order.productName, cachedDraft?.productName, header?.productName),
     material: pickText(order.material, cachedDraft?.material, header?.plannedMaterial),
     worker: pickText(order.worker, cachedDraft?.worker, header?.plannedWorker),
-    stage: pickText(order.stage, cachedDraft?.stage, header?.plannedStage),
+    stage: normalizeStageCode(pickText(order.stage, cachedDraft?.stage, header?.plannedStage)),
     occurredDate: pickText(order.occurredDate, cachedDraft?.occurredDate, header?.occurredDate, header?.plannedDate),
     destination: pickText(order.destination, cachedDraft?.destination, header?.destination),
     documentNo: pickText(order.documentNo, cachedDraft?.documentNo, header?.documentNo),
@@ -3335,7 +3336,7 @@ export function MaterialDashboard() {
                           <td className="px-3 py-3 text-zinc-700">{order.material}</td>
                           <td className="px-3 py-3">
                             <div className="font-medium text-zinc-800">{order.worker}</div>
-                            <div className="text-xs text-zinc-500">{order.stage}</div>
+                            <div className="text-xs text-zinc-500">{order.stage ? getStageLabel(order.stage) : "-"}</div>
                           </td>
                           <td className="px-3 py-3 text-right text-zinc-700">{order.qtyPiece ?? "-"}</td>
                           <td className={`px-3 py-3 text-right ${order.issued > 0 ? "text-zinc-700" : "text-zinc-400"}`}>{formatGram(order.issued)}</td>
@@ -3432,7 +3433,7 @@ export function MaterialDashboard() {
                         Mã hàng: {draft.sku || "Chưa chọn"}
                       </span>
                       <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                        Công đoạn: {draft.stage || "Chưa chọn"}
+                        Công đoạn: {draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}
                       </span>
                     </div>
                     {editingMovementId ? (

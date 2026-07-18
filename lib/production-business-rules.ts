@@ -65,7 +65,17 @@ export function normalizeStageCode(stage: string) {
     "nau": "NAU",
     "quay bi": "QBI",
     "đánh bóng": "DKB",
-    "danh bong": "DKB"
+    "danh bong": "DKB",
+    "ghép dây": "GEP",
+    "ghep day": "GEP",
+    "ghép": "GEP",
+    "ghep": "GEP",
+    "sản xuất khóa": "SXK",
+    "san xuat khoa": "SXK",
+    "dập định hình": "DAP",
+    "dap dinh hinh": "DAP",
+    "dập": "DAP",
+    "dap": "DAP"
   };
 
   return stageByName[normalized] ?? stage;
