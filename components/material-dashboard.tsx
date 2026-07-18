@@ -277,7 +277,8 @@ function DrawerSection({
   );
 }
 
-const fieldControlClass = "w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-jade/30";
+const fieldControlClass =
+  "h-10 w-full rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
 
 function createEmptyOrder(): ProductionOrder {
   const today = toIsoDate();
@@ -3441,18 +3442,43 @@ export function MaterialDashboard() {
                     </p>
                   </div>
 
-                  <DrawerSection title="Thông tin LSX" note="Nhóm nhận diện đơn và sản phẩm đang thao tác.">
+                  <DrawerSection
+                    title="Thông tin LSX"
+                    note={
+                      editingMovementId
+                        ? "Thông tin gốc của LSX - sửa tại màn Lệnh sản xuất, không sửa được ở đây."
+                        : "Nhóm nhận diện đơn và sản phẩm đang thao tác."
+                    }
+                  >
                     <div className="grid gap-3 sm:grid-cols-2">
                       <FieldShell label="Mã LSX" required>
-                        <input className={fieldControlClass} placeholder="VD: DHAG-260713" value={draft.code} onChange={(e) => updateDraft("code", e.target.value)} />
+                        <input
+                          className={fieldControlClass}
+                          placeholder="VD: DHAG-260713"
+                          value={draft.code}
+                          onChange={(e) => updateDraft("code", e.target.value)}
+                          disabled={Boolean(editingMovementId)}
+                        />
                       </FieldShell>
                       <FieldShell label="Mã hàng" required>
-                        <input className={fieldControlClass} placeholder="VD: RG750Y" value={draft.sku} onChange={(e) => updateDraft("sku", e.target.value)} />
+                        <input
+                          className={fieldControlClass}
+                          placeholder="VD: RG750Y"
+                          value={draft.sku}
+                          onChange={(e) => updateDraft("sku", e.target.value)}
+                          disabled={Boolean(editingMovementId)}
+                        />
                       </FieldShell>
                     </div>
                     <div className="mt-3">
                       <FieldShell label="Tên hàng / diễn giải">
-                        <input className={fieldControlClass} placeholder="Tên sản phẩm hoặc ghi chú nhận diện" value={draft.productName ?? ""} onChange={(e) => updateDraft("productName", e.target.value)} />
+                        <input
+                          className={fieldControlClass}
+                          placeholder="Tên sản phẩm hoặc ghi chú nhận diện"
+                          value={draft.productName ?? ""}
+                          onChange={(e) => updateDraft("productName", e.target.value)}
+                          disabled={Boolean(editingMovementId)}
+                        />
                       </FieldShell>
                     </div>
                   </DrawerSection>
