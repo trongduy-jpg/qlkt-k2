@@ -60,6 +60,7 @@ import {
   createMaterialMovement,
   createProductionOrderHeader,
   createWorker,
+  deleteMaterial,
   deleteMaterialMovement,
   deleteWorker,
   loadDatabaseHealth,
@@ -67,6 +68,7 @@ import {
   loadProductionOrderHeaders,
   loadProductionOrders,
   loadWorkers,
+  updateMaterial,
   updateWorker,
   updateProductionOrderStatus,
   updateProductionOrderHeader,
@@ -716,6 +718,7 @@ export function MaterialDashboard() {
   const [materialDraft, setMaterialDraft] = useState<Omit<MaterialMaster, "id">>(createEmptyMaterialDraft());
   const [workerDraft, setWorkerDraft] = useState<Omit<WorkerMaster, "id">>(createEmptyWorkerDraft());
   const [editingWorkerId, setEditingWorkerId] = useState<string | null>(null);
+  const [editingMaterialId, setEditingMaterialId] = useState<string | null>(null);
 
   async function reloadOperationalData(options?: {
     movementDraftOverrides?: Record<string, ProductionOrder>;
@@ -2052,7 +2055,7 @@ export function MaterialDashboard() {
                     <FieldShell label="NVL dự kiến">
                       <SelectControl value={productionHeaderDraft.plannedMaterial} onChange={(value) => updateProductionHeaderDraft("plannedMaterial", value)}>
                         {materials.map((material) => (
-                          <option key={material.id} value={material.name}>{material.name}</option>
+                          <option key={material.id} value={material.name}>{material.code} - {material.name}</option>
                         ))}
                       </SelectControl>
                     </FieldShell>
@@ -2252,7 +2255,7 @@ export function MaterialDashboard() {
             <FieldShell label="NVL dự kiến">
               <SelectControl value={productionHeaderDraft.plannedMaterial} onChange={(value) => updateProductionHeaderDraft("plannedMaterial", value)}>
                 {materials.map((material) => (
-                  <option key={material.id} value={material.name}>{material.name}</option>
+                  <option key={material.id} value={material.name}>{material.code} - {material.name}</option>
                 ))}
               </SelectControl>
             </FieldShell>
@@ -2472,21 +2475,62 @@ export function MaterialDashboard() {
   async function addMaterial() {
     if (!materialDraft.code.trim() || !materialDraft.name.trim()) return;
 
+    const normalizedMaterial = {
+      ...materialDraft,
+      code: materialDraft.code.trim().toUpperCase(),
+      name: materialDraft.name.trim(),
+      category: materialDraft.category.trim() || "gold",
+      unit: materialDraft.unit.trim() || "gram",
+      purity: Number(materialDraft.purity)
+    };
+
     try {
-      const savedMaterial = await createMaterial({
-        ...materialDraft,
-        code: materialDraft.code.trim().toUpperCase(),
-        name: materialDraft.name.trim(),
-        category: materialDraft.category.trim() || "gold",
-        unit: materialDraft.unit.trim() || "gram",
-        purity: Number(materialDraft.purity)
-      });
-      setMaterials((current) => [...current, savedMaterial].sort((a, b) => a.code.localeCompare(b.code)));
-      setMaterialDraft(createEmptyMaterialDraft());
-      pushAudit("create_material", `Thêm NVL ${savedMaterial.code} - ${savedMaterial.name}`);
-      await createAuditLog("create_material", `Thêm NVL ${savedMaterial.code} - ${savedMaterial.name}`, savedMaterial.id);
+      if (editingMaterialId) {
+        const savedMaterial = await updateMaterial(editingMaterialId, normalizedMaterial);
+        setMaterials((current) =>
+          current.map((item) => (item.id === editingMaterialId ? savedMaterial : item)).sort((a, b) => a.code.localeCompare(b.code))
+        );
+        setEditingMaterialId(null);
+        setMaterialDraft(createEmptyMaterialDraft());
+        pushAudit("update_material", `Cập nhật NVL ${savedMaterial.code} - ${savedMaterial.name}`);
+        await createAuditLog("update_material", `Cập nhật NVL ${savedMaterial.code} - ${savedMaterial.name}`, savedMaterial.id);
+      } else {
+        const savedMaterial = await createMaterial(normalizedMaterial);
+        setMaterials((current) => [...current, savedMaterial].sort((a, b) => a.code.localeCompare(b.code)));
+        setMaterialDraft(createEmptyMaterialDraft());
+        pushAudit("create_material", `Thêm NVL ${savedMaterial.code} - ${savedMaterial.name}`);
+        await createAuditLog("create_material", `Thêm NVL ${savedMaterial.code} - ${savedMaterial.name}`, savedMaterial.id);
+      }
     } catch (error) {
-      setRemoteError(error instanceof Error ? error.message : "Không thêm được NVL");
+      setRemoteError(error instanceof Error ? error.message : "Không lưu được NVL");
+    }
+  }
+
+  function startEditMaterial(material: MaterialMaster) {
+    setEditingMaterialId(material.id);
+    setMaterialDraft({
+      code: material.code,
+      name: material.name,
+      category: material.category,
+      purity: material.purity,
+      unit: material.unit
+    });
+  }
+
+  function cancelEditMaterial() {
+    setEditingMaterialId(null);
+    setMaterialDraft(createEmptyMaterialDraft());
+  }
+
+  async function removeMaterial(id: string) {
+    try {
+      await deleteMaterial(id);
+      setMaterials((current) => current.filter((item) => item.id !== id));
+      if (editingMaterialId === id) cancelEditMaterial();
+      pushAudit("delete_material", `Xóa NVL ${id}`);
+      await createAuditLog("delete_material", `Xóa NVL ${id}`, id);
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không xóa được NVL (có thể đang được dùng trong giao dịch NVL)");
     }
   }
 
@@ -3681,6 +3725,10 @@ export function MaterialDashboard() {
               onStartEditWorker={startEditWorker}
               onCancelEditWorker={cancelEditWorker}
               onDeleteWorker={removeWorker}
+              editingMaterialId={editingMaterialId}
+              onStartEditMaterial={startEditMaterial}
+              onCancelEditMaterial={cancelEditMaterial}
+              onDeleteMaterial={removeMaterial}
             />
           </div>
           {renderProductionFormOverlay()}

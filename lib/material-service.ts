@@ -335,6 +335,34 @@ export async function createMaterial(input: Omit<MaterialMaster, "id">): Promise
   return { ...data, purity: Number(data.purity) } as MaterialMaster;
 }
 
+export async function updateMaterial(id: string, input: Omit<MaterialMaster, "id">): Promise<MaterialMaster> {
+  if (!isSupabaseConfigured || !supabase) {
+    return { ...input, id };
+  }
+
+  const { data, error } = await supabase
+    .from("materials")
+    .update(input)
+    .eq("id", id)
+    .select("id, code, name, category, purity, unit")
+    .single();
+
+  if (error || !data) throw new Error(`Cannot update material: ${error?.message ?? "unknown error"}`);
+  return { ...data, purity: Number(data.purity) } as MaterialMaster;
+}
+
+export async function deleteMaterial(id: string): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+
+  const { error } = await supabase.from("materials").delete().eq("id", id);
+  if (error) {
+    if (error.message.includes("foreign key constraint") || error.code === "23503") {
+      throw new Error("Không xóa được: NVL này đã có giao dịch NVL gắn với mã. Hãy sửa các giao dịch đó sang NVL khác trước khi xóa.");
+    }
+    throw new Error(`Không xóa được NVL: ${error.message}`);
+  }
+}
+
 export async function createWorker(input: Omit<WorkerMaster, "id">): Promise<WorkerMaster> {
   if (!isSupabaseConfigured || !supabase) {
     return { ...input, id: crypto.randomUUID() };

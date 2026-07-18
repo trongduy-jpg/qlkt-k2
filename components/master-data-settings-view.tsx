@@ -17,6 +17,10 @@ type MasterDataSettingsViewProps = {
   onStartEditWorker: (worker: WorkerMaster) => void;
   onCancelEditWorker: () => void;
   onDeleteWorker: (id: string) => void;
+  editingMaterialId: string | null;
+  onStartEditMaterial: (material: MaterialMaster) => void;
+  onCancelEditMaterial: () => void;
+  onDeleteMaterial: (id: string) => void;
 };
 
 export function MasterDataSettingsView({
@@ -32,7 +36,11 @@ export function MasterDataSettingsView({
   editingWorkerId,
   onStartEditWorker,
   onCancelEditWorker,
-  onDeleteWorker
+  onDeleteWorker,
+  editingMaterialId,
+  onStartEditMaterial,
+  onCancelEditMaterial,
+  onDeleteMaterial
 }: MasterDataSettingsViewProps) {
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
@@ -46,7 +54,14 @@ export function MasterDataSettingsView({
 
       <div className="mt-4 balanced-grid">
         <div className="rounded-md border border-line bg-paper p-3">
-          <h4 className="font-semibold text-ink">Danh mục NVL</h4>
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="font-semibold text-ink">Danh mục NVL</h4>
+            {editingMaterialId ? (
+              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                Đang sửa NVL
+              </span>
+            ) : null}
+          </div>
           <div className="mt-3 grid gap-2">
             <div className="grid grid-cols-2 gap-2">
               <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Mã NVL" value={materialDraft.code} onChange={(event) => setMaterialDraft((current) => ({ ...current, code: event.target.value }))} />
@@ -62,16 +77,49 @@ export function MasterDataSettingsView({
               <input className="rounded-md border border-line px-3 py-2 text-sm" type="number" step="0.0001" placeholder="Hàm lượng" value={materialDraft.purity} onChange={(event) => setMaterialDraft((current) => ({ ...current, purity: Number(event.target.value) }))} />
               <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="ĐVT" value={materialDraft.unit} onChange={(event) => setMaterialDraft((current) => ({ ...current, unit: event.target.value }))} />
             </div>
-            <button className="rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddMaterial}>
-              Thêm NVL
-            </button>
+            <div className="flex gap-2">
+              <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddMaterial}>
+                {editingMaterialId ? "Cập nhật NVL" : "Thêm NVL"}
+              </button>
+              {editingMaterialId ? (
+                <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onCancelEditMaterial}>
+                  Hủy
+                </button>
+              ) : null}
+            </div>
           </div>
           <div className="mt-4 max-h-72 overflow-y-auto rounded-md border border-line bg-white">
+            {materials.length === 0 ? (
+              <div className="px-3 py-4 text-sm text-zinc-500">Chưa có NVL nào trong danh mục.</div>
+            ) : null}
             {materials.map((material) => (
-              <div key={material.id} className="grid grid-cols-[90px_1fr_80px] gap-2 border-b border-line/70 px-3 py-2 text-sm last:border-b-0">
+              <div
+                key={material.id}
+                className={`grid grid-cols-[80px_1fr_70px_auto] items-center gap-2 border-b border-line/70 px-3 py-2 text-sm last:border-b-0 ${
+                  editingMaterialId === material.id ? "bg-amber-50/60" : ""
+                }`}
+              >
                 <span className="font-semibold text-ink">{material.code}</span>
-                <span className="text-zinc-700">{material.name}</span>
+                <span className="truncate text-zinc-700">{material.name}</span>
                 <span className="text-right text-zinc-500">{material.purity}</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"
+                    type="button"
+                    title="Sửa NVL"
+                    onClick={() => onStartEditMaterial(material)}
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
+                    type="button"
+                    title="Xóa NVL"
+                    onClick={() => onDeleteMaterial(material.id)}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
