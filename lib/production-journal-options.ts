@@ -100,12 +100,12 @@ export const goldAgeOptions: SelectOption[] = [
 ];
 
 export const sourceMaterialOptions: SelectOption[] = [
-  { value: "750Y", label: "750Y – Vàng 18K vàng" },
-  { value: "750W", label: "750W – Vàng 18K trắng" },
-  { value: "750R", label: "750R – Vàng 18K hồng" },
+  { value: "750Y", label: "750Y – Vàng 18K màu vàng" },
+  { value: "750W", label: "750W – Vàng 18K màu trắng" },
+  { value: "750R", label: "750R – Vàng 18K màu hồng" },
   { value: "BAC925", label: "BAC925 – Bạc 92.5" },
-  { value: "Nau moi", label: "Nấu mới" },
-  { value: "Nau quay dau", label: "Nấu quay đầu" },
+  { value: "Nau moi", label: "NM – Nấu mới" },
+  { value: "Nau quay dau", label: "NQD – Nấu quay đầu" },
   { value: "TP", label: "TP – Thành phẩm nhập lại" }
 ];
 
