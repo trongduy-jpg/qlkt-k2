@@ -2964,7 +2964,6 @@ export function MaterialDashboard() {
                           </th>
                           <th className="px-3 py-3">Trạng thái LSX</th>
                           <th className="px-3 py-3">Trạng thái vận hành</th>
-                          <th className="px-3 py-3 text-right">Thao tác</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -3016,18 +3015,6 @@ export function MaterialDashboard() {
                               <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
                                 {summary.status}
                               </span>
-                            </td>
-                            <td className="px-3 py-3 text-right align-top">
-                              <button
-                                className="rounded-md border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:border-jade/60"
-                                type="button"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  selectProductionOrder(summary.code);
-                                }}
-                              >
-                                Xem chi tiết
-                              </button>
                             </td>
                           </tr>
                         ))}
