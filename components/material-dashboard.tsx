@@ -264,15 +264,15 @@ function DrawerSection({
 }) {
   return (
     <section className="rounded-lg border border-line bg-white shadow-sm">
-      <div className="border-b border-line/80 px-4 py-3">
+      <div className="border-b border-line/80 px-3 py-2">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">{title}</h4>
-            {note ? <p className="mt-1 text-xs leading-5 text-zinc-500">{note}</p> : null}
+            {note ? <p className="mt-0.5 text-xs leading-5 text-zinc-500">{note}</p> : null}
           </div>
         </div>
       </div>
-      <div className="px-4 py-4">{children}</div>
+      <div className="px-3 py-3">{children}</div>
     </section>
   );
 }
@@ -3425,7 +3425,7 @@ export function MaterialDashboard() {
                   </button>
                 </div>
                 <div className="mt-4 grid gap-3">
-                  <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 px-4 py-3">
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2.5">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
                         {editingMovementId ? "Đang sửa giao dịch" : "Giao dịch mới"}
@@ -3434,54 +3434,55 @@ export function MaterialDashboard() {
                         LSX: {draft.code || "Chưa chọn"}
                       </span>
                       <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
+                        Mã hàng: {draft.sku || "Chưa chọn"}
+                      </span>
+                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
                         Công đoạn: {draft.stage || "Chưa chọn"}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-zinc-700">
-                      Ưu tiên nhập theo thứ tự từ trên xuống. Các trường ở nhóm đầu là thông tin user cần nhìn trước để tránh ghi nhầm giao dịch.
-                    </p>
+                    {editingMovementId ? (
+                      <p className="mt-1.5 text-xs leading-5 text-zinc-600">
+                        Thông tin gốc của LSX đã khoá, sửa tại màn Lệnh sản xuất nếu cần.
+                      </p>
+                    ) : (
+                      <p className="mt-1.5 text-xs leading-5 text-zinc-600">
+                        Ưu tiên nhập theo thứ tự từ trên xuống để tránh ghi nhầm giao dịch.
+                      </p>
+                    )}
                   </div>
 
-                  <DrawerSection
-                    title="Thông tin LSX"
-                    note={
-                      editingMovementId
-                        ? "Thông tin gốc của LSX - sửa tại màn Lệnh sản xuất, không sửa được ở đây."
-                        : "Nhóm nhận diện đơn và sản phẩm đang thao tác."
-                    }
-                  >
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <FieldShell label="Mã LSX" required>
-                        <input
-                          className={fieldControlClass}
-                          placeholder="VD: DHAG-260713"
-                          value={draft.code}
-                          onChange={(e) => updateDraft("code", e.target.value)}
-                          disabled={Boolean(editingMovementId)}
-                        />
-                      </FieldShell>
-                      <FieldShell label="Mã hàng" required>
-                        <input
-                          className={fieldControlClass}
-                          placeholder="VD: RG750Y"
-                          value={draft.sku}
-                          onChange={(e) => updateDraft("sku", e.target.value)}
-                          disabled={Boolean(editingMovementId)}
-                        />
-                      </FieldShell>
-                    </div>
-                    <div className="mt-3">
-                      <FieldShell label="Tên hàng / diễn giải">
-                        <input
-                          className={fieldControlClass}
-                          placeholder="Tên sản phẩm hoặc ghi chú nhận diện"
-                          value={draft.productName ?? ""}
-                          onChange={(e) => updateDraft("productName", e.target.value)}
-                          disabled={Boolean(editingMovementId)}
-                        />
-                      </FieldShell>
-                    </div>
-                  </DrawerSection>
+                  {!editingMovementId ? (
+                    <DrawerSection title="Thông tin LSX" note="Nhóm nhận diện đơn và sản phẩm đang thao tác.">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <FieldShell label="Mã LSX" required>
+                          <input
+                            className={fieldControlClass}
+                            placeholder="VD: DHAG-260713"
+                            value={draft.code}
+                            onChange={(e) => updateDraft("code", e.target.value)}
+                          />
+                        </FieldShell>
+                        <FieldShell label="Mã hàng" required>
+                          <input
+                            className={fieldControlClass}
+                            placeholder="VD: RG750Y"
+                            value={draft.sku}
+                            onChange={(e) => updateDraft("sku", e.target.value)}
+                          />
+                        </FieldShell>
+                      </div>
+                      <div className="mt-3">
+                        <FieldShell label="Tên hàng / diễn giải">
+                          <input
+                            className={fieldControlClass}
+                            placeholder="Tên sản phẩm hoặc ghi chú nhận diện"
+                            value={draft.productName ?? ""}
+                            onChange={(e) => updateDraft("productName", e.target.value)}
+                          />
+                        </FieldShell>
+                      </div>
+                    </DrawerSection>
+                  ) : null}
 
                   <DrawerSection title="Thông tin chứng từ" note="Phục vụ đối chiếu ngày nghiệp vụ và số chứng từ nhập/xuất.">
                     <div className="grid gap-3 sm:grid-cols-2">
@@ -3650,26 +3651,9 @@ export function MaterialDashboard() {
                       </div>
                     </div>
                   </DrawerSection>
-                  <div className="rounded-lg border border-line bg-paper/60 px-4 py-3">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-ink">
-                          {editingMovementId ? "Bạn đang cập nhật giao dịch NVL hiện có." : "Bạn đang tạo giao dịch NVL mới."}
-                        </p>
-                        <p className="mt-1 text-xs leading-5 text-zinc-500">
-                          Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Nên hoàn thành nhóm trên trước rồi mới mở phần nâng cao.
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                          {editingMovementId ? "Chế độ: Sửa NVL" : "Chế độ: Thêm NVL"}
-                        </span>
-                        <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                          Form: {draft.code || "Chưa chọn LSX"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  <p className="text-xs leading-5 text-zinc-500">
+                    Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Nên hoàn thành nhóm trên trước rồi mới mở phần nâng cao.
+                  </p>
                   {isDraftForClosedOrder ? (
                     <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
                       LSX này đã chốt. Bạn vẫn có thể cập nhật NK NVL theo luồng xử lý thực tế.
