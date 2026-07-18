@@ -2998,7 +2998,9 @@ export function MaterialDashboard() {
                           <th className="px-3 py-3">SR/KH</th>
                           <th className="px-3 py-3">Deadline đơn hàng</th>
                           <th className="px-3 py-3 text-right">Số lượng</th>
-                          <th className="px-3 py-3 text-right">Giao dịch</th>
+                          <th className="px-3 py-3 text-right" title="Số dòng đã ghi nhận trong Nhật ký NVL cho LSX này - khác với thông tin trong form LSX.">
+                            Số GD NVL
+                          </th>
                           <th className="px-3 py-3">Trạng thái LSX</th>
                           <th className="px-3 py-3">Trạng thái vận hành</th>
                           <th className="px-3 py-3 text-right">Thao tác</th>
@@ -3034,7 +3036,16 @@ export function MaterialDashboard() {
                             <td className="px-3 py-3 text-right align-top text-zinc-700">
                               {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
                             </td>
-                            <td className="px-3 py-3 text-right align-top text-zinc-700">{summary.movementCount}</td>
+                            <td
+                              className={`px-3 py-3 text-right align-top ${summary.movementCount > 0 ? "text-zinc-700" : "text-zinc-400"}`}
+                              title={
+                                summary.movementCount > 0
+                                  ? `${summary.movementCount} dòng đã ghi trong Nhật ký NVL`
+                                  : "Chưa có giao dịch nào trong Nhật ký NVL cho LSX này"
+                              }
+                            >
+                              {summary.movementCount}
+                            </td>
                             <td className="px-3 py-3 align-top">
                               <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
                                 {summary.deliveryStatus || "Chưa cập nhật"}
