@@ -2679,7 +2679,7 @@ export function MaterialDashboard() {
             </p>
           </header>
 
-          <div className={`${isDashboard || isReport ? "grid" : "hidden"} gap-4 py-5 sm:grid-cols-2 xl:grid-cols-4`}>
+          <div className={`${isDashboard ? "grid" : "hidden"} gap-4 py-5 sm:grid-cols-2 xl:grid-cols-4`}>
             {kpis.map((item) => (
               <article key={item.label} className="rounded-md border border-line bg-white/92 p-4 shadow-sm">
                 <p className="text-sm font-medium text-zinc-600">{item.label}</p>
@@ -2715,7 +2715,6 @@ export function MaterialDashboard() {
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <div>
                 <h3 className="text-base font-bold text-ink">Báo cáo hao hụt</h3>
-                <p className="mt-1 text-sm text-zinc-600">Chỉ giữ đúng các trường anh yêu cầu trong báo cáo hao hụt.</p>
               </div>
               <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={exportJson}>
                 Xuất dữ liệu báo cáo
@@ -2724,12 +2723,7 @@ export function MaterialDashboard() {
 
             <div className="mt-4 rounded-md border border-line bg-paper p-3">
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h4 className="font-semibold text-ink">Bảng hao hụt</h4>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Các cột đang hiển thị: công đoạn, dòng phát sinh, loại vàng/NVL, tổng xuất, tổng nhập, hao hụt, hao hụt quy 24K, tên thợ, số LSX, mã hàng, trạng thái.
-                  </p>
-                </div>
+                <h4 className="font-semibold text-ink">Bảng hao hụt</h4>
                 <span className="rounded-md border border-line bg-white px-2 py-1 text-xs font-semibold text-zinc-600">
                   {lossReportRows.length} dòng
                 </span>
@@ -2986,7 +2980,7 @@ export function MaterialDashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-bold text-ink">Danh sách lệnh sản xuất</h4>
-                      <p className="mt-1 text-xs text-zinc-500">Hiển thị theo từng dòng như spreadsheet để phù hợp khi số lượng LSX lớn. Bấm vào dòng để mở chi tiết.</p>
+                      <p className="mt-1 text-xs text-zinc-500">Bấm vào dòng để mở chi tiết.</p>
                     </div>
                     <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
                       {filteredOrderSummaries.length} LSX
@@ -3294,7 +3288,7 @@ export function MaterialDashboard() {
                 <div className="mb-3 flex items-center justify-between">
                   <div>
                     <h4 className="text-sm font-bold text-ink">Lịch sử giao dịch NVL</h4>
-                    <p className="mt-1 text-xs text-zinc-500">Chỉ hiển thị các dòng đã phát sinh thực sự. User sửa trực tiếp trên dòng lịch sử này.</p>
+                    <p className="mt-1 text-xs text-zinc-500">Bấm "Sửa NVL" để chỉnh sửa một dòng đã ghi nhận.</p>
                   </div>
                   {filteredOrders.length > 0 ? (
                     <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
