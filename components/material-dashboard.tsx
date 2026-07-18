@@ -25,6 +25,7 @@ import { GoogleSheetFlowView } from "@/components/google-sheet-flow-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { PriceTableView } from "@/components/price-table-view";
 import { WorkerBoxView } from "@/components/worker-box-view";
+import { buildWorkerBoxLinesFromMovements } from "@/lib/worker-box-service";
 import {
   alerts,
   kpis,
@@ -1301,6 +1302,8 @@ export function MaterialDashboard() {
       { issued: 0, returned: 0, powder: 0, loss: 0, pending: 0 }
     );
   }, [orders]);
+
+  const computedWorkerBoxLines = useMemo(() => buildWorkerBoxLinesFromMovements(orders, workers), [orders, workers]);
 
   const lossReportRows = useMemo(() => {
     return orders
@@ -2768,7 +2771,7 @@ export function MaterialDashboard() {
             </div>
           </section>
 
-          <WorkerBoxView isVisible={isWorkerBox} useDemoData={!isSupabaseConfigured} />
+          <WorkerBoxView isVisible={isWorkerBox} useDemoData={!isSupabaseConfigured} lines={computedWorkerBoxLines} />
 
           <section className={`${isDashboard ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
             <div className="flex flex-col gap-4">

@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { workerBoxPeriods, type WorkerBoxBalanceLine } from "@/lib/worker-box-data";
 import {
   filterWorkerBoxLines,
   getDefaultWorkerBoxPeriodCode,
+  getPeriodsFromLines,
   getWorkerBoxPeriod,
   type WorkerBoxDebtFilter,
   type WorkerBoxGoldAgeFilter,
@@ -16,6 +17,7 @@ import {
 type WorkerBoxViewProps = {
   isVisible: boolean;
   useDemoData?: boolean;
+  lines?: WorkerBoxBalanceLine[];
 };
 
 function formatGram(value: number) {
@@ -44,7 +46,8 @@ function mapGoldAgeLabel(code: string) {
   return code;
 }
 
-export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewProps) {
+export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: WorkerBoxViewProps) {
+  const computedPeriods = useMemo(() => getPeriodsFromLines(lines), [lines]);
   const [periodCode, setPeriodCode] = useState(getDefaultWorkerBoxPeriodCode());
   const [query, setQuery] = useState("");
   const [reviewFilter, setReviewFilter] = useState<WorkerBoxReviewFilter>("all");
@@ -57,10 +60,20 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
-  const selectedPeriod = useDemoData ? getWorkerBoxPeriod(periodCode) : null;
+  useEffect(() => {
+    if (useDemoData) return;
+    if (computedPeriods.length === 0) return;
+    if (computedPeriods.some((period) => period.code === periodCode)) return;
+    setPeriodCode(computedPeriods[0].code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [computedPeriods, useDemoData]);
+
+  const selectedPeriod = useDemoData
+    ? getWorkerBoxPeriod(periodCode)
+    : computedPeriods.find((period) => period.code === periodCode) ?? null;
 
   const result = useMemo(() => {
-    if (!useDemoData) {
+    if (!useDemoData && lines.length === 0) {
       return {
         rows: [],
         total: 0,
@@ -83,17 +96,20 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
       };
     }
 
-    return filterWorkerBoxLines({
-      periodCode,
-      reviewStatus: reviewFilter,
-      debtStatus: debtFilter,
-      metalCode: metalFilter,
-      goldAgeCode: goldAgeFilter,
-      query,
-      page,
-      pageSize
-    });
-  }, [debtFilter, goldAgeFilter, metalFilter, page, pageSize, periodCode, query, reviewFilter, useDemoData]);
+    return filterWorkerBoxLines(
+      {
+        periodCode,
+        reviewStatus: reviewFilter,
+        debtStatus: debtFilter,
+        metalCode: metalFilter,
+        goldAgeCode: goldAgeFilter,
+        query,
+        page,
+        pageSize
+      },
+      useDemoData ? undefined : lines
+    );
+  }, [debtFilter, goldAgeFilter, lines, metalFilter, page, pageSize, periodCode, query, reviewFilter, useDemoData]);
 
   const selectedLine = result.rows.find((line) => line.id === selectedId) ?? null;
 
@@ -131,7 +147,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
             <select
               className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-paper"
               value={periodCode}
-              disabled={!useDemoData}
+              disabled={!useDemoData && lines.length === 0}
               onChange={(event) => {
                 setPeriodCode(event.target.value);
                 clearFilters();
@@ -139,6 +155,10 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
             >
               {useDemoData ? (
                 workerBoxPeriods.map((period) => (
+                  <option key={period.code} value={period.code}>{period.label}</option>
+                ))
+              ) : computedPeriods.length > 0 ? (
+                computedPeriods.map((period) => (
                   <option key={period.code} value={period.code}>{period.label}</option>
                 ))
               ) : (
@@ -149,7 +169,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
             <select
               className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-paper"
               value={reviewFilter}
-              disabled={!useDemoData}
+              disabled={!useDemoData && lines.length === 0}
               onChange={(event) => {
                 setReviewFilter(event.target.value as WorkerBoxReviewFilter);
                 setPage(1);
@@ -167,7 +187,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
                 className="h-10 w-full rounded-md border border-line bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-paper sm:w-64"
                 placeholder="Tìm thợ, công đoạn, NVL..."
                 value={query}
-                disabled={!useDemoData}
+                disabled={!useDemoData && lines.length === 0}
                 onChange={(event) => {
                   setQuery(event.target.value);
                   setPage(1);
@@ -180,7 +200,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
             <button
               className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:bg-paper disabled:text-zinc-400"
               type="button"
-              disabled={!useDemoData}
+              disabled={!useDemoData && lines.length === 0}
               onClick={() => setIsAdvancedOpen((current) => !current)}
             >
               <SlidersHorizontal size={16} />
@@ -239,9 +259,15 @@ export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewPr
           </div>
         ) : null}
 
-        {!useDemoData ? (
+        {!useDemoData && lines.length === 0 ? (
           <div className="mt-3 rounded-md border border-dashed border-line bg-paper px-3 py-2 text-sm text-zinc-600">
-            Chưa có dữ liệu thực cho phân hệ <strong className="text-ink">Tồn hợp thợ</strong>. Dữ liệu demo đã được tắt để tránh hiển thị sai.
+            Chưa có giao dịch NVL nào để tổng hợp tồn hộp thợ.
+          </div>
+        ) : null}
+
+        {!useDemoData && lines.length > 0 ? (
+          <div className="mt-3 rounded-md border border-dashed border-amber-200 bg-amber-50/60 px-3 py-2 text-sm text-amber-800">
+            Số liệu tự động tổng hợp từ Nhật ký NVL (sổ sách), chưa đối chiếu với tồn thực tế kiểm đếm tại xưởng.
           </div>
         ) : null}
 
