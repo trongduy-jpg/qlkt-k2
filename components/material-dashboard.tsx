@@ -2446,6 +2446,28 @@ export function MaterialDashboard() {
     }
   }
 
+  async function reopenSelectedProductionOrder() {
+    if (!selectedOrderSummary) return;
+    if (!isClosedStatus(selectedOrderSummary.status)) return;
+
+    try {
+      setProductionHeaders((current) =>
+        current.map((header) => (header.code === selectedOrderSummary.code ? { ...header, status: "Đang xử lý" } : header))
+      );
+
+      if (isSupabaseConfigured) {
+        await updateProductionOrderStatus(selectedOrderSummary.code, "Đang xử lý");
+        await reloadOperationalData();
+      }
+
+      setSelectedOrderCode(selectedOrderSummary.code);
+      pushAudit("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`);
+      await createAuditLog("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`, selectedOrderMovements[0]?.id);
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không mở lại được LSX");
+    }
+  }
+
   async function addMaterial() {
     if (!materialDraft.code.trim() || !materialDraft.name.trim()) return;
 
@@ -3127,7 +3149,7 @@ export function MaterialDashboard() {
 
                         {isClosedStatus(selectedOrderSummary.status) ? (
                           <div className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-700">
-                            LSX đã chốt. Hệ thống đang khóa thêm, sửa trạng thái và xóa giao dịch để bảo vệ số liệu kế toán.
+                            LSX đã chốt nên đang khóa thêm/sửa/xóa giao dịch để bảo vệ số liệu kế toán. Nếu có phát sinh mới, bấm "Mở lại LSX" bên dưới để chỉnh sửa, sau đó chốt lại.
                           </div>
                         ) : null}
                       </div>
@@ -3166,13 +3188,23 @@ export function MaterialDashboard() {
                         </button>
                       </div>
                     ) : (
-                      <button
-                        className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
-                        type="button"
-                        onClick={viewSelectedOrderMovements}
-                      >
-                        Mở NK NVL
-                      </button>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <button
+                          className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
+                          type="button"
+                          onClick={viewSelectedOrderMovements}
+                        >
+                          Mở NK NVL
+                        </button>
+                        <button
+                          className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800"
+                          type="button"
+                          onClick={reopenSelectedProductionOrder}
+                          title="Mở lại LSX để chỉnh sửa thông tin gốc khi có phát sinh mới"
+                        >
+                          Mở lại LSX
+                        </button>
+                      </div>
                     )}
                   </div>
                 ) : null}
