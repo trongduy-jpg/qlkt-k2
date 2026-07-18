@@ -215,16 +215,11 @@ export async function loadProductionOrderHeaders(): Promise<ProductionOrderHeade
     .select("id, order_code, sku, product_name, destination, order_date, occurred_date, document_no, document_in_no, document_line_no, movement_type, quantity_piece, planned_date, planned_stage, planned_worker, planned_material, material_spec, planned_gold_age, planned_material_type, delivery_status, order_month, sales_type, customer_name, specification, deadline_date, completed_date, delivered_qty, actual_progress_note, completed_weight_gram, issued_gram, returned_gram, powder_gram, transferred_weight_gram, loss_period, nxt_period, source_material_name, source_name, import_source, export_source, nxt_link_code, converted_issue_weight, converted_return_weight, note, status, created_at")
     .order("created_at", { ascending: false });
 
-  if (result.error?.message.includes("column") || result.error?.message.includes("schema cache")) {
-    result = await supabase
-      .from("production_orders")
-      .select("id, order_code, sku, status")
-      .order("order_code", { ascending: false });
-  }
-
   if (result.error || !result.data) {
     console.error("Failed to load production order headers", result.error);
-    return [];
+    throw new Error(
+      `Không tải được thông tin LSX (thiếu cột trên Supabase? hãy chạy production_business_rules_upgrade.sql roi NOTIFY pgrst, 'reload schema';): ${result.error?.message ?? "unknown error"}`
+    );
   }
 
   return result.data.map((row: Record<string, unknown>) => ({
