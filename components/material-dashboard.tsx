@@ -2,19 +2,16 @@
 
 import {
   AlertTriangle,
-  BadgeCheck,
   Boxes,
   CircleDollarSign,
   ClipboardList,
   ChevronDown,
   Database,
-  Download,
   FileWarning,
   Gem,
   History,
   Plus,
   Scale,
-  Search,
   Settings2,
   Trash2,
   X
@@ -2634,43 +2631,12 @@ export function MaterialDashboard() {
 
         <section className="px-5 py-5 md:px-8">
           <div className="content-shell">
-          <header className="flex flex-col gap-4 border-b border-line pb-5 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-brass">Quản trị sản xuất</p>
-              <h2 className="mt-1 text-2xl font-bold text-ink">Theo dõi tiến độ NVL và quản trị hao hụt</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">
-                Quản lý lệnh sản xuất, xuất/nhập nguyên vật liệu, treo nợ/xác định, quy đổi hao hụt và quyết toán theo kỳ.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                className="inline-flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink shadow-sm"
-                type="button"
-                onClick={() => setActiveModule("Lệnh sản xuất")}
-              >
-                <Search size={16} />
-                Tra cứu LSX
-              </button>
-              <button
-                className="inline-flex items-center gap-2 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white shadow-sm"
-                type="button"
-                onClick={() => {
-                  setStatus("Treo nợ");
-                  setActiveModule("Nhật ký NVL");
-                }}
-              >
-                <BadgeCheck size={16} />
-                Xem treo nợ
-              </button>
-              <button
-                className="inline-flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink shadow-sm"
-                type="button"
-                onClick={exportJson}
-              >
-                <Download size={16} />
-                Xuất JSON
-              </button>
-            </div>
+          <header className="border-b border-line pb-5">
+            <p className="text-sm font-semibold uppercase tracking-wide text-brass">Quản trị sản xuất</p>
+            <h2 className="mt-1 text-2xl font-bold text-ink">Theo dõi tiến độ NVL và quản trị hao hụt</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">
+              Quản lý lệnh sản xuất, xuất/nhập nguyên vật liệu, treo nợ/xác định, quy đổi hao hụt và quyết toán theo kỳ.
+            </p>
           </header>
 
           <div className={`${isDashboard || isReport ? "grid" : "hidden"} gap-4 py-5 sm:grid-cols-2 xl:grid-cols-4`}>
