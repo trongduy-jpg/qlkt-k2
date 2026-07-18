@@ -370,7 +370,12 @@ export async function deleteWorker(id: string): Promise<void> {
   if (!isSupabaseConfigured || !supabase) return;
 
   const { error } = await supabase.from("workers").delete().eq("id", id);
-  if (error) throw new Error(`Cannot delete worker: ${error.message}`);
+  if (error) {
+    if (error.message.includes("foreign key constraint") || error.code === "23503") {
+      throw new Error("Không xóa được: thợ này đã có giao dịch NVL gắn với mã. Hãy sửa các giao dịch đó sang thợ khác trước khi xóa.");
+    }
+    throw new Error(`Không xóa được thợ: ${error.message}`);
+  }
 }
 
 export async function createProductionOrderHeader(input: ProductionOrderHeaderInput) {
@@ -523,8 +528,11 @@ async function getMaterialId(materialName: string) {
 
 async function upsertWorker(workerName: string, stage: string) {
   if (!supabase) throw new Error("Supabase is not configured");
-  const workerCode = buildWorkerCode(workerName);
 
+  const byName = await supabase.from("workers").select("id").eq("full_name", workerName).maybeSingle();
+  if (byName.data) return byName.data.id as string;
+
+  const workerCode = buildWorkerCode(workerName);
   const { data, error } = await supabase
     .from("workers")
     .upsert(
