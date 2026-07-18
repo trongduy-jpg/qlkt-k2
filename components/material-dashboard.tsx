@@ -3313,7 +3313,6 @@ export function MaterialDashboard() {
                         <th className="px-3 py-3 text-right">SL</th>
                         <th className="px-3 py-3 text-right">Xuất</th>
                         <th className="px-3 py-3 text-right">Nhập</th>
-                        <th className="px-3 py-3 text-right">Chuyển</th>
                         <th className="px-3 py-3 text-right">Hao hụt</th>
                         <th className="px-3 py-3">Hao/NXT</th>
                         <th className="px-3 py-3">Trạng thái</th>
@@ -3343,7 +3342,6 @@ export function MaterialDashboard() {
                           <td className="px-3 py-3 text-right text-zinc-700">{order.qtyPiece ?? "-"}</td>
                           <td className="px-3 py-3 text-right text-zinc-700">{formatGram(order.issued)}</td>
                           <td className="px-3 py-3 text-right text-zinc-700">{formatGram(order.returned)}</td>
-                          <td className="px-3 py-3 text-right text-zinc-700">{formatGram(order.transferred ?? 0)}</td>
                           <td className="px-3 py-3 text-right font-semibold text-ink">{formatGram(order.loss)}</td>
                           <td className="px-3 py-3 text-xs text-zinc-600">
                             <div>{order.lossPeriod || "-"}</div>
