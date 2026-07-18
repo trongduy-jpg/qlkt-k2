@@ -413,22 +413,11 @@ export async function createProductionOrderHeader(input: ProductionOrderHeaderIn
     .select("id")
     .single();
 
-  if (result.error?.message.includes("column") || result.error?.message.includes("schema cache")) {
-    result = await supabase
-      .from("production_orders")
-      .upsert(
-        {
-          order_code: input.code,
-          sku: input.sku,
-          status: toDbStatus(input.status)
-        },
-        { onConflict: "order_code" }
-      )
-      .select("id")
-      .single();
+  if (result.error || !result.data) {
+    throw new Error(
+      `Không lưu được LSX (thiếu cột trên Supabase? hãy chạy production_business_rules_upgrade.sql): ${result.error?.message ?? "unknown error"}`
+    );
   }
-
-  if (result.error || !result.data) throw new Error(`Cannot create production order: ${result.error?.message ?? "unknown error"}`);
   return { ...input, id: result.data.id as string };
 }
 
@@ -488,20 +477,11 @@ export async function updateProductionOrderHeader(orderCode: string, input: Prod
     .select("id")
     .single();
 
-  if (result.error?.message.includes("column") || result.error?.message.includes("schema cache")) {
-    result = await supabase
-      .from("production_orders")
-      .update({
-        order_code: input.code,
-        sku: input.sku,
-        status: toDbStatus(input.status)
-      })
-      .eq("order_code", orderCode)
-      .select("id")
-      .single();
+  if (result.error || !result.data) {
+    throw new Error(
+      `Không cập nhật được LSX (thiếu cột trên Supabase? hãy chạy production_business_rules_upgrade.sql): ${result.error?.message ?? "unknown error"}`
+    );
   }
-
-  if (result.error || !result.data) throw new Error(`Cannot update production order: ${result.error?.message ?? "unknown error"}`);
   return { ...input, id: result.data.id as string };
 }
 
@@ -597,24 +577,13 @@ async function upsertProductionOrder(order: ProductionOrder) {
     .select("id")
     .single();
 
-  if (result.error?.message.includes("column") || result.error?.message.includes("schema cache")) {
-    result = await supabase
-      .from("production_orders")
-      .upsert(
-        {
-          order_code: order.code,
-          sku: order.sku,
-          status: toDbStatus(order.status)
-        },
-        { onConflict: "order_code" }
-      )
-      .select("id")
-      .single();
-  }
-
   const { data, error } = result;
 
-  if (error || !data) throw new Error(`Cannot upsert production order ${order.code}`);
+  if (error || !data) {
+    throw new Error(
+      `Không lưu được LSX ${order.code} (thiếu cột trên Supabase? hãy chạy production_business_rules_upgrade.sql): ${error?.message ?? "unknown error"}`
+    );
+  }
   return data.id as string;
 }
 

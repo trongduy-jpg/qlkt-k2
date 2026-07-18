@@ -2901,12 +2901,12 @@ export function MaterialDashboard() {
 
           {isProduction ? (
             <>
-              {isProductionDetailOpen && selectedOrderDetail && selectedOrderSummary ? (
+              {isProductionDetailOpen && !isProductionFormOpen && selectedOrderDetail && selectedOrderSummary ? (
                 <div className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm" onClick={() => setIsProductionDetailOpen(false)} />
               ) : null}
               <aside
                 className={`fixed inset-y-0 right-0 z-50 w-full max-w-xl overflow-y-auto border-l border-line bg-white p-5 shadow-2xl transition-transform duration-200 ${
-                  isProductionDetailOpen && selectedOrderDetail && selectedOrderSummary ? "translate-x-0" : "pointer-events-none translate-x-full"
+                  isProductionDetailOpen && !isProductionFormOpen && selectedOrderDetail && selectedOrderSummary ? "translate-x-0" : "pointer-events-none translate-x-full"
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
