@@ -49,10 +49,10 @@ export const productionOrderMaterialSpecOptions: SelectOption[] = [
 ];
 
 export const productionOrderDeliveryStatusOptions: SelectOption[] = [
-  { value: "Hoan tat", label: "Hoan tat" },
-  { value: "Chua Hoan Tat", label: "Chua Hoan Tat" },
-  { value: "Chua giao du", label: "Chua giao du" },
-  { value: "Ngung San Xuat", label: "Ngung San Xuat" }
+  { value: "Chưa Hoàn Tất", label: "Chưa hoàn tất" },
+  { value: "Hoàn tất", label: "Hoàn tất" },
+  { value: "Chưa giao đủ", label: "Chưa giao đủ" },
+  { value: "Ngưng Sản Xuất", label: "Ngưng sản xuất" }
 ];
 
 export const productionOrderSalesTypeOptions: SelectOption[] = [
