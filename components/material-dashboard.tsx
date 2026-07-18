@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Database,
   FileWarning,
-  Gem,
   History,
   Plus,
   Scale,
@@ -2138,7 +2137,7 @@ export function MaterialDashboard() {
                 <button className="rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-ink" type="button" onClick={cancelProductionHeaderEdit}>
                   Hủy
                 </button>
-                <button className="rounded-md bg-jade px-4 py-2 text-sm font-semibold text-white" type="button" onClick={saveProductionHeader}>
+                <button className="rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white" type="button" onClick={saveProductionHeader}>
                   Lưu LSX
                 </button>
               </div>
@@ -2597,43 +2596,40 @@ export function MaterialDashboard() {
         </div>
       ) : null}
       <div className="shell-grid min-h-screen">
-        <aside className="border-r border-line bg-white/88 px-5 py-6 backdrop-blur">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-md bg-ink text-white">
-              <Gem size={20} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-jade">ASIANA GOLD</p>
-              <h1 className="text-lg font-bold text-ink">QLKT K2</h1>
-            </div>
+        <aside className="border-r border-line bg-white/70 px-5 py-6">
+          <div>
+            <p className="font-display text-2xl font-semibold tracking-wide text-ink">ASIANA GOLD</p>
+            <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">QLKT K2</p>
           </div>
 
-          <nav className="mt-8 space-y-1">
+          <nav className="mt-8 space-y-0.5">
             {navItems.map(([label, Icon]) => (
               <button
                 key={label}
-                className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium ${
-                  activeModule === label ? "bg-ink text-white" : "text-zinc-700 hover:bg-paper hover:text-ink"
+                className={`flex w-full items-center gap-3 border-l-2 px-3 py-2 text-left text-sm transition-colors ${
+                  activeModule === label
+                    ? "border-ink font-semibold text-ink"
+                    : "border-transparent text-zinc-500 hover:border-line hover:text-ink"
                 }`}
                 type="button"
                 onClick={() => setActiveModule(label)}
               >
-                <Icon size={17} />
+                <Icon size={16} className={activeModule === label ? "text-ink" : "text-zinc-400"} />
                 {label}
               </button>
             ))}
           </nav>
 
           {isLoadingRemote ? (
-            <p className="mt-8 text-xs font-semibold text-jade">Đang tải dữ liệu...</p>
+            <p className="mt-8 text-xs font-semibold text-brass">Đang tải dữ liệu...</p>
           ) : null}
         </aside>
 
         <section className="px-5 py-5 md:px-8">
           <div className="content-shell">
           <header className="border-b border-line pb-5">
-            <p className="text-sm font-semibold uppercase tracking-wide text-brass">Quản trị sản xuất</p>
-            <h2 className="mt-1 text-2xl font-bold text-ink">Theo dõi tiến độ NVL và quản trị hao hụt</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Quản trị sản xuất</p>
+            <h2 className="font-display mt-1 text-3xl font-semibold text-ink">Theo dõi tiến độ NVL và quản trị hao hụt</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">
               Quản lý lệnh sản xuất, xuất/nhập nguyên vật liệu, treo nợ/xác định, quy đổi hao hụt và quyết toán theo kỳ.
             </p>
@@ -2863,7 +2859,7 @@ export function MaterialDashboard() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white"
                     type="button"
                     onClick={() => {
                       setEditingProductionCode(null);
@@ -2955,7 +2951,7 @@ export function MaterialDashboard() {
                   <div className="overflow-x-auto rounded-md border border-line bg-white">
                     <table className="w-full min-w-[1180px] border-collapse text-sm">
                       <thead>
-                        <tr className="border-b border-line bg-paper text-left text-xs uppercase text-zinc-500">
+                        <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
                           <th className="px-3 py-3">Mã LSX</th>
                           <th className="px-3 py-3">Mã hàng</th>
                           <th className="px-3 py-3">Tên hàng</th>
@@ -3192,7 +3188,7 @@ export function MaterialDashboard() {
                           Mở NK NVL
                         </button>
                         <button
-                          className="rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white sm:col-span-2"
+                          className="rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white sm:col-span-2"
                           type="button"
                           onClick={closeSelectedProductionOrder}
                         >
@@ -3233,7 +3229,7 @@ export function MaterialDashboard() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-jade px-3 text-sm font-semibold text-white shadow-sm"
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold uppercase tracking-wide text-white"
                     type="button"
                     onClick={() => {
                       setEditingMovementId(null);
@@ -3278,7 +3274,7 @@ export function MaterialDashboard() {
                 {filteredOrders.length > 0 ? (
                   <table className="w-full min-w-[1080px] border-collapse text-sm">
                     <thead>
-                    <tr className="border-b border-line bg-paper text-left text-xs uppercase text-zinc-500">
+                    <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
                         <th className="px-3 py-3">Số CT</th>
                         <th className="px-3 py-3">Mã hàng</th>
                         <th className="px-3 py-3">Mã LSX</th>
@@ -3637,7 +3633,7 @@ export function MaterialDashboard() {
                     </div>
                   ) : null}
                   <button
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                    className="inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
                     type="button"
                     onClick={addOrder}
                     disabled={isDraftDirectChargeInvalid}

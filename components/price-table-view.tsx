@@ -18,7 +18,7 @@ export function PriceTableView({ isVisible, rows }: PriceTableViewProps) {
       <div className="mt-4 overflow-x-auto">
         <table className="w-full min-w-[620px] text-sm">
           <thead>
-            <tr className="border-b border-line bg-paper text-left text-xs uppercase text-zinc-500">
+            <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
               <th className="px-3 py-3">Kim loại</th>
               <th className="px-3 py-3">Nguồn / công thức</th>
               <th className="px-3 py-3">Hàm lượng</th>

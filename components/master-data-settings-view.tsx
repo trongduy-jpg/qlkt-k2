@@ -62,7 +62,7 @@ export function MasterDataSettingsView({
               <input className="rounded-md border border-line px-3 py-2 text-sm" type="number" step="0.0001" placeholder="Hàm lượng" value={materialDraft.purity} onChange={(event) => setMaterialDraft((current) => ({ ...current, purity: Number(event.target.value) }))} />
               <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="ĐVT" value={materialDraft.unit} onChange={(event) => setMaterialDraft((current) => ({ ...current, unit: event.target.value }))} />
             </div>
-            <button className="rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddMaterial}>
+            <button className="rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddMaterial}>
               Thêm NVL
             </button>
           </div>
@@ -96,7 +96,7 @@ export function MasterDataSettingsView({
               <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Công đoạn" value={workerDraft.stage ?? ""} onChange={(event) => setWorkerDraft((current) => ({ ...current, stage: event.target.value }))} />
             </div>
             <div className="flex gap-2">
-              <button className="flex-1 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddWorker}>
+              <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddWorker}>
                 {editingWorkerId ? "Cập nhật thợ" : "Thêm thợ"}
               </button>
               {editingWorkerId ? (

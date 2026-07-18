@@ -301,7 +301,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-[1200px] w-full text-sm">
               <thead>
-                <tr className="border-b border-line bg-paper text-left text-xs uppercase text-zinc-500">
+                <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
                   <th className="px-3 py-3">Kỳ báo cáo</th>
                   <th className="px-3 py-3">Trạng thái soát xét</th>
                   <th className="px-3 py-3">Kim loại</th>
