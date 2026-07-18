@@ -1389,10 +1389,7 @@ export function MaterialDashboard() {
           editingMovementId ? current.map((item) => (item.id === editingMovementId ? savedOrder : item)) : [savedOrder, ...current]
         );
       }
-      setJournalFocusCode(savedOrder.code);
       setSelectedOrderCode(savedOrder.code);
-      setQuery(savedOrder.code);
-      setStatus("Tất cả");
       if (editingMovementId) {
         pushAudit("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`);
         await createAuditLog("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
@@ -1637,13 +1634,9 @@ export function MaterialDashboard() {
       }
       setProductionHeaderDraftCache(nextHeaderDraftCache);
       setSelectedOrderCode(nextHeader.code);
-      setJournalFocusCode(nextHeader.code);
       setRecentCreatedOrderCode(nextHeader.code);
-      setQuery(nextHeader.code);
-      setStatus("Tất cả");
       setProductionHeaderDraft(createEmptyProductionOrderHeaderDraft());
       setIsProductionFormOpen(false);
-      setActiveModule("Nhật ký NVL");
       pushAudit("create_production_order", `Tạo LSX ${nextHeader.code} - ${nextHeader.sku}`);
       await createAuditLog("create_production_order", `Tạo LSX ${nextHeader.code} - ${nextHeader.sku}`, saved.id);
     } catch (error) {
@@ -1877,7 +1870,6 @@ export function MaterialDashboard() {
     setEditingMovementId(order.id);
     setDraft({ ...order });
     setSelectedOrderCode(order.code);
-    setJournalFocusCode(order.code);
     setIsMovementFormOpen(true);
     setActiveModule("Nhật ký NVL");
   }
