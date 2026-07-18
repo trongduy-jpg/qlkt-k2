@@ -2844,9 +2844,9 @@ export function MaterialDashboard() {
                           <th className="px-3 py-3">Mã LSX</th>
                           <th className="px-3 py-3">Mã hàng</th>
                           <th className="px-3 py-3">Tên hàng</th>
-                          <th className="px-3 py-3">Công đoạn</th>
-                          <th className="px-3 py-3">Thợ</th>
-                          <th className="px-3 py-3">Deadline</th>
+                          <th className="px-3 py-3">Khách hàng</th>
+                          <th className="px-3 py-3">SR/KH</th>
+                          <th className="px-3 py-3">Deadline đơn hàng</th>
                           <th className="px-3 py-3 text-right">Số lượng</th>
                           <th className="px-3 py-3 text-right">Giao dịch</th>
                           <th className="px-3 py-3">Trạng thái LSX</th>
@@ -2872,11 +2872,11 @@ export function MaterialDashboard() {
                                 {summary.productName || "Chưa cập nhật"}
                               </p>
                             </td>
-                            <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.plannedStage) ? "text-zinc-700" : "text-zinc-400"}`}>
-                              {summary.plannedStage || "Chưa cập nhật"}
+                            <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.customerName) ? "text-zinc-700" : "text-zinc-400"}`}>
+                              {summary.customerName || "Chưa cập nhật"}
                             </td>
-                            <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.plannedWorker) ? "text-zinc-700" : "text-zinc-400"}`}>
-                              {summary.plannedWorker || "Chưa phân công"}
+                            <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.salesType) ? "text-zinc-700" : "text-zinc-400"}`}>
+                              {summary.salesType || "Chưa cập nhật"}
                             </td>
                             <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
                               {summary.deadlineDate || "Chưa cập nhật"}
