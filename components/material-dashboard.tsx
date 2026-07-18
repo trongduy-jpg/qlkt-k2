@@ -2155,7 +2155,7 @@ export function MaterialDashboard() {
     return (
       <div className="space-y-4">
         <div className="rounded-md border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-sm text-zinc-700">
-          Đang sửa LSX {editingProductionCode}. Trạng thái vận hành và tiến độ thực tế sẽ tiếp tục cập nhật trong Nhật ký NVL.
+          Trạng thái vận hành và tiến độ thực tế sẽ tiếp tục cập nhật trong Nhật ký NVL.
         </div>
 
         <div className="rounded-md border border-line bg-white p-3">
@@ -3078,6 +3078,9 @@ export function MaterialDashboard() {
                 <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-5 py-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wide text-brass">Chi tiết LSX</p>
+                    <h3 className="font-display mt-1 text-2xl font-semibold text-ink">
+                      {selectedOrderSummary?.code || "Chi tiết LSX"}
+                    </h3>
                     <p className="mt-1 text-sm text-zinc-600">
                       {isEditingSelectedOrder
                         ? "Chỉnh sửa trực tiếp bên dưới, bấm Lưu LSX để lưu thay đổi."
@@ -3399,14 +3402,16 @@ export function MaterialDashboard() {
                 aria-hidden={!isMovementFormOpen}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <Plus className="text-jade" size={18} />
-                    <div>
-                      <h3 className="text-base font-bold text-ink">{editingMovementId ? "Sửa giao dịch NVL" : "Thêm giao dịch NVL"}</h3>
-                      <p className="mt-1 text-sm text-zinc-600">
-                        {editingMovementId ? "Chỉnh sửa giao dịch NVL trong đúng ngữ cảnh nhật ký nguyên vật liệu." : "Nhập thông tin theo mẫu Nhật ký sản xuất tháng."}
-                      </p>
-                    </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-brass">
+                      {editingMovementId ? "Sửa giao dịch NVL" : "Thêm giao dịch NVL"}
+                    </p>
+                    <h3 className="font-display mt-1 text-2xl font-semibold text-ink">
+                      {editingMovementId ? draft.code || "Giao dịch NVL" : "Giao dịch mới"}
+                    </h3>
+                    <p className="mt-1 text-sm text-zinc-600">
+                      {editingMovementId ? "Chỉnh sửa trực tiếp bên dưới, bấm Cập nhật NVL để lưu." : "Nhập thông tin theo mẫu Nhật ký sản xuất tháng."}
+                    </p>
                   </div>
                   <button
                     className="inline-flex size-9 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
@@ -3422,9 +3427,6 @@ export function MaterialDashboard() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
                         {editingMovementId ? "Đang sửa giao dịch" : "Giao dịch mới"}
-                      </span>
-                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                        LSX: {draft.code || "Chưa chọn"}
                       </span>
                       <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
                         Mã hàng: {draft.sku || "Chưa chọn"}
