@@ -136,11 +136,6 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brass">Báo cáo tồn hộp thợ</p>
             <h3 className="mt-1 text-lg font-bold text-ink">Đối soát tồn hộp thợ theo kỳ</h3>
-            <p className="mt-1 max-w-3xl text-sm leading-6 text-zinc-600">
-              Màn hình này chỉ giữ đúng các trường nghiệp vụ cần đối soát: kỳ báo cáo, trạng thái soát xét, kim loại,
-              tuổi vàng, thợ, công đoạn, tồn đầu kỳ, nhập, xuất, tồn bột máy, tồn sổ sách, tồn thực tế, chênh lệch,
-              nhận xét và định mức ký quỹ.
-            </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -307,8 +302,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
                   <th className="px-3 py-3">Kim loại</th>
                   <th className="px-3 py-3">Tuổi vàng</th>
                   <th className="px-3 py-3">Tên thợ</th>
-                  <th className="px-3 py-3">Mã công đoạn</th>
-                  <th className="px-3 py-3">Tên công đoạn</th>
+                  <th className="px-3 py-3">Công đoạn</th>
                   <th className="px-3 py-3 text-right">Tồn đầu kỳ</th>
                   <th className="px-3 py-3 text-right">Nhập trong kỳ</th>
                   <th className="px-3 py-3 text-right">Xuất trong kỳ</th>
@@ -316,8 +310,6 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
                   <th className="px-3 py-3 text-right">Tồn sổ sách</th>
                   <th className="px-3 py-3 text-right">Tồn thực tế</th>
                   <th className="px-3 py-3 text-right">Chênh lệch</th>
-                  <th className="px-3 py-3">Nhận xét</th>
-                  <th className="px-3 py-3 text-right">Định mức ký quỹ</th>
                 </tr>
               </thead>
               <tbody>
@@ -339,8 +331,10 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
                       <div className="font-semibold text-ink">{line.workerName}</div>
                       <div className="text-xs text-zinc-500">{line.workerCode}</div>
                     </td>
-                    <td className="px-3 py-3">{line.stageCode}</td>
-                    <td className="px-3 py-3">{line.stageName}</td>
+                    <td className="px-3 py-3">
+                      <div className="font-medium text-zinc-800">{line.stageName}</div>
+                      <div className="text-xs text-zinc-500">{line.stageCode}</div>
+                    </td>
                     <td className="px-3 py-3 text-right">{formatGram(line.openingConvertedGram)}</td>
                     <td className="px-3 py-3 text-right">{formatGram(line.importConvertedGram)}</td>
                     <td className="px-3 py-3 text-right">{formatGram(line.exportConvertedGram)}</td>
@@ -350,14 +344,10 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
                     <td className={`px-3 py-3 text-right font-semibold ${line.diffConvertedGram < 0 ? "text-red-700" : "text-emerald-700"}`}>
                       {formatGram(line.diffConvertedGram)}
                     </td>
-                    <td className="px-3 py-3 max-w-[240px]">
-                      <div className="line-clamp-2 text-zinc-700">{line.comment || "-"}</div>
-                    </td>
-                    <td className="px-3 py-3 text-right">{formatGram(line.depositNormConvertedGram)}</td>
                   </tr>
                 )) : (
                   <tr>
-                    <td className="px-3 py-10 text-center text-sm text-zinc-500" colSpan={16}>
+                    <td className="px-3 py-10 text-center text-sm text-zinc-500" colSpan={13}>
                       Chưa có dữ liệu tồn hợp thợ để hiển thị.
                     </td>
                   </tr>
