@@ -2,6 +2,7 @@ export type Status = string;
 
 export type ProductionOrder = {
   id: string;
+  orderId?: string;
   code: string;
   sku: string;
   productName?: string;

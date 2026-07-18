@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:reset": "node tools/reset-supabase-data.mjs",
+    "db:seed:master": "node tools/seed-supabase-master-data.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

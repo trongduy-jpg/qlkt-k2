@@ -15,6 +15,7 @@ import {
 
 type WorkerBoxViewProps = {
   isVisible: boolean;
+  useDemoData?: boolean;
 };
 
 function formatGram(value: number) {
@@ -43,7 +44,7 @@ function mapGoldAgeLabel(code: string) {
   return code;
 }
 
-export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
+export function WorkerBoxView({ isVisible, useDemoData = true }: WorkerBoxViewProps) {
   const [periodCode, setPeriodCode] = useState(getDefaultWorkerBoxPeriodCode());
   const [query, setQuery] = useState("");
   const [reviewFilter, setReviewFilter] = useState<WorkerBoxReviewFilter>("all");
@@ -56,9 +57,32 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
-  const selectedPeriod = getWorkerBoxPeriod(periodCode);
+  const selectedPeriod = useDemoData ? getWorkerBoxPeriod(periodCode) : null;
 
   const result = useMemo(() => {
+    if (!useDemoData) {
+      return {
+        rows: [],
+        total: 0,
+        page: 1,
+        pageSize,
+        pageCount: 1,
+        summary: {
+          book: 0,
+          physical: 0,
+          diff: 0,
+          risk: 0,
+          pending: 0,
+          matched: 0
+        },
+        filterOptions: {
+          metalCodes: [],
+          goldAgeCodes: [],
+          debtStatuses: []
+        }
+      };
+    }
+
     return filterWorkerBoxLines({
       periodCode,
       reviewStatus: reviewFilter,
@@ -69,7 +93,7 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
       page,
       pageSize
     });
-  }, [debtFilter, goldAgeFilter, metalFilter, page, periodCode, query, reviewFilter]);
+  }, [debtFilter, goldAgeFilter, metalFilter, page, pageSize, periodCode, query, reviewFilter, useDemoData]);
 
   const selectedLine = result.rows.find((line) => line.id === selectedId) ?? null;
 
@@ -105,21 +129,27 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
 
           <div className="flex flex-wrap gap-2">
             <select
-              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-paper"
               value={periodCode}
+              disabled={!useDemoData}
               onChange={(event) => {
                 setPeriodCode(event.target.value);
                 clearFilters();
               }}
             >
-              {workerBoxPeriods.map((period) => (
-                <option key={period.code} value={period.code}>{period.label}</option>
-              ))}
+              {useDemoData ? (
+                workerBoxPeriods.map((period) => (
+                  <option key={period.code} value={period.code}>{period.label}</option>
+                ))
+              ) : (
+                <option value="">Chưa có dữ liệu kỳ báo cáo</option>
+              )}
             </select>
 
             <select
-              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-paper"
               value={reviewFilter}
+              disabled={!useDemoData}
               onChange={(event) => {
                 setReviewFilter(event.target.value as WorkerBoxReviewFilter);
                 setPage(1);
@@ -134,9 +164,10 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
               <input
-                className="h-10 w-full rounded-md border border-line bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 sm:w-64"
+                className="h-10 w-full rounded-md border border-line bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-paper sm:w-64"
                 placeholder="Tìm thợ, công đoạn, NVL..."
                 value={query}
+                disabled={!useDemoData}
                 onChange={(event) => {
                   setQuery(event.target.value);
                   setPage(1);
@@ -147,8 +178,9 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
             </div>
 
             <button
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:bg-paper disabled:text-zinc-400"
               type="button"
+              disabled={!useDemoData}
               onClick={() => setIsAdvancedOpen((current) => !current)}
             >
               <SlidersHorizontal size={16} />
@@ -157,7 +189,7 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
           </div>
         </div>
 
-        {isAdvancedOpen ? (
+        {isAdvancedOpen && useDemoData ? (
           <div className="mt-3 grid gap-2 rounded-md border border-line bg-paper p-3 md:grid-cols-4">
             <select
               className="h-10 rounded-md border border-line bg-white px-3 text-sm"
@@ -204,6 +236,12 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
             <button className="h-10 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink" type="button" onClick={clearFilters}>
               Xóa lọc
             </button>
+          </div>
+        ) : null}
+
+        {!useDemoData ? (
+          <div className="mt-3 rounded-md border border-dashed border-line bg-paper px-3 py-2 text-sm text-zinc-600">
+            Chưa có dữ liệu thực cho phân hệ <strong className="text-ink">Tồn hợp thợ</strong>. Dữ liệu demo đã được tắt để tránh hiển thị sai.
           </div>
         ) : null}
 
@@ -257,7 +295,7 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
                 </tr>
               </thead>
               <tbody>
-                {result.rows.map((line) => (
+                {result.rows.length > 0 ? result.rows.map((line) => (
                   <tr
                     key={line.id}
                     className={`cursor-pointer border-b border-line/70 hover:bg-paper ${selectedId === line.id ? "bg-emerald-50/70" : ""}`}
@@ -291,7 +329,13 @@ export function WorkerBoxView({ isVisible }: WorkerBoxViewProps) {
                     </td>
                     <td className="px-3 py-3 text-right">{formatGram(line.depositNormConvertedGram)}</td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td className="px-3 py-10 text-center text-sm text-zinc-500" colSpan={16}>
+                      Chưa có dữ liệu tồn hợp thợ để hiển thị.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

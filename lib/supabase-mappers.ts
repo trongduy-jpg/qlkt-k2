@@ -24,6 +24,7 @@ export function fromDbStatus(status: string): Status {
 
 export type MovementRow = {
   id: string;
+  order_id?: string | null;
   process_name: string;
   occurred_date?: string | null;
   destination?: string | null;
@@ -66,6 +67,7 @@ export type MovementRow = {
 export function movementRowToProductionOrder(row: MovementRow): ProductionOrder {
   return {
     id: row.id,
+    orderId: row.order_id ?? "",
     code: row.production_orders?.order_code ?? "",
     sku: row.production_orders?.sku ?? "",
     productName: row.production_orders?.product_name ?? "",
