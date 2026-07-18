@@ -65,11 +65,13 @@ import {
   createProductionOrderHeader,
   createWorker,
   deleteMaterialMovement,
+  deleteWorker,
   loadDatabaseHealth,
   loadMaterials,
   loadProductionOrderHeaders,
   loadProductionOrders,
   loadWorkers,
+  updateWorker,
   updateProductionOrderStatus,
   updateProductionOrderHeader,
   updateMaterialMovement,
@@ -717,6 +719,7 @@ export function MaterialDashboard() {
   const [workers, setWorkers] = useState<WorkerMaster[]>([]);
   const [materialDraft, setMaterialDraft] = useState<Omit<MaterialMaster, "id">>(createEmptyMaterialDraft());
   const [workerDraft, setWorkerDraft] = useState<Omit<WorkerMaster, "id">>(createEmptyWorkerDraft());
+  const [editingWorkerId, setEditingWorkerId] = useState<string | null>(null);
 
   async function reloadOperationalData(options?: {
     movementDraftOverrides?: Record<string, ProductionOrder>;
@@ -2492,20 +2495,60 @@ export function MaterialDashboard() {
   async function addWorker() {
     if (!workerDraft.worker_code.trim() || !workerDraft.full_name.trim()) return;
 
+    const normalizedWorker = {
+      ...workerDraft,
+      worker_code: workerDraft.worker_code.trim().toUpperCase(),
+      full_name: workerDraft.full_name.trim(),
+      department: workerDraft.department.trim() || "San xuat",
+      stage: workerDraft.stage?.trim() || null
+    };
+
     try {
-      const savedWorker = await createWorker({
-        ...workerDraft,
-        worker_code: workerDraft.worker_code.trim().toUpperCase(),
-        full_name: workerDraft.full_name.trim(),
-        department: workerDraft.department.trim() || "San xuat",
-        stage: workerDraft.stage?.trim() || null
-      });
-      setWorkers((current) => [...current, savedWorker].sort((a, b) => a.worker_code.localeCompare(b.worker_code)));
-      setWorkerDraft(createEmptyWorkerDraft());
-      pushAudit("create_worker", `Thêm thợ ${savedWorker.worker_code} - ${savedWorker.full_name}`);
-      await createAuditLog("create_worker", `Thêm thợ ${savedWorker.worker_code} - ${savedWorker.full_name}`, savedWorker.id);
+      if (editingWorkerId) {
+        const savedWorker = await updateWorker(editingWorkerId, normalizedWorker);
+        setWorkers((current) =>
+          current.map((item) => (item.id === editingWorkerId ? savedWorker : item)).sort((a, b) => a.worker_code.localeCompare(b.worker_code))
+        );
+        setEditingWorkerId(null);
+        setWorkerDraft(createEmptyWorkerDraft());
+        pushAudit("update_worker", `Cập nhật thợ ${savedWorker.worker_code} - ${savedWorker.full_name}`);
+        await createAuditLog("update_worker", `Cập nhật thợ ${savedWorker.worker_code} - ${savedWorker.full_name}`, savedWorker.id);
+      } else {
+        const savedWorker = await createWorker(normalizedWorker);
+        setWorkers((current) => [...current, savedWorker].sort((a, b) => a.worker_code.localeCompare(b.worker_code)));
+        setWorkerDraft(createEmptyWorkerDraft());
+        pushAudit("create_worker", `Thêm thợ ${savedWorker.worker_code} - ${savedWorker.full_name}`);
+        await createAuditLog("create_worker", `Thêm thợ ${savedWorker.worker_code} - ${savedWorker.full_name}`, savedWorker.id);
+      }
     } catch (error) {
-      setRemoteError(error instanceof Error ? error.message : "Không thêm được thợ");
+      setRemoteError(error instanceof Error ? error.message : "Không lưu được thợ");
+    }
+  }
+
+  function startEditWorker(worker: WorkerMaster) {
+    setEditingWorkerId(worker.id);
+    setWorkerDraft({
+      worker_code: worker.worker_code,
+      full_name: worker.full_name,
+      department: worker.department,
+      stage: worker.stage
+    });
+  }
+
+  function cancelEditWorker() {
+    setEditingWorkerId(null);
+    setWorkerDraft(createEmptyWorkerDraft());
+  }
+
+  async function removeWorker(id: string) {
+    try {
+      await deleteWorker(id);
+      setWorkers((current) => current.filter((item) => item.id !== id));
+      if (editingWorkerId === id) cancelEditWorker();
+      pushAudit("delete_worker", `Xóa thợ ${id}`);
+      await createAuditLog("delete_worker", `Xóa thợ ${id}`, id);
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không xóa được thợ (có thể đang được dùng trong giao dịch NVL)");
     }
   }
 
@@ -3302,9 +3345,9 @@ export function MaterialDashboard() {
                             <div className="text-xs text-zinc-500">{order.stage}</div>
                           </td>
                           <td className="px-3 py-3 text-right text-zinc-700">{order.qtyPiece ?? "-"}</td>
-                          <td className="px-3 py-3 text-right text-zinc-700">{formatGram(order.issued)}</td>
-                          <td className="px-3 py-3 text-right text-zinc-700">{formatGram(order.returned)}</td>
-                          <td className="px-3 py-3 text-right font-semibold text-ink">{formatGram(order.loss)}</td>
+                          <td className={`px-3 py-3 text-right ${order.issued > 0 ? "text-zinc-700" : "text-zinc-400"}`}>{formatGram(order.issued)}</td>
+                          <td className={`px-3 py-3 text-right ${order.returned > 0 ? "text-zinc-700" : "text-zinc-400"}`}>{formatGram(order.returned)}</td>
+                          <td className={`px-3 py-3 text-right font-semibold ${order.loss > 0 ? "text-ink" : "text-zinc-400"}`}>{formatGram(order.loss)}</td>
                           <td className="px-3 py-3 text-xs text-zinc-600">
                             <div>{order.lossPeriod || "-"}</div>
                             <div>{order.nxtPeriod || "-"}</div>
@@ -3684,6 +3727,10 @@ export function MaterialDashboard() {
               setWorkerDraft={setWorkerDraft}
               onAddMaterial={addMaterial}
               onAddWorker={addWorker}
+              editingWorkerId={editingWorkerId}
+              onStartEditWorker={startEditWorker}
+              onCancelEditWorker={cancelEditWorker}
+              onDeleteWorker={removeWorker}
             />
           </div>
           {renderProductionFormOverlay()}

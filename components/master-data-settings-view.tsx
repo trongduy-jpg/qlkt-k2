@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import { LockKeyhole } from "lucide-react";
+import { LockKeyhole, Pencil, Trash2 } from "lucide-react";
 import { modules } from "@/lib/demo-data";
 import type { MaterialMaster, WorkerMaster } from "@/lib/material-service";
 
@@ -13,6 +13,10 @@ type MasterDataSettingsViewProps = {
   setWorkerDraft: Dispatch<SetStateAction<Omit<WorkerMaster, "id">>>;
   onAddMaterial: () => void;
   onAddWorker: () => void;
+  editingWorkerId: string | null;
+  onStartEditWorker: (worker: WorkerMaster) => void;
+  onCancelEditWorker: () => void;
+  onDeleteWorker: (id: string) => void;
 };
 
 export function MasterDataSettingsView({
@@ -24,7 +28,11 @@ export function MasterDataSettingsView({
   setMaterialDraft,
   setWorkerDraft,
   onAddMaterial,
-  onAddWorker
+  onAddWorker,
+  editingWorkerId,
+  onStartEditWorker,
+  onCancelEditWorker,
+  onDeleteWorker
 }: MasterDataSettingsViewProps) {
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
@@ -70,7 +78,14 @@ export function MasterDataSettingsView({
         </div>
 
         <div className="rounded-md border border-line bg-paper p-3">
-          <h4 className="font-semibold text-ink">Danh mục thợ</h4>
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="font-semibold text-ink">Danh mục thợ</h4>
+            {editingWorkerId ? (
+              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                Đang sửa thợ
+              </span>
+            ) : null}
+          </div>
           <div className="mt-3 grid gap-2">
             <div className="grid grid-cols-2 gap-2">
               <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Mã thợ" value={workerDraft.worker_code} onChange={(event) => setWorkerDraft((current) => ({ ...current, worker_code: event.target.value }))} />
@@ -80,16 +95,49 @@ export function MasterDataSettingsView({
               <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Bộ phận" value={workerDraft.department} onChange={(event) => setWorkerDraft((current) => ({ ...current, department: event.target.value }))} />
               <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Công đoạn" value={workerDraft.stage ?? ""} onChange={(event) => setWorkerDraft((current) => ({ ...current, stage: event.target.value }))} />
             </div>
-            <button className="rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddWorker}>
-              Thêm thợ
-            </button>
+            <div className="flex gap-2">
+              <button className="flex-1 rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddWorker}>
+                {editingWorkerId ? "Cập nhật thợ" : "Thêm thợ"}
+              </button>
+              {editingWorkerId ? (
+                <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onCancelEditWorker}>
+                  Hủy
+                </button>
+              ) : null}
+            </div>
           </div>
           <div className="mt-4 max-h-72 overflow-y-auto rounded-md border border-line bg-white">
+            {workers.length === 0 ? (
+              <div className="px-3 py-4 text-sm text-zinc-500">Chưa có thợ nào trong danh mục.</div>
+            ) : null}
             {workers.map((worker) => (
-              <div key={worker.id} className="grid grid-cols-[90px_1fr_100px] gap-2 border-b border-line/70 px-3 py-2 text-sm last:border-b-0">
+              <div
+                key={worker.id}
+                className={`grid grid-cols-[90px_1fr_90px_auto] items-center gap-2 border-b border-line/70 px-3 py-2 text-sm last:border-b-0 ${
+                  editingWorkerId === worker.id ? "bg-amber-50/60" : ""
+                }`}
+              >
                 <span className="font-semibold text-ink">{worker.worker_code}</span>
-                <span className="text-zinc-700">{worker.full_name}</span>
+                <span className="truncate text-zinc-700">{worker.full_name}</span>
                 <span className="text-right text-zinc-500">{worker.stage}</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"
+                    type="button"
+                    title="Sửa thợ"
+                    onClick={() => onStartEditWorker(worker)}
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
+                    type="button"
+                    title="Xóa thợ"
+                    onClick={() => onDeleteWorker(worker.id)}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

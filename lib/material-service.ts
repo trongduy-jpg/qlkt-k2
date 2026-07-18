@@ -350,6 +350,29 @@ export async function createWorker(input: Omit<WorkerMaster, "id">): Promise<Wor
   return data as WorkerMaster;
 }
 
+export async function updateWorker(id: string, input: Omit<WorkerMaster, "id">): Promise<WorkerMaster> {
+  if (!isSupabaseConfigured || !supabase) {
+    return { ...input, id };
+  }
+
+  const { data, error } = await supabase
+    .from("workers")
+    .update(input)
+    .eq("id", id)
+    .select("id, worker_code, full_name, department, stage")
+    .single();
+
+  if (error || !data) throw new Error(`Cannot update worker: ${error?.message ?? "unknown error"}`);
+  return data as WorkerMaster;
+}
+
+export async function deleteWorker(id: string): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+
+  const { error } = await supabase.from("workers").delete().eq("id", id);
+  if (error) throw new Error(`Cannot delete worker: ${error.message}`);
+}
+
 export async function createProductionOrderHeader(input: ProductionOrderHeaderInput) {
   if (!isSupabaseConfigured || !supabase) {
     return { ...input, id: crypto.randomUUID() };
