@@ -692,7 +692,6 @@ export function MaterialDashboard() {
   const [productionDeadlineFilter, setProductionDeadlineFilter] = useState("Tất cả deadline");
   const [selectedOrderCode, setSelectedOrderCode] = useState<string | null>(null);
   const [isProductionDetailOpen, setIsProductionDetailOpen] = useState(false);
-  const [journalFocusCode, setJournalFocusCode] = useState<string | null>(null);
   const [orders, setOrders] = useState<ProductionOrder[]>(productionOrders);
   const [productionHeaders, setProductionHeaders] = useState<ProductionOrderHeader[]>([]);
   const [productionHeaderDraft, setProductionHeaderDraft] = useState<Omit<ProductionOrderHeader, "id" | "createdAt">>(createEmptyProductionOrderHeaderDraft());
@@ -933,11 +932,10 @@ export function MaterialDashboard() {
 
     return orders.filter((order) => {
       const matchStatus = status === "Tất cả" || order.status === status;
-      const matchSelectedOrder = !normalizedQuery && (!journalFocusCode || order.code === journalFocusCode);
       const searchable = `${order.code} ${order.sku} ${order.material} ${order.worker} ${order.stage}`.toLowerCase();
-      return matchStatus && (matchSelectedOrder || (normalizedQuery && searchable.includes(normalizedQuery)));
+      return matchStatus && (!normalizedQuery || searchable.includes(normalizedQuery));
     });
-  }, [journalFocusCode, orders, query, status]);
+  }, [orders, query, status]);
 
   const orderSummaries = useMemo(() => {
     const map = new Map<string, OrderSummary & { statuses: Status[] }>();
@@ -1753,7 +1751,6 @@ export function MaterialDashboard() {
       }
       setProductionHeaderDraftCache(nextHeaderDraftCache);
       setSelectedOrderCode(nextHeader.code);
-      setJournalFocusCode(nextHeader.code);
       setEditingProductionCode(null);
       setProductionHeaderDraft(createEmptyProductionOrderHeaderDraft());
       setIsProductionFormOpen(false);
@@ -1844,7 +1841,6 @@ export function MaterialDashboard() {
   function selectProductionOrder(code: string) {
     setSelectedOrderCode(code);
     setIsProductionDetailOpen(true);
-    setJournalFocusCode(code);
     setRecentCreatedOrderCode(code);
     setQuery("");
     setActiveModule("Lệnh sản xuất");
@@ -2199,7 +2195,6 @@ export function MaterialDashboard() {
     };
     });
     setSelectedOrderCode(summary.code);
-    setJournalFocusCode(summary.code);
     setQuery(summary.code);
     setStatus("Tất cả");
     setEditingMovementId(null);
@@ -2214,7 +2209,6 @@ export function MaterialDashboard() {
 
   function viewSelectedOrderMovements() {
     if (!selectedOrderSummary) return;
-    setJournalFocusCode(selectedOrderSummary.code);
     setQuery(selectedOrderSummary.code);
     setStatus("Tất cả");
     setActiveModule("Nhật ký NVL");
@@ -2274,7 +2268,6 @@ export function MaterialDashboard() {
         const savedSeed = isSupabaseConfigured ? await createMaterialMovement(seedMovement) : seedMovement;
         setOrders((current) => [savedSeed, ...current.filter((item) => item.id !== savedSeed.id)]);
         setSelectedOrderCode(savedSeed.code);
-        setJournalFocusCode(savedSeed.code);
         setQuery(savedSeed.code);
       }
 
@@ -2288,7 +2281,6 @@ export function MaterialDashboard() {
       }
 
       setSelectedOrderCode(selectedOrderSummary.code);
-      setJournalFocusCode(selectedOrderSummary.code);
       setQuery(selectedOrderSummary.code);
       setStatus("Tất cả");
       setActiveModule("Nhật ký NVL");
