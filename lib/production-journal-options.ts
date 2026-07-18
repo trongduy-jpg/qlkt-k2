@@ -5,9 +5,9 @@ export type SelectOption = {
 };
 
 export const journalDestinations: SelectOption[] = [
-  { value: "NKBC", label: "NKBC - Nhat ky bac/cong doan" },
-  { value: "BKNXT", label: "BKNXT - Bang ke NXT" },
-  { value: "KCP", label: "KCP - Kho cap phat" }
+  { value: "NKBC", label: "NKBC – Nhật ký bạc/công đoạn" },
+  { value: "BKNXT", label: "BKNXT – Bảng kê NXT" },
+  { value: "KCP", label: "KCP – Kho cấp phát" }
 ];
 
 export const productionOrderDestinations: SelectOption[] = [
@@ -61,34 +61,34 @@ export const productionOrderSalesTypeOptions: SelectOption[] = [
 ];
 
 export const journalStages: SelectOption[] = [
-  { value: "CKE", label: "CKE - Can keo" },
-  { value: "CDT", label: "CDT - Can dat" },
-  { value: "DAN", label: "DAN - Dan day" },
-  { value: "BIEN", label: "BIEN - Bien" },
-  { value: "QBI", label: "QBI - Quay bi" },
-  { value: "BAO", label: "BAO - Bao day" },
-  { value: "PI", label: "PI - Pi" },
-  { value: "DAP", label: "DAP - Dap dinh hinh" },
-  { value: "DKB", label: "DKB - Danh bong" },
-  { value: "GEP", label: "GEP - Ghep day" },
-  { value: "NAU", label: "NAU - Nau" },
-  { value: "SXK", label: "SXK - San xuat khoa" },
-  { value: "HTH", label: "HTH - Hoan thien" }
+  { value: "CKE", label: "CKE – Cán kéo" },
+  { value: "CDT", label: "CDT – Cán dát" },
+  { value: "DAN", label: "DAN – Đan dây" },
+  { value: "BIEN", label: "BIEN – Biến" },
+  { value: "QBI", label: "QBI – Quay bi" },
+  { value: "BAO", label: "BAO – Bao dây" },
+  { value: "PI", label: "PI – Pi" },
+  { value: "DAP", label: "DAP – Đập định hình" },
+  { value: "DKB", label: "DKB – Đánh bóng" },
+  { value: "GEP", label: "GEP – Ghép dây" },
+  { value: "NAU", label: "NAU – Nấu" },
+  { value: "SXK", label: "SXK – Sản xuất khóa" },
+  { value: "HTH", label: "HTH – Hoàn thiện" }
 ];
 
 export const journalMovementReasons: SelectOption[] = [
-  { value: "Xuat can keo", label: "Xuat can keo" },
-  { value: "Nhap sau can keo", label: "Nhap sau can keo" },
-  { value: "Xuat dan day", label: "Xuat dan day" },
-  { value: "Nhap sau dan day", label: "Nhap sau dan day" },
-  { value: "Xuat quay bi", label: "Xuat quay bi" },
-  { value: "Nhap sau quay bi", label: "Nhap sau quay bi" },
-  { value: "Xuat bao day", label: "Xuat bao day" },
-  { value: "Nhap sau bao day", label: "Nhap sau bao day" },
-  { value: "Xuat nau moi", label: "Xuat nau moi" },
-  { value: "Nhap sau nau moi", label: "Nhap sau nau moi" },
-  { value: "Xuat nau lai", label: "Xuat nau lai" },
-  { value: "Nhap sau nau lai", label: "Nhap sau nau lai" }
+  { value: "Xuat can keo", label: "Xuất cán kéo" },
+  { value: "Nhap sau can keo", label: "Nhập sau cán kéo" },
+  { value: "Xuat dan day", label: "Xuất đan dây" },
+  { value: "Nhap sau dan day", label: "Nhập sau đan dây" },
+  { value: "Xuat quay bi", label: "Xuất quay bi" },
+  { value: "Nhap sau quay bi", label: "Nhập sau quay bi" },
+  { value: "Xuat bao day", label: "Xuất bao dây" },
+  { value: "Nhap sau bao day", label: "Nhập sau bao dây" },
+  { value: "Xuat nau moi", label: "Xuất nấu mới" },
+  { value: "Nhap sau nau moi", label: "Nhập sau nấu mới" },
+  { value: "Xuat nau lai", label: "Xuất nấu lại" },
+  { value: "Nhap sau nau lai", label: "Nhập sau nấu lại" }
 ];
 
 export const goldAgeOptions: SelectOption[] = [
@@ -96,46 +96,46 @@ export const goldAgeOptions: SelectOption[] = [
   { value: "0.9583", label: "23K / 95.83%" },
   { value: "0.75", label: "18K / 75.00%" },
   { value: "0.61", label: "15K / 61.00%" },
-  { value: "0.925", label: "Bac 92.5%" }
+  { value: "0.925", label: "Bạc 92.5%" }
 ];
 
 export const sourceMaterialOptions: SelectOption[] = [
-  { value: "750Y", label: "750Y - Vang 18K vang" },
-  { value: "750W", label: "750W - Vang 18K trang" },
-  { value: "750R", label: "750R - Vang 18K hong" },
-  { value: "BAC925", label: "BAC925 - Bac 92.5" },
-  { value: "Nau moi", label: "Nau moi" },
-  { value: "Nau quay dau", label: "Nau quay dau" },
-  { value: "TP", label: "TP - Thanh pham/BTP nhap lai" }
+  { value: "750Y", label: "750Y – Vàng 18K vàng" },
+  { value: "750W", label: "750W – Vàng 18K trắng" },
+  { value: "750R", label: "750R – Vàng 18K hồng" },
+  { value: "BAC925", label: "BAC925 – Bạc 92.5" },
+  { value: "Nau moi", label: "Nấu mới" },
+  { value: "Nau quay dau", label: "Nấu quay đầu" },
+  { value: "TP", label: "TP – Thành phẩm nhập lại" }
 ];
 
 export const materialTypeOptions: SelectOption[] = [
-  { value: "NL18K", label: "NL18K - Nguyen lieu vang 18K" },
-  { value: "NL24K", label: "NL24K - Nguyen lieu vang 24K" },
-  { value: "NL23K", label: "NL23K - Nguyen lieu vang 23K" },
-  { value: "NLBAC92.5", label: "NLBAC92.5 - Nguyen lieu bac 92.5" },
-  { value: "NLBAC9999", label: "NLBAC9999 - Bac 9999" },
-  { value: "BOT18K", label: "BOT18K - Bot vang 18K" },
-  { value: "BOT23K", label: "BOT23K - Bot vang 23K" },
-  { value: "BOT24K", label: "BOT24K - Bot vang 24K" },
-  { value: "PK18K", label: "PK18K - Phu kien 18K" },
-  { value: "BTPDAY18K", label: "BTPDAY18K - BTP day 18K" },
-  { value: "BTPDAYBAC92.5", label: "BTPDAYBAC92.5 - BTP day bac" }
+  { value: "NL18K", label: "NL18K – Nguyên liệu vàng 18K" },
+  { value: "NL24K", label: "NL24K – Nguyên liệu vàng 24K" },
+  { value: "NL23K", label: "NL23K – Nguyên liệu vàng 23K" },
+  { value: "NLBAC92.5", label: "NLBAC92.5 – Nguyên liệu bạc 92.5" },
+  { value: "NLBAC9999", label: "NLBAC9999 – Bạc 99.99" },
+  { value: "BOT18K", label: "BOT18K – Bột vàng 18K" },
+  { value: "BOT23K", label: "BOT23K – Bột vàng 23K" },
+  { value: "BOT24K", label: "BOT24K – Bột vàng 24K" },
+  { value: "PK18K", label: "PK18K – Phụ kiện 18K" },
+  { value: "BTPDAY18K", label: "BTPDAY18K – BTP dây 18K" },
+  { value: "BTPDAYBAC92.5", label: "BTPDAYBAC92.5 – BTP dây bạc" }
 ];
 
 export const materialMetalOptions: SelectOption[] = [
-  { value: "AU", label: "AU - Vang" },
-  { value: "AG", label: "AG - Bac" },
-  { value: "PT", label: "PT - Platinum" }
+  { value: "AU", label: "AU – Vàng" },
+  { value: "AG", label: "AG – Bạc" },
+  { value: "PT", label: "PT – Platinum" }
 ];
 
 export const sourceOptions: SelectOption[] = [
-  { value: "CD", label: "CD - Cong doan" },
-  { value: "VN", label: "VN - Nguon Viet Nam" },
-  { value: "PHAN_KIM", label: "Phan kim" },
-  { value: "US", label: "Nhap tu US" },
-  { value: "PL", label: "PL - Phan loai/phieu le" },
-  { value: "KCP", label: "KCP - Kho cap phat" }
+  { value: "CD", label: "CD – Công đoạn" },
+  { value: "VN", label: "VN – Nguồn Việt Nam" },
+  { value: "PHAN_KIM", label: "Phân kim" },
+  { value: "US", label: "Nhập từ US" },
+  { value: "PL", label: "PL – Phân loại/phiếu lẻ" },
+  { value: "KCP", label: "KCP – Kho cấp phát" }
 ];
 
 export const movementLossStatusOptions: SelectOption[] = [
@@ -154,6 +154,9 @@ export const movementGoldAgeOptions: SelectOption[] = [
   { value: "0.925", label: "BAC" }
 ];
 
+// Ghi chu: cac ma US/VN/KS/PK/L2/CD/BH/KT/BK la ma nghiep vu noi bo,
+// chua co dien giai chinh thuc - giu nguyen cho den khi xac nhan y nghia
+// tu nguoi dung de tranh chu thich sai.
 export const movementImportSourceOptions: SelectOption[] = [
   { value: "US", label: "US" },
   { value: "VN", label: "VN" },
