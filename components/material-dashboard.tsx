@@ -3345,14 +3345,18 @@ export function MaterialDashboard() {
                         <th className="px-3 py-3 text-right">Hao hụt</th>
                         <th className="px-3 py-3">Hao/NXT</th>
                         <th className="px-3 py-3">Trạng thái</th>
-                        <th className="px-3 py-3 text-right">Thao tác</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredOrders.map((order) => (
                         <tr
                           key={order.id}
-                          className={`border-b ${recentCreatedOrderCode === order.code ? "border-emerald-200 bg-emerald-50/40" : "border-line/70"}`}
+                          className={`border-b ${isClosedStatus(order.status) ? "" : "cursor-pointer hover:bg-paper"} ${recentCreatedOrderCode === order.code ? "border-emerald-200 bg-emerald-50/40" : "border-line/70"}`}
+                          onClick={() => {
+                            if (isClosedStatus(order.status)) return;
+                            openMovementForEdit(order);
+                          }}
+                          title={isClosedStatus(order.status) ? "Giao dịch đã chốt, không thể sửa" : "Bấm để sửa giao dịch này"}
                         >
                           <td className="px-3 py-3">
                             <div className="font-semibold text-ink">{order.documentNo || order.documentInNo || "-"}</div>
@@ -3376,7 +3380,7 @@ export function MaterialDashboard() {
                             <div>{order.lossPeriod || "-"}</div>
                             <div>{order.nxtPeriod || "-"}</div>
                           </td>
-                          <td className="px-3 py-3">
+                          <td className="px-3 py-3" onClick={(event) => event.stopPropagation()}>
                             <select
                               className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 outline-none disabled:cursor-not-allowed disabled:opacity-70 ${statusClass[order.status]}`}
                               value={order.status}
@@ -3387,28 +3391,6 @@ export function MaterialDashboard() {
                                 <option key={item}>{item}</option>
                               ))}
                             </select>
-                          </td>
-                          <td className="px-3 py-3 text-right">
-                            <div className="flex justify-end gap-2">
-                              <button
-                                className="rounded-md border border-line bg-white px-2 py-1 text-xs font-semibold text-ink disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400"
-                                type="button"
-                                onClick={() => openMovementForEdit(order)}
-                                disabled={isClosedStatus(order.status)}
-                                title="Sửa giao dịch NVL"
-                              >
-                                Sửa NVL
-                              </button>
-                              <button
-                                className="inline-flex size-8 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400"
-                                type="button"
-                                onClick={() => removeOrder(order.id)}
-                                disabled={isClosedStatus(order.status)}
-                                title="Xóa giao dịch"
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            </div>
                           </td>
                         </tr>
                       ))}
@@ -3690,15 +3672,32 @@ export function MaterialDashboard() {
                       {remoteError}
                     </div>
                   ) : null}
-                  <button
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
-                    type="button"
-                    onClick={addOrder}
-                    disabled={isDraftDirectChargeInvalid}
-                  >
-                    <Plus size={16} />
-                    {editingMovementId ? "Cập nhật NVL" : "Thêm vào bảng"}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                      type="button"
+                      onClick={addOrder}
+                      disabled={isDraftDirectChargeInvalid}
+                    >
+                      <Plus size={16} />
+                      {editingMovementId ? "Cập nhật NVL" : "Thêm vào bảng"}
+                    </button>
+                    {editingMovementId ? (
+                      <button
+                        className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400"
+                        type="button"
+                        onClick={() => {
+                          removeOrder(editingMovementId);
+                          closeMovementForm();
+                        }}
+                        disabled={isClosedStatus(draft.status)}
+                        title="Xóa giao dịch"
+                      >
+                        <Trash2 size={16} />
+                        Xóa
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               </section>
 
