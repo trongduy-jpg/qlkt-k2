@@ -2607,6 +2607,8 @@ export function MaterialDashboard() {
     setProductionHeaderDraft({
       ...emptyDraft,
       code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), orderSummaries.map((summary) => summary.code)),
+      sku: selectedOrderSummary.sku || "",
+      productName: selectedOrderSummary.productName || "",
       customerName: selectedOrderSummary.customerName || "",
       salesType: selectedOrderSummary.salesType || ""
     });

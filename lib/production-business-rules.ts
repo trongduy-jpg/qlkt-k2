@@ -22,23 +22,30 @@ export function toMonthCode(dateString: string) {
   return dateString.slice(0, 7);
 }
 
-export function buildProductionOrderCode(prefix: string, dateString: string) {
-  const compactDate = dateString.slice(2).replaceAll("-", "");
-  return `${prefix}-${compactDate}`;
+function buildOrderMonthKey(dateString: string) {
+  const [year, month] = dateString.split("-");
+  return `${(year || "").slice(2)}${month || ""}`;
+}
+
+// Ma LSX = {prefix}-{YYMM}{STT trong thang}, vi du DHAG-26071 la lenh thu 1
+// cua thang 07/2026. Cac lenh tao them (cung mot khach/mot ma hang) chi lay
+// so thu tu tiep theo trong thang, khong gan them ngay hay hau to rieng.
+export function buildProductionOrderCode(prefix: string, dateString: string, existingCodes: Iterable<string> = []) {
+  const monthKey = buildOrderMonthKey(dateString);
+  const monthPrefix = `${prefix}-${monthKey}`;
+
+  let maxSequence = 0;
+  for (const code of existingCodes) {
+    if (!code.startsWith(monthPrefix)) continue;
+    const sequence = Number(code.slice(monthPrefix.length));
+    if (Number.isFinite(sequence) && sequence > maxSequence) maxSequence = sequence;
+  }
+
+  return `${monthPrefix}${maxSequence + 1}`;
 }
 
 export function buildUniqueProductionOrderCode(prefix: string, dateString: string, existingCodes: Iterable<string>) {
-  const baseCode = buildProductionOrderCode(prefix, dateString);
-  const taken = new Set(existingCodes);
-  if (!taken.has(baseCode)) return baseCode;
-
-  let sequence = 2;
-  let candidate = `${baseCode}-${sequence}`;
-  while (taken.has(candidate)) {
-    sequence += 1;
-    candidate = `${baseCode}-${sequence}`;
-  }
-  return candidate;
+  return buildProductionOrderCode(prefix, dateString, existingCodes);
 }
 
 export function buildDocumentNo(dateString: string, sequence: number) {
