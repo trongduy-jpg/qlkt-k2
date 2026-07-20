@@ -32,7 +32,6 @@ import {
 } from "@/lib/demo-data";
 import {
   journalDestinations,
-  journalMovementReasons,
   journalStages,
   movementExportSourceOptions,
   movementGoldAgeOptions,
@@ -3520,7 +3519,7 @@ export function MaterialDashboard() {
                         <SelectControl value={draft.destination ?? ""} onChange={(value) => updateDraft("destination", value)}>
                           <option value="">Chọn nơi nhận</option>
                           {journalDestinations.map((item) => (
-                            <option key={item.value} value={item.value}>{item.label}</option>
+                            <option key={item.value} value={item.value} title={item.label}>{item.label}</option>
                           ))}
                         </SelectControl>
                       </FieldShell>
@@ -3597,12 +3596,12 @@ export function MaterialDashboard() {
                     </div>
                     <div className="mt-3">
                       <FieldShell label="Diễn giải giao dịch">
-                        <SelectControl value={draft.sourceMaterialName ?? ""} onChange={(value) => updateDraft("sourceMaterialName", value)}>
-                          <option value="">Chọn diễn giải giao dịch</option>
-                          {journalMovementReasons.map((item) => (
-                            <option key={item.value} value={item.value}>{item.label}</option>
-                          ))}
-                        </SelectControl>
+                        <input
+                          className={fieldControlClass}
+                          placeholder="Nhập diễn giải giao dịch (VD: Xuất cán kéo)"
+                          value={draft.sourceMaterialName ?? ""}
+                          onChange={(e) => updateDraft("sourceMaterialName", e.target.value)}
+                        />
                       </FieldShell>
                     </div>
                   </DrawerSection>

@@ -5,7 +5,7 @@ export type SelectOption = {
 };
 
 export const journalDestinations: SelectOption[] = [
-  { value: "NKBC", label: "NKBC – Nhật ký bạc/công đoạn" },
+  { value: "NKBC", label: "NKBC – NK Bạc/CĐ" },
   { value: "BKNXT", label: "BKNXT – Bảng kê NXT" },
   { value: "KCP", label: "KCP – Kho cấp phát" }
 ];
