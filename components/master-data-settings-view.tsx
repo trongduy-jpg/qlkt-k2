@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState } from "react";
 import { LockKeyhole, Pencil, Trash2 } from "lucide-react";
-import type { MaterialMaster, ReferenceOption, StageMaster, WorkerMaster } from "@/lib/material-service";
+import type { StageMaster } from "@/lib/material-service";
 import type { AppUser } from "@/lib/auth-service";
+import { useMasterData } from "@/components/master-data-context";
 
 const haoHutRuleLabels: Record<StageMaster["hao_hut_rule"], string> = {
   truc_tiep: "Trực tiếp tính chi phí",
@@ -16,103 +17,55 @@ const appUserRoleLabels: Record<AppUser["role"], string> = {
   nhan_vien: "Nhân viên"
 };
 
-type MasterDataSettingsViewProps = {
-  isVisible: boolean;
-  materials: MaterialMaster[];
-  workers: WorkerMaster[];
-  stages: StageMaster[];
-  referenceOptions: ReferenceOption[];
-  referenceListKeys: Array<{ key: string; label: string }>;
-  referenceListKey: string;
-  onChangeReferenceListKey: (key: string) => void;
-  appUsers: AppUser[];
-  currentUserId?: string;
-  materialDraft: Omit<MaterialMaster, "id">;
-  workerDraft: Omit<WorkerMaster, "id">;
-  stageDraft: Omit<StageMaster, "id">;
-  referenceDraft: Omit<ReferenceOption, "id">;
-  appUserDraft: Omit<AppUser, "id">;
-  setMaterialDraft: Dispatch<SetStateAction<Omit<MaterialMaster, "id">>>;
-  setWorkerDraft: Dispatch<SetStateAction<Omit<WorkerMaster, "id">>>;
-  setStageDraft: Dispatch<SetStateAction<Omit<StageMaster, "id">>>;
-  setReferenceDraft: Dispatch<SetStateAction<Omit<ReferenceOption, "id">>>;
-  setAppUserDraft: Dispatch<SetStateAction<Omit<AppUser, "id">>>;
-  onAddMaterial: () => void;
-  onAddWorker: () => void;
-  onAddStage: () => void;
-  onAddReferenceOption: () => void;
-  onAddAppUser: () => void;
-  editingWorkerId: string | null;
-  onStartEditWorker: (worker: WorkerMaster) => void;
-  onCancelEditWorker: () => void;
-  onDeleteWorker: (id: string) => void;
-  editingMaterialId: string | null;
-  onStartEditMaterial: (material: MaterialMaster) => void;
-  onCancelEditMaterial: () => void;
-  onDeleteMaterial: (id: string) => void;
-  editingStageId: string | null;
-  onStartEditStage: (stage: StageMaster) => void;
-  onCancelEditStage: () => void;
-  onDeleteStage: (id: string) => void;
-  editingReferenceId: string | null;
-  onStartEditReferenceOption: (option: ReferenceOption) => void;
-  onCancelEditReferenceOption: () => void;
-  onDeleteReferenceOption: (id: string) => void;
-  editingAppUserId: string | null;
-  onStartEditAppUser: (user: AppUser) => void;
-  onCancelEditAppUser: () => void;
-  onDeleteAppUser: (id: string) => void;
-};
-
 type CategoryTab = "materials" | "workers" | "stages" | "reference" | "users";
 
-export function MasterDataSettingsView({
-  isVisible,
-  materials,
-  workers,
-  stages,
-  referenceOptions,
-  referenceListKeys,
-  referenceListKey,
-  onChangeReferenceListKey,
-  appUsers,
-  currentUserId,
-  materialDraft,
-  workerDraft,
-  stageDraft,
-  referenceDraft,
-  appUserDraft,
-  setMaterialDraft,
-  setWorkerDraft,
-  setStageDraft,
-  setReferenceDraft,
-  setAppUserDraft,
-  onAddMaterial,
-  onAddWorker,
-  onAddStage,
-  onAddReferenceOption,
-  onAddAppUser,
-  editingWorkerId,
-  onStartEditWorker,
-  onCancelEditWorker,
-  onDeleteWorker,
-  editingMaterialId,
-  onStartEditMaterial,
-  onCancelEditMaterial,
-  onDeleteMaterial,
-  editingStageId,
-  onStartEditStage,
-  onCancelEditStage,
-  onDeleteStage,
-  editingReferenceId,
-  onStartEditReferenceOption,
-  onCancelEditReferenceOption,
-  onDeleteReferenceOption,
-  editingAppUserId,
-  onStartEditAppUser,
-  onCancelEditAppUser,
-  onDeleteAppUser
-}: MasterDataSettingsViewProps) {
+export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
+  const {
+    materials,
+    workers,
+    stages,
+    referenceOptions,
+    referenceListKeys,
+    referenceListKey,
+    onChangeReferenceListKey,
+    appUsers,
+    currentUserId,
+    materialDraft,
+    workerDraft,
+    stageDraft,
+    referenceDraft,
+    appUserDraft,
+    setMaterialDraft,
+    setWorkerDraft,
+    setStageDraft,
+    setReferenceDraft,
+    setAppUserDraft,
+    onAddMaterial,
+    onAddWorker,
+    onAddStage,
+    onAddReferenceOption,
+    onAddAppUser,
+    editingWorkerId,
+    onStartEditWorker,
+    onCancelEditWorker,
+    onDeleteWorker,
+    editingMaterialId,
+    onStartEditMaterial,
+    onCancelEditMaterial,
+    onDeleteMaterial,
+    editingStageId,
+    onStartEditStage,
+    onCancelEditStage,
+    onDeleteStage,
+    editingReferenceId,
+    onStartEditReferenceOption,
+    onCancelEditReferenceOption,
+    onDeleteReferenceOption,
+    editingAppUserId,
+    onStartEditAppUser,
+    onCancelEditAppUser,
+    onDeleteAppUser
+  } = useMasterData();
   const [tab, setTab] = useState<CategoryTab>("materials");
 
   return (

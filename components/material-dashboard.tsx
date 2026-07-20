@@ -64,6 +64,7 @@ import {
 } from "@/lib/production-summary";
 import { AuditLogView } from "@/components/audit-log-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
+import { MasterDataProvider } from "@/components/master-data-context";
 import { PriceTableView } from "@/components/price-table-view";
 import { WorkerBoxView } from "@/components/worker-box-view";
 import { buildWorkerBoxLinesFromMovements } from "@/lib/worker-box-service";
@@ -3447,53 +3448,56 @@ export function MaterialDashboard() {
           <div className={`${isPricing || isSettings ? "unified-stack" : "hidden"} pb-8 pt-5`}>
             <PriceTableView isVisible={isPricing} rows={priceRows} />
 
-            <MasterDataSettingsView
-              isVisible={isSettings}
-              materials={materials}
-              workers={workers}
-              stages={stages}
-              materialDraft={materialDraft}
-              workerDraft={workerDraft}
-              stageDraft={stageDraft}
-              setMaterialDraft={setMaterialDraft}
-              setWorkerDraft={setWorkerDraft}
-              setStageDraft={setStageDraft}
-              onAddMaterial={addMaterial}
-              onAddWorker={addWorker}
-              onAddStage={addStage}
-              editingWorkerId={editingWorkerId}
-              onStartEditWorker={startEditWorker}
-              onCancelEditWorker={cancelEditWorker}
-              onDeleteWorker={removeWorker}
-              editingMaterialId={editingMaterialId}
-              onStartEditMaterial={startEditMaterial}
-              onCancelEditMaterial={cancelEditMaterial}
-              onDeleteMaterial={removeMaterial}
-              editingStageId={editingStageId}
-              onStartEditStage={startEditStage}
-              onCancelEditStage={cancelEditStage}
-              onDeleteStage={removeStage}
-              referenceOptions={referenceOptions}
-              referenceListKeys={referenceListKeys}
-              referenceListKey={referenceListKey}
-              onChangeReferenceListKey={changeReferenceListKey}
-              referenceDraft={referenceDraft}
-              setReferenceDraft={setReferenceDraft}
-              onAddReferenceOption={addReferenceOption}
-              editingReferenceId={editingReferenceId}
-              onStartEditReferenceOption={startEditReferenceOption}
-              onCancelEditReferenceOption={cancelEditReferenceOption}
-              onDeleteReferenceOption={removeReferenceOption}
-              appUsers={appUsers}
-              currentUserId={appUser?.id}
-              appUserDraft={appUserDraft}
-              setAppUserDraft={setAppUserDraft}
-              onAddAppUser={addAppUser}
-              editingAppUserId={editingAppUserId}
-              onStartEditAppUser={startEditAppUser}
-              onCancelEditAppUser={cancelEditAppUser}
-              onDeleteAppUser={removeAppUser}
-            />
+            <MasterDataProvider
+              value={{
+                materials,
+                workers,
+                stages,
+                materialDraft,
+                workerDraft,
+                stageDraft,
+                setMaterialDraft,
+                setWorkerDraft,
+                setStageDraft,
+                onAddMaterial: addMaterial,
+                onAddWorker: addWorker,
+                onAddStage: addStage,
+                editingWorkerId,
+                onStartEditWorker: startEditWorker,
+                onCancelEditWorker: cancelEditWorker,
+                onDeleteWorker: removeWorker,
+                editingMaterialId,
+                onStartEditMaterial: startEditMaterial,
+                onCancelEditMaterial: cancelEditMaterial,
+                onDeleteMaterial: removeMaterial,
+                editingStageId,
+                onStartEditStage: startEditStage,
+                onCancelEditStage: cancelEditStage,
+                onDeleteStage: removeStage,
+                referenceOptions,
+                referenceListKeys,
+                referenceListKey,
+                onChangeReferenceListKey: changeReferenceListKey,
+                referenceDraft,
+                setReferenceDraft,
+                onAddReferenceOption: addReferenceOption,
+                editingReferenceId,
+                onStartEditReferenceOption: startEditReferenceOption,
+                onCancelEditReferenceOption: cancelEditReferenceOption,
+                onDeleteReferenceOption: removeReferenceOption,
+                appUsers,
+                currentUserId: appUser?.id,
+                appUserDraft,
+                setAppUserDraft,
+                onAddAppUser: addAppUser,
+                editingAppUserId,
+                onStartEditAppUser: startEditAppUser,
+                onCancelEditAppUser: cancelEditAppUser,
+                onDeleteAppUser: removeAppUser
+              }}
+            >
+              <MasterDataSettingsView isVisible={isSettings} />
+            </MasterDataProvider>
           </div>
           {renderProductionFormOverlay()}
           </div>
