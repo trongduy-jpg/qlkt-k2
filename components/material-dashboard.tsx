@@ -1445,6 +1445,28 @@ export function MaterialDashboard() {
     return Array.from(merged.values());
   }, [stages]);
 
+  const selectedOrderStageProgress = useMemo(() => {
+    const currentStageCode = selectedOrderMovements[0]?.stage
+      ? normalizeProductionStageCode(selectedOrderMovements[0].stage)
+      : "";
+
+    return stageOptionsForDropdown.map((stageOption) => {
+      const stageMovements = selectedOrderMovements.filter(
+        (movement) => normalizeProductionStageCode(movement.stage) === stageOption.value
+      );
+      return {
+        code: stageOption.value,
+        label: stageOption.label,
+        movementCount: stageMovements.length,
+        issued: stageMovements.reduce((sum, movement) => sum + Number(movement.issued || 0), 0),
+        returned: stageMovements.reduce((sum, movement) => sum + Number(movement.returned || 0), 0),
+        qtyPiece: stageMovements.reduce((sum, movement) => sum + Number(movement.qtyPiece || 0), 0),
+        latestDate: stageMovements[0]?.occurredDate || "",
+        isCurrent: stageOption.value === currentStageCode && stageMovements.length > 0
+      };
+    });
+  }, [stageOptionsForDropdown, selectedOrderMovements]);
+
   const referenceOptionsByKey = useMemo(() => {
     const grouped = new Map<string, ReferenceOption[]>();
     for (const option of referenceOptions) {
@@ -3344,7 +3366,7 @@ export function MaterialDashboard() {
                     </span>
                   </div>
                   <div className="overflow-x-auto rounded-md border border-line bg-white">
-                    <table className="w-full min-w-[1180px] border-collapse text-sm">
+                    <table className="w-full min-w-[1360px] border-collapse text-sm">
                       <thead>
                         <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
                           <th className="px-3 py-3">Mã LSX</th>
@@ -3357,6 +3379,7 @@ export function MaterialDashboard() {
                           <th className="px-3 py-3 text-right" title="Số dòng đã ghi nhận trong Nhật ký NVL cho LSX này - khác với thông tin trong form LSX.">
                             Số GD NVL
                           </th>
+                          <th className="px-3 py-3">Khâu hiện tại</th>
                           <th className="px-3 py-3">Trạng thái LSX</th>
                           <th className="px-3 py-3">Trạng thái vận hành</th>
                         </tr>
@@ -3400,6 +3423,23 @@ export function MaterialDashboard() {
                               }
                             >
                               {summary.movementCount}
+                            </td>
+                            <td className="px-3 py-3 align-top">
+                              {(() => {
+                                const stageCode = summary.plannedStage ? normalizeProductionStageCode(summary.plannedStage) : "";
+                                const stageIndex = stageCode ? stageOptionsForDropdown.findIndex((item) => item.value === stageCode) : -1;
+                                if (stageIndex < 0) {
+                                  return <span className="text-xs text-zinc-400">Chưa bắt đầu</span>;
+                                }
+                                return (
+                                  <span className="inline-flex flex-col text-xs">
+                                    <span className="font-semibold text-ink">
+                                      Khâu {stageIndex + 1}/{stageOptionsForDropdown.length}
+                                    </span>
+                                    <span className="text-zinc-500">{getStageLabel(stageCode)}</span>
+                                  </span>
+                                );
+                              })()}
                             </td>
                             <td className="px-3 py-3 align-top">
                               <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
@@ -3530,6 +3570,61 @@ export function MaterialDashboard() {
                                 ["Thợ đã nhận", selectedOrderDetail.movementWorkers.length ? selectedOrderDetail.movementWorkers.join(", ") : "Chưa có"]
                               ]}
                             />
+                          </div>
+                        </div>
+
+                        <div className="rounded-md border border-line bg-paper p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tiến trình công đoạn</p>
+                            <span className="rounded-full border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-600">
+                              Đã qua {selectedOrderStageProgress.filter((item) => item.movementCount > 0).length}/{selectedOrderStageProgress.length} khâu
+                            </span>
+                          </div>
+                          <div className="mt-3 grid gap-2">
+                            {selectedOrderStageProgress.map((stage) => (
+                              <div
+                                key={stage.code}
+                                className={`flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-xs ${
+                                  stage.isCurrent
+                                    ? "border-jade bg-jade/10"
+                                    : stage.movementCount > 0
+                                      ? "border-line bg-white"
+                                      : "border-dashed border-line/70 bg-transparent text-zinc-400"
+                                }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
+                                      stage.isCurrent
+                                        ? "bg-jade text-white"
+                                        : stage.movementCount > 0
+                                          ? "bg-ink text-white"
+                                          : "bg-zinc-200 text-zinc-500"
+                                    }`}
+                                  >
+                                    {stage.movementCount > 0 ? "✓" : "•"}
+                                  </span>
+                                  <span className={`font-semibold ${stage.movementCount > 0 ? "text-ink" : "text-zinc-400"}`}>
+                                    {stage.label}
+                                  </span>
+                                  {stage.isCurrent ? (
+                                    <span className="rounded-full bg-jade px-2 py-0.5 text-[10px] font-semibold uppercase text-white">
+                                      Đang ở đây
+                                    </span>
+                                  ) : null}
+                                </div>
+                                {stage.movementCount > 0 ? (
+                                  <div className="flex flex-wrap items-center gap-3 text-zinc-600">
+                                    <span>Xuất {formatGram(stage.issued)}</span>
+                                    <span>Nhập {formatGram(stage.returned)}</span>
+                                    {stage.qtyPiece > 0 ? <span>SL {stage.qtyPiece}</span> : null}
+                                    <span>{formatDisplayDate(stage.latestDate) || "-"}</span>
+                                  </div>
+                                ) : (
+                                  <span>Chưa thực hiện</span>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         </div>
 
