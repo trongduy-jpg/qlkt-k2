@@ -56,12 +56,14 @@ import {
 } from "@/lib/master-data-drafts";
 import {
   buildDraftStageMovements,
+  buildLossReportRows,
   buildOrderSummaries,
   buildStageOptionsForDropdown,
   buildStageProgress,
   computeMovementTotals,
   selectMovementsForOrder
 } from "@/lib/production-summary";
+import { LossReportView } from "@/components/loss-report-view";
 import { AuditLogView } from "@/components/audit-log-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { MasterDataProvider } from "@/components/master-data-context";
@@ -593,29 +595,7 @@ export function MaterialDashboard() {
 
   const computedWorkerBoxLines = useMemo(() => buildWorkerBoxLinesFromMovements(orders, workers), [orders, workers]);
 
-  const lossReportRows = useMemo(() => {
-    return orders
-      .map((order) => {
-        const purity = Number(order.goldAge || (order.convertedIssueWeight && order.issued ? order.convertedIssueWeight / order.issued : 1));
-        const convertedLoss = Number((order.loss * purity).toFixed(4));
-
-        return {
-          id: order.id,
-          stage: normalizeStageCode(order.stage),
-          count: 1,
-          material: order.material || "-",
-          issued: order.issued,
-          returned: order.returned,
-          loss: order.loss,
-          convertedLoss,
-          worker: order.worker || "-",
-          lsxCode: order.code || "-",
-          sku: order.sku || "-",
-          status: order.status
-        };
-      })
-      .sort((a, b) => b.loss - a.loss);
-  }, [orders]);
+  const lossReportRows = useMemo(() => buildLossReportRows(orders), [orders]);
 
   const workerOptionsForDraft = useMemo(() => {
     const selectedStage = draft.stage.toLowerCase();
@@ -2324,65 +2304,7 @@ export function MaterialDashboard() {
             </div>
           </div>
 
-          <section className={`${isReport ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h3 className="text-base font-bold text-ink">Báo cáo hao hụt</h3>
-              </div>
-              <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={exportJson}>
-                Xuất dữ liệu báo cáo
-              </button>
-            </div>
-
-            <div className="mt-4 rounded-md border border-line bg-paper p-3">
-              <div className="flex items-center justify-between gap-3">
-                <h4 className="font-semibold text-ink">Bảng hao hụt</h4>
-                <span className="rounded-md border border-line bg-white px-2 py-1 text-xs font-semibold text-zinc-600">
-                  {lossReportRows.length} dòng
-                </span>
-              </div>
-              <div className="mt-3 overflow-x-auto">
-                <table className="w-full min-w-[1280px] text-sm">
-                  <thead>
-                    <tr className="border-b border-line bg-white text-left text-xs uppercase text-zinc-500">
-                      <th className="px-3 py-3">Công đoạn</th>
-                      <th className="px-3 py-3 text-right">Dòng phát sinh</th>
-                      <th className="px-3 py-3">Loại vàng/NVL</th>
-                      <th className="px-3 py-3 text-right">Tổng xuất</th>
-                      <th className="px-3 py-3 text-right">Tổng nhập</th>
-                      <th className="px-3 py-3 text-right">Hao hụt</th>
-                      <th className="px-3 py-3 text-right">Hao hụt quy 24K</th>
-                      <th className="px-3 py-3">Tên thợ</th>
-                      <th className="px-3 py-3">Số LSX</th>
-                      <th className="px-3 py-3">Mã hàng</th>
-                      <th className="px-3 py-3">Trạng thái</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {lossReportRows.map((row) => (
-                      <tr key={row.id} className="border-b border-line/70 bg-white">
-                        <td className="px-3 py-3 font-semibold text-ink">{row.stage}</td>
-                        <td className="px-3 py-3 text-right text-zinc-700">{row.count}</td>
-                        <td className="px-3 py-3 text-zinc-700">{row.material}</td>
-                        <td className="px-3 py-3 text-right text-zinc-700">{formatGram(row.issued)}</td>
-                        <td className="px-3 py-3 text-right text-zinc-700">{formatGram(row.returned)}</td>
-                        <td className="px-3 py-3 text-right font-semibold text-ink">{formatGram(row.loss)}</td>
-                        <td className="px-3 py-3 text-right font-semibold text-brass">{formatGram(row.convertedLoss)}</td>
-                        <td className="px-3 py-3 text-zinc-700">{row.worker}</td>
-                        <td className="px-3 py-3 font-semibold text-ink">{row.lsxCode}</td>
-                        <td className="px-3 py-3 text-zinc-700">{row.sku}</td>
-                        <td className="px-3 py-3">
-                          <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${statusClass[row.status]}`}>
-                            {row.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </section>
+          <LossReportView isVisible={isReport} rows={lossReportRows} onExportJson={exportJson} />
 
           <WorkerBoxView isVisible={isWorkerBox} useDemoData={!isSupabaseConfigured} lines={computedWorkerBoxLines} />
 

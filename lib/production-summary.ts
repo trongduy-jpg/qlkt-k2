@@ -270,6 +270,45 @@ export function buildDraftStageMovements(orders: ProductionOrder[], code: string
   return map;
 }
 
+export type LossReportRow = {
+  id: string;
+  stage: string;
+  count: number;
+  material: string;
+  issued: number;
+  returned: number;
+  loss: number;
+  convertedLoss: number;
+  worker: string;
+  lsxCode: string;
+  sku: string;
+  status: Status;
+};
+
+export function buildLossReportRows(orders: ProductionOrder[]): LossReportRow[] {
+  return orders
+    .map((order) => {
+      const purity = Number(order.goldAge || (order.convertedIssueWeight && order.issued ? order.convertedIssueWeight / order.issued : 1));
+      const convertedLoss = Number((order.loss * purity).toFixed(4));
+
+      return {
+        id: order.id,
+        stage: normalizeStageCode(order.stage),
+        count: 1,
+        material: order.material || "-",
+        issued: order.issued,
+        returned: order.returned,
+        loss: order.loss,
+        convertedLoss,
+        worker: order.worker || "-",
+        lsxCode: order.code || "-",
+        sku: order.sku || "-",
+        status: order.status
+      };
+    })
+    .sort((a, b) => b.loss - a.loss);
+}
+
 export type StageProgressItem = {
   code: string;
   label: string;
