@@ -15,7 +15,8 @@ import {
   Trash2,
   X
 } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AuditLogView } from "@/components/audit-log-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { PriceTableView } from "@/components/price-table-view";
@@ -684,8 +685,46 @@ function normalizeStageCode(stage: string) {
   return normalizeProductionStageCode(stage);
 }
 
+const moduleSlugs: Record<string, string> = {
+  "Dashboard": "dashboard",
+  "Lệnh sản xuất": "lenh-san-xuat",
+  "Nhật ký NVL": "nhat-ky-nvl",
+  "Giá & định mức": "gia-dinh-muc",
+  "Tồn hộp thợ": "ton-hop-tho",
+  "Báo cáo hao hụt": "bao-cao-hao-hut",
+  "Audit log": "audit-log",
+  "Cấu hình": "cau-hinh"
+};
+
+const slugToModule: Record<string, string> = Object.fromEntries(
+  Object.entries(moduleSlugs).map(([label, slug]) => [slug, label])
+);
+
 export function MaterialDashboard() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const hasReadUrlRef = useRef(false);
   const [activeModule, setActiveModule] = useState("Dashboard");
+
+  useEffect(() => {
+    if (!hasReadUrlRef.current) {
+      hasReadUrlRef.current = true;
+      const slugFromUrl = searchParams.get("tab");
+      const labelFromUrl = slugFromUrl ? slugToModule[slugFromUrl] : undefined;
+      if (labelFromUrl && labelFromUrl !== activeModule) {
+        setActiveModule(labelFromUrl);
+        return;
+      }
+    }
+
+    const currentSlug = moduleSlugs[activeModule] ?? "dashboard";
+    if (searchParams.get("tab") !== currentSlug) {
+      router.replace(`${pathname}?tab=${currentSlug}`, { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeModule]);
+
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<(typeof statusOptions)[number]>("Tất cả");
   const [productionDeliveryStatus, setProductionDeliveryStatus] = useState("Tất cả trạng thái LSX");
