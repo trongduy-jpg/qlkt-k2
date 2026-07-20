@@ -1,0 +1,82 @@
+create table if not exists reference_options (
+  id uuid primary key default gen_random_uuid(),
+  list_key text not null,
+  option_code text not null,
+  option_label text not null,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  unique (list_key, option_code)
+);
+
+create index if not exists idx_reference_options_list_key on reference_options(list_key);
+
+insert into reference_options (list_key, option_code, option_label, sort_order) values
+  ('nk_nvl_noi_nhan', 'NKBC', 'NKBC – NK Bạc/CĐ', 1),
+  ('nk_nvl_noi_nhan', 'BKNXT', 'BKNXT – Bảng kê NXT', 2),
+  ('nk_nvl_noi_nhan', 'KCP', 'KCP – Kho cấp phát', 3),
+
+  ('lsx_noi_nhan', 'CH1', 'CH1', 1),
+  ('lsx_noi_nhan', 'CH2', 'CH2', 2),
+  ('lsx_noi_nhan', 'CH3', 'CH3', 3),
+  ('lsx_noi_nhan', 'ADM2', 'ADM2', 4),
+  ('lsx_noi_nhan', 'PKD Si', 'PKD Si', 5),
+  ('lsx_noi_nhan', 'PSX L2', 'PSX L2', 6),
+
+  ('loai_nguyen_lieu', '18KY', '18KY', 1),
+  ('loai_nguyen_lieu', '18KW', '18KW', 2),
+  ('loai_nguyen_lieu', '18KR', '18KR', 3),
+  ('loai_nguyen_lieu', '18K3M', '18K3M', 4),
+  ('loai_nguyen_lieu', '18KW/KY', '18KW/KY', 5),
+  ('loai_nguyen_lieu', '18KW/KR', '18KW/KR', 6),
+  ('loai_nguyen_lieu', '18KW/KY/KR', '18KW/KY/KR', 7),
+  ('loai_nguyen_lieu', '18KY/KR', '18KY/KR', 8),
+  ('loai_nguyen_lieu', '14KY', '14KY', 9),
+  ('loai_nguyen_lieu', '14KW', '14KW', 10),
+  ('loai_nguyen_lieu', '14KR', '14KR', 11),
+  ('loai_nguyen_lieu', '14KW/KY', '14KW/KY', 12),
+  ('loai_nguyen_lieu', '10KY', '10KY', 13),
+  ('loai_nguyen_lieu', '10KW', '10KW', 14),
+  ('loai_nguyen_lieu', '24K', '24K', 15),
+  ('loai_nguyen_lieu', '22K', '22K', 16),
+  ('loai_nguyen_lieu', '24K/18KY', '24K/18KY', 17),
+  ('loai_nguyen_lieu', '22K/18KY', '22K/18KY', 18),
+  ('loai_nguyen_lieu', 'PT950', 'PT950', 19),
+  ('loai_nguyen_lieu', 'PT900', 'PT900', 20),
+  ('loai_nguyen_lieu', 'PT950-18K', 'PT950-18K', 21),
+  ('loai_nguyen_lieu', 'PT/18KW', 'PT/18KW', 22),
+  ('loai_nguyen_lieu', 'PT/18KY', 'PT/18KY', 23),
+  ('loai_nguyen_lieu', '24K/PT', '24K/PT', 24),
+  ('loai_nguyen_lieu', 'BAC', 'BAC', 25),
+  ('loai_nguyen_lieu', 'BAC925', 'BAC925', 26),
+
+  ('tuoi_vang', '0.9999', '24K', 1),
+  ('tuoi_vang', '0.75', '18K', 2),
+  ('tuoi_vang', '0.6667', '16K', 3),
+  ('tuoi_vang', '0.7083', '17K', 4),
+  ('tuoi_vang', '0.625', '15K', 5),
+  ('tuoi_vang', '0.4167', '10K', 6),
+  ('tuoi_vang', '0.9', 'PT', 7),
+  ('tuoi_vang', '0.925', 'BAC', 8),
+
+  ('nguon_nvl', '750Y', '750Y – Vàng 18K màu vàng', 1),
+  ('nguon_nvl', '750W', '750W – Vàng 18K màu trắng', 2),
+  ('nguon_nvl', '750R', '750R – Vàng 18K màu hồng', 3),
+  ('nguon_nvl', 'BAC925', 'BAC925 – Bạc 92.5', 4),
+  ('nguon_nvl', 'Nau moi', 'NM – Nấu mới', 5),
+  ('nguon_nvl', 'Nau quay dau', 'NQD – Nấu quay đầu', 6),
+  ('nguon_nvl', 'TP', 'TP – Thành phẩm nhập lại', 7),
+
+  ('nguon_nhap', 'US', 'US', 1),
+  ('nguon_nhap', 'VN', 'VN', 2),
+  ('nguon_nhap', 'KS', 'KS', 3),
+  ('nguon_nhap', 'PK', 'PK', 4),
+  ('nguon_nhap', 'L2', 'L2', 5),
+  ('nguon_nhap', 'CĐ', 'CĐ', 6),
+  ('nguon_nhap', 'BH', 'BH', 7),
+
+  ('nguon_xuat', 'KT', 'KT', 1),
+  ('nguon_xuat', 'L2', 'L2', 2),
+  ('nguon_xuat', 'BK', 'BK', 3),
+  ('nguon_xuat', 'CD', 'CD', 4),
+  ('nguon_xuat', 'BH', 'BH', 5)
+on conflict (list_key, option_code) do nothing;

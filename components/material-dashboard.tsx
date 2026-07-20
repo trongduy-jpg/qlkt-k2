@@ -62,19 +62,23 @@ import {
   createMaterial,
   createMaterialMovement,
   createProductionOrderHeader,
+  createReferenceOption,
   createStage,
   createWorker,
   deleteMaterial,
   deleteMaterialMovement,
+  deleteReferenceOption,
   deleteStage,
   deleteWorker,
   loadDatabaseHealth,
   loadMaterials,
   loadProductionOrderHeaders,
   loadProductionOrders,
+  loadReferenceOptions,
   loadStages,
   loadWorkers,
   updateMaterial,
+  updateReferenceOption,
   updateStage,
   updateWorker,
   updateProductionOrderStatus,
@@ -83,6 +87,7 @@ import {
   updateMaterialMovementStatus,
   type DatabaseHealth,
   type MaterialMaster,
+  type ReferenceOption,
   type StageMaster,
   type WorkerMaster
 } from "@/lib/material-service";
@@ -348,6 +353,25 @@ function createEmptyStageDraft(): Omit<StageMaster, "id"> {
     stage_code: "",
     stage_name: "",
     hao_hut_rule: "binh_thuong"
+  };
+}
+
+const referenceListKeys: Array<{ key: string; label: string }> = [
+  { key: "nk_nvl_noi_nhan", label: "Nơi nhận (Nhật ký NVL)" },
+  { key: "lsx_noi_nhan", label: "Nơi nhận (Lệnh sản xuất)" },
+  { key: "loai_nguyen_lieu", label: "Loại nguyên liệu" },
+  { key: "tuoi_vang", label: "Tuổi vàng" },
+  { key: "nguon_nvl", label: "Nguồn NVL / Mã nối NXT" },
+  { key: "nguon_nhap", label: "Nguồn nhập" },
+  { key: "nguon_xuat", label: "Nguồn xuất" }
+];
+
+function createEmptyReferenceDraft(listKey: string): Omit<ReferenceOption, "id"> {
+  return {
+    list_key: listKey,
+    option_code: "",
+    option_label: "",
+    sort_order: 0
   };
 }
 
@@ -757,12 +781,16 @@ export function MaterialDashboard() {
   const [materials, setMaterials] = useState<MaterialMaster[]>([]);
   const [workers, setWorkers] = useState<WorkerMaster[]>([]);
   const [stages, setStages] = useState<StageMaster[]>([]);
+  const [referenceOptions, setReferenceOptions] = useState<ReferenceOption[]>([]);
   const [materialDraft, setMaterialDraft] = useState<Omit<MaterialMaster, "id">>(createEmptyMaterialDraft());
   const [workerDraft, setWorkerDraft] = useState<Omit<WorkerMaster, "id">>(createEmptyWorkerDraft());
   const [stageDraft, setStageDraft] = useState<Omit<StageMaster, "id">>(createEmptyStageDraft());
+  const [referenceListKey, setReferenceListKey] = useState<string>(referenceListKeys[0].key);
+  const [referenceDraft, setReferenceDraft] = useState<Omit<ReferenceOption, "id">>(createEmptyReferenceDraft(referenceListKeys[0].key));
   const [editingWorkerId, setEditingWorkerId] = useState<string | null>(null);
   const [editingMaterialId, setEditingMaterialId] = useState<string | null>(null);
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
+  const [editingReferenceId, setEditingReferenceId] = useState<string | null>(null);
 
   async function reloadOperationalData(options?: {
     movementDraftOverrides?: Record<string, ProductionOrder>;
@@ -770,12 +798,13 @@ export function MaterialDashboard() {
   }) {
     if (!isSupabaseConfigured) return;
 
-    const [remoteOrders, remoteHeaders, remoteMaterials, remoteWorkers, remoteStages, remoteDatabaseHealth] = await Promise.all([
+    const [remoteOrders, remoteHeaders, remoteMaterials, remoteWorkers, remoteStages, remoteReferenceOptions, remoteDatabaseHealth] = await Promise.all([
       loadProductionOrders(),
       loadProductionOrderHeaders(),
       loadMaterials(),
       loadWorkers(),
       loadStages(),
+      loadReferenceOptions(),
       loadDatabaseHealth()
     ]);
 
@@ -820,6 +849,7 @@ export function MaterialDashboard() {
     setMaterials(remoteMaterials);
     setWorkers(remoteWorkers);
     setStages(remoteStages);
+    setReferenceOptions(remoteReferenceOptions);
     setDatabaseHealth(remoteDatabaseHealth);
 
     return { remoteMaterials, remoteWorkers };
@@ -1393,6 +1423,23 @@ export function MaterialDashboard() {
     }
     return Array.from(merged.values());
   }, [stages]);
+
+  const referenceOptionsByKey = useMemo(() => {
+    const grouped = new Map<string, ReferenceOption[]>();
+    for (const option of referenceOptions) {
+      const list = grouped.get(option.list_key) ?? [];
+      list.push(option);
+      grouped.set(option.list_key, list);
+    }
+    for (const list of grouped.values()) list.sort((a, b) => a.sort_order - b.sort_order);
+    return grouped;
+  }, [referenceOptions]);
+
+  function getDynamicOptions(listKey: string, staticFallback: { value: string; label: string }[]) {
+    const dbOptions = referenceOptionsByKey.get(listKey);
+    if (!dbOptions || dbOptions.length === 0) return staticFallback;
+    return dbOptions.map((item) => ({ value: item.option_code, label: item.option_label }));
+  }
 
   function updateDraft<K extends keyof ProductionOrder>(key: K, value: ProductionOrder[K]) {
     setDraft((current) => {
@@ -2015,7 +2062,7 @@ export function MaterialDashboard() {
                   <div className="col-span-12 md:col-span-6 xl:col-span-2">
                     <FieldShell label="Nơi nhận" hint="Bộ phận hoặc nơi tiếp nhận lệnh.">
                       <SelectControl value={productionHeaderDraft.destination} onChange={(value) => updateProductionHeaderDraft("destination", value)}>
-                        {productionOrderDestinations.map((item) => (
+                        {getDynamicOptions("lsx_noi_nhan", productionOrderDestinations).map((item) => (
                           <option key={item.value} value={item.value}>{item.label}</option>
                         ))}
                       </SelectControl>
@@ -2124,7 +2171,7 @@ export function MaterialDashboard() {
                   <div className="col-span-12 md:col-span-6 xl:col-span-3">
                     <FieldShell label="Loại nguyên liệu">
                       <SelectControl value={productionHeaderDraft.materialSpec} onChange={(value) => updateProductionHeaderDraft("materialSpec", value)}>
-                        {productionOrderMaterialSpecOptions.map((item) => (
+                        {getDynamicOptions("loai_nguyen_lieu", productionOrderMaterialSpecOptions).map((item) => (
                           <option key={item.value} value={item.value}>{item.label}</option>
                         ))}
                       </SelectControl>
@@ -2247,7 +2294,7 @@ export function MaterialDashboard() {
             </div>
             <FieldShell label="Nơi nhận">
               <SelectControl value={productionHeaderDraft.destination} onChange={(value) => updateProductionHeaderDraft("destination", value)}>
-                {productionOrderDestinations.map((item) => (
+                {getDynamicOptions("lsx_noi_nhan", productionOrderDestinations).map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
                 ))}
               </SelectControl>
@@ -2322,7 +2369,7 @@ export function MaterialDashboard() {
             </FieldShell>
             <FieldShell label="Loại nguyên liệu">
               <SelectControl value={productionHeaderDraft.materialSpec} onChange={(value) => updateProductionHeaderDraft("materialSpec", value)}>
-                {productionOrderMaterialSpecOptions.map((item) => (
+                {getDynamicOptions("loai_nguyen_lieu", productionOrderMaterialSpecOptions).map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
                 ))}
               </SelectControl>
@@ -2664,6 +2711,69 @@ export function MaterialDashboard() {
     } catch (error) {
       setRemoteError(error instanceof Error ? error.message : "Không xóa được công đoạn");
     }
+  }
+
+  async function addReferenceOption() {
+    if (!referenceDraft.option_code.trim() || !referenceDraft.option_label.trim()) return;
+
+    const normalizedOption = {
+      ...referenceDraft,
+      list_key: referenceListKey,
+      option_code: referenceDraft.option_code.trim(),
+      option_label: referenceDraft.option_label.trim()
+    };
+
+    try {
+      if (editingReferenceId) {
+        const saved = await updateReferenceOption(editingReferenceId, normalizedOption);
+        setReferenceOptions((current) => current.map((item) => (item.id === editingReferenceId ? saved : item)));
+        setEditingReferenceId(null);
+        setReferenceDraft(createEmptyReferenceDraft(referenceListKey));
+        pushAudit("update_reference_option", `Cập nhật lựa chọn ${saved.option_code} - ${saved.option_label}`);
+        await createAuditLog("update_reference_option", `Cập nhật lựa chọn ${saved.option_code} - ${saved.option_label}`, saved.id);
+      } else {
+        const saved = await createReferenceOption(normalizedOption);
+        setReferenceOptions((current) => [...current, saved]);
+        setReferenceDraft(createEmptyReferenceDraft(referenceListKey));
+        pushAudit("create_reference_option", `Thêm lựa chọn ${saved.option_code} - ${saved.option_label}`);
+        await createAuditLog("create_reference_option", `Thêm lựa chọn ${saved.option_code} - ${saved.option_label}`, saved.id);
+      }
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không lưu được lựa chọn");
+    }
+  }
+
+  function startEditReferenceOption(option: ReferenceOption) {
+    setEditingReferenceId(option.id);
+    setReferenceDraft({
+      list_key: option.list_key,
+      option_code: option.option_code,
+      option_label: option.option_label,
+      sort_order: option.sort_order
+    });
+  }
+
+  function cancelEditReferenceOption() {
+    setEditingReferenceId(null);
+    setReferenceDraft(createEmptyReferenceDraft(referenceListKey));
+  }
+
+  async function removeReferenceOption(id: string) {
+    try {
+      await deleteReferenceOption(id);
+      setReferenceOptions((current) => current.filter((item) => item.id !== id));
+      if (editingReferenceId === id) cancelEditReferenceOption();
+      pushAudit("delete_reference_option", `Xóa lựa chọn ${id}`);
+      await createAuditLog("delete_reference_option", `Xóa lựa chọn ${id}`, id);
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không xóa được lựa chọn");
+    }
+  }
+
+  function changeReferenceListKey(key: string) {
+    setReferenceListKey(key);
+    setEditingReferenceId(null);
+    setReferenceDraft(createEmptyReferenceDraft(key));
   }
 
   async function addWorker() {
@@ -3613,7 +3723,7 @@ export function MaterialDashboard() {
                       <FieldShell label="Nơi nhận" required>
                         <SelectControl value={draft.destination ?? ""} onChange={(value) => updateDraft("destination", value)}>
                           <option value="">Chọn nơi nhận</option>
-                          {journalDestinations.map((item) => (
+                          {getDynamicOptions("nk_nvl_noi_nhan", journalDestinations).map((item) => (
                             <option key={item.value} value={item.value} title={item.label}>{item.label}</option>
                           ))}
                         </SelectControl>
@@ -3730,7 +3840,7 @@ export function MaterialDashboard() {
                         <FieldShell label="Tuổi vàng" required>
                           <SelectControl value={String(draft.goldAge ?? "")} onChange={(value) => updateDraft("goldAge", Number(value))}>
                             <option value="">Chọn tuổi vàng</option>
-                            {movementGoldAgeOptions.map((item) => (
+                            {getDynamicOptions("tuoi_vang", movementGoldAgeOptions).map((item) => (
                               <option key={item.value} value={item.value}>{item.label}</option>
                             ))}
                           </SelectControl>
@@ -3738,7 +3848,7 @@ export function MaterialDashboard() {
                         <FieldShell label="Mã nối NXT">
                           <SelectControl value={draft.nxtLinkCode ?? ""} onChange={(value) => updateDraft("nxtLinkCode", value)}>
                             <option value="">Chọn mã nối</option>
-                            {sourceMaterialOptions.map((item) => (
+                            {getDynamicOptions("nguon_nvl", sourceMaterialOptions).map((item) => (
                               <option key={item.value} value={item.value}>{item.label}</option>
                             ))}
                           </SelectControl>
@@ -3748,7 +3858,7 @@ export function MaterialDashboard() {
                         <FieldShell label="Nguồn nhập">
                           <SelectControl value={draft.importSource ?? ""} onChange={(value) => updateDraft("importSource", value)}>
                             <option value="">Chọn nguồn nhập</option>
-                            {movementImportSourceOptions.map((item) => (
+                            {getDynamicOptions("nguon_nhap", movementImportSourceOptions).map((item) => (
                               <option key={item.value} value={item.value}>{item.label}</option>
                             ))}
                           </SelectControl>
@@ -3756,7 +3866,7 @@ export function MaterialDashboard() {
                         <FieldShell label="Nguồn xuất">
                           <SelectControl value={draft.exportSource ?? ""} onChange={(value) => updateDraft("exportSource", value)}>
                             <option value="">Chọn nguồn xuất</option>
-                            {movementExportSourceOptions.map((item) => (
+                            {getDynamicOptions("nguon_xuat", movementExportSourceOptions).map((item) => (
                               <option key={item.value} value={item.value}>{item.label}</option>
                             ))}
                           </SelectControl>
@@ -3876,6 +3986,17 @@ export function MaterialDashboard() {
               onStartEditStage={startEditStage}
               onCancelEditStage={cancelEditStage}
               onDeleteStage={removeStage}
+              referenceOptions={referenceOptions}
+              referenceListKeys={referenceListKeys}
+              referenceListKey={referenceListKey}
+              onChangeReferenceListKey={changeReferenceListKey}
+              referenceDraft={referenceDraft}
+              setReferenceDraft={setReferenceDraft}
+              onAddReferenceOption={addReferenceOption}
+              editingReferenceId={editingReferenceId}
+              onStartEditReferenceOption={startEditReferenceOption}
+              onCancelEditReferenceOption={cancelEditReferenceOption}
+              onDeleteReferenceOption={removeReferenceOption}
             />
           </div>
           {renderProductionFormOverlay()}
