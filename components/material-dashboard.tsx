@@ -1445,6 +1445,22 @@ export function MaterialDashboard() {
     return Array.from(merged.values());
   }, [stages]);
 
+  const draftStageMovements = useMemo(() => {
+    const map = new Map<string, ProductionOrder>();
+    const code = draft.code.trim();
+    if (!code) return map;
+    for (const order of orders) {
+      if (order.code !== code) continue;
+      const stageCode = normalizeProductionStageCode(order.stage);
+      if (!stageCode) continue;
+      const existing = map.get(stageCode);
+      if (!existing || (order.occurredDate || "") >= (existing.occurredDate || "")) {
+        map.set(stageCode, order);
+      }
+    }
+    return map;
+  }, [orders, draft.code]);
+
   const selectedOrderStageProgress = useMemo(() => {
     const currentStageCode = selectedOrderMovements[0]?.stage
       ? normalizeProductionStageCode(selectedOrderMovements[0].stage)
@@ -1506,11 +1522,11 @@ export function MaterialDashboard() {
     setRemoteError(null);
   }
 
-  function addOrder() {
-    void addOrderAsync();
+  function addOrder(keepOpen = false) {
+    void addOrderAsync(keepOpen);
   }
 
-  async function addOrderAsync() {
+  async function addOrderAsync(keepOpen = false) {
     const missingFields = validateMovementDraft(draft);
     if (missingFields.length > 0) {
       setRemoteError(`Chưa thể lưu giao dịch. Vui lòng bổ sung: ${missingFields.join(", ")}.`);
@@ -1566,10 +1582,27 @@ export function MaterialDashboard() {
         pushAudit("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`);
         await createAuditLog("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
       }
-      setDraft(createEmptyOrder());
-      setEditingMovementId(null);
-      setIsMovementFormOpen(false);
-      setActiveModule("Nhật ký NVL");
+      if (keepOpen) {
+        // Giu drawer mo de nhap tiep khau khac cua cung LSX, chi xoa cac
+        // truong so lieu cua khau vua luu, giu lai thong tin chung.
+        setEditingMovementId(null);
+        setDraft((current) => ({
+          ...current,
+          id: "",
+          worker: "",
+          qtyPiece: 0,
+          issued: 0,
+          returned: 0,
+          transferred: 0,
+          loss: 0,
+          sourceMaterialName: ""
+        }));
+      } else {
+        setDraft(createEmptyOrder());
+        setEditingMovementId(null);
+        setIsMovementFormOpen(false);
+        setActiveModule("Nhật ký NVL");
+      }
     } catch (error) {
       setRemoteError(error instanceof Error ? error.message : editingMovementId ? "Không cập nhật được giao dịch" : "Không thêm được giao dịch");
     }
@@ -2525,6 +2558,30 @@ export function MaterialDashboard() {
 
   function openMovementForStage(stageCode: string) {
     prepareMovementForSummary(selectedOrderSummary, stageCode);
+  }
+
+  function selectStageTab(stageCode: string) {
+    const existing = draftStageMovements.get(stageCode);
+    if (existing) {
+      setEditingMovementId(existing.id);
+      setDraft((current) => ({ ...current, ...existing }));
+    } else {
+      const suggestedWorker = workers.find((item) => item.stage && normalizeStageCode(item.stage) === stageCode);
+      setEditingMovementId(null);
+      setDraft((current) => ({
+        ...current,
+        id: "",
+        stage: stageCode,
+        worker: suggestedWorker?.full_name ?? "",
+        qtyPiece: 0,
+        issued: 0,
+        returned: 0,
+        transferred: 0,
+        loss: 0,
+        sourceMaterialName: ""
+      }));
+    }
+    setRemoteError(null);
   }
 
   function viewSelectedOrderMovements() {
@@ -3968,14 +4025,37 @@ export function MaterialDashboard() {
                     </div>
                   </DrawerSection>
 
-                  <DrawerSection title="Công đoạn xử lý" note="Chọn đúng công đoạn trước để hệ thống gợi ý thợ phù hợp hơn.">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <FieldShell label="Công đoạn" required>
-                        <SelectControl value={draft.stage} onChange={(value) => updateDraft("stage", value)}>
-                          {stageOptionsForDropdown.map((item) => (
-                            <option key={item.value} value={item.value}>{item.label}</option>
-                          ))}
-                        </SelectControl>
+                  <DrawerSection title="Công đoạn xử lý" note="Bấm vào từng khâu để nhập xuất/nhập; khâu có dấu ✓ là đã ghi nhận, khâu ○ chưa nhập thì có thể bỏ qua.">
+                    <FieldShell label="Chọn khâu để cập nhật" hint={draft.code ? "Mỗi khâu lưu thành một dòng riêng trong Nhật ký NVL." : "Nhập Mã LSX ở trên trước rồi mới chọn khâu."} required>
+                      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                        {stageOptionsForDropdown.map((item) => {
+                          const done = draftStageMovements.has(item.value);
+                          const active = normalizeStageCode(draft.stage) === item.value;
+                          return (
+                            <button
+                              key={item.value}
+                              type="button"
+                              disabled={!draft.code.trim()}
+                              onClick={() => selectStageTab(item.value)}
+                              className={`flex items-center justify-between gap-1 rounded-md border px-2.5 py-1.5 text-left text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                                active
+                                  ? "border-ink bg-ink text-white"
+                                  : done
+                                    ? "border-line bg-white text-ink hover:border-ink/50"
+                                    : "border-dashed border-line/70 text-zinc-400 hover:border-line"
+                              }`}
+                              title={item.label}
+                            >
+                              <span className="truncate">{item.value}</span>
+                              <span className={active ? "text-white" : done ? "text-ink" : "text-zinc-400"}>{done ? "✓" : "○"}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </FieldShell>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      <FieldShell label="Khâu đang nhập">
+                        <input className={`${fieldControlClass} bg-paper`} value={draft.stage ? getStageLabel(draft.stage) : "Chưa chọn khâu"} readOnly />
                       </FieldShell>
                       <FieldShell label="Trạng thái công đoạn" required>
                         <SelectControl value={draft.stageStatus ?? "Đang thực hiện"} onChange={(value) => updateDraft("stageStatus", value)}>
@@ -4121,16 +4201,27 @@ export function MaterialDashboard() {
                       {remoteError}
                     </div>
                   ) : null}
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
                       type="button"
-                      onClick={addOrder}
+                      onClick={() => addOrder(false)}
                       disabled={isDraftDirectChargeInvalid}
                     >
                       <Plus size={16} />
                       {editingMovementId ? "Cập nhật NVL" : "Thêm vào bảng"}
                     </button>
+                    {draft.code.trim() ? (
+                      <button
+                        className="inline-flex items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:border-zinc-200 disabled:text-zinc-400"
+                        type="button"
+                        onClick={() => addOrder(true)}
+                        disabled={isDraftDirectChargeInvalid}
+                        title="Lưu khâu này và tiếp tục nhập khâu khác của cùng LSX"
+                      >
+                        Lưu & tiếp khâu khác
+                      </button>
+                    ) : null}
                     {editingMovementId ? (
                       <button
                         className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400"
