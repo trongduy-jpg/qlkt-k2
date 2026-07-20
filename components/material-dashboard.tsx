@@ -3665,12 +3665,14 @@ export function MaterialDashboard() {
                   ) : null}
                 </div>
                 {filteredOrders.length > 0 ? (
-                  <table className="w-full min-w-[1080px] border-collapse text-sm">
+                  <table className="w-full min-w-[1320px] border-collapse text-sm">
                     <thead>
                     <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
                         <th className="px-3 py-3">Số CT</th>
                         <th className="px-3 py-3">Mã hàng</th>
+                        <th className="px-3 py-3">Tên hàng</th>
                         <th className="px-3 py-3">Mã LSX</th>
+                        <th className="px-3 py-3">Loại NVL</th>
                         <th className="px-3 py-3">NVL</th>
                         <th className="px-3 py-3">Thợ / công đoạn</th>
                         <th className="px-3 py-3 text-right">SL</th>
@@ -3696,11 +3698,10 @@ export function MaterialDashboard() {
                             <div className="font-semibold text-ink">{order.documentNo || order.documentInNo || "-"}</div>
                             <div className="text-xs text-zinc-500">{formatDisplayDate(order.occurredDate) || "-"}</div>
                           </td>
-                          <td className="px-3 py-3">
-                            <div className="font-semibold text-ink">{order.sku}</div>
-                            {order.productName ? <div className="text-xs text-zinc-500">{order.productName}</div> : null}
-                          </td>
+                          <td className="px-3 py-3 font-semibold text-ink">{order.sku}</td>
+                          <td className="px-3 py-3 text-zinc-700">{order.productName || "-"}</td>
                           <td className="px-3 py-3 font-semibold text-ink">{order.code}</td>
+                          <td className="px-3 py-3 text-zinc-700">{order.materialType || "-"}</td>
                           <td className="px-3 py-3 text-zinc-700">{order.material}</td>
                           <td className="px-3 py-3">
                             <div className="font-medium text-zinc-800">{order.worker}</div>
@@ -3840,15 +3841,12 @@ export function MaterialDashboard() {
                         </SelectControl>
                       </FieldShell>
                     </div>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       <FieldShell label="Số CT xuất">
                         <input className={fieldControlClass} placeholder="Tự sinh nếu bỏ trống" value={draft.documentNo ?? ""} onChange={(e) => updateDraft("documentNo", e.target.value)} />
                       </FieldShell>
                       <FieldShell label="Số CT nhập">
                         <input className={fieldControlClass} placeholder="Nếu có" value={draft.documentInNo ?? ""} onChange={(e) => updateDraft("documentInNo", e.target.value)} />
-                      </FieldShell>
-                      <FieldShell label="STT dòng">
-                        <input className={fieldControlClass} placeholder="VD: 1" value={draft.documentLineNo ?? ""} onChange={(e) => updateDraft("documentLineNo", e.target.value)} />
                       </FieldShell>
                     </div>
                   </DrawerSection>
