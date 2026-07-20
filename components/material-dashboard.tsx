@@ -5,7 +5,6 @@ import {
   Boxes,
   CircleDollarSign,
   ClipboardList,
-  ChevronDown,
   Database,
   FileWarning,
   History,
@@ -15,9 +14,31 @@ import {
   Trash2,
   X
 } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-context";
+import {
+  DetailGroup,
+  DetailInlineList,
+  DrawerSection,
+  FieldShell,
+  InfoMetric,
+  SelectControl,
+  fieldControlClass
+} from "@/components/production-ui";
+import {
+  deliveryStatusClass,
+  formatGram,
+  getSummaryStatus,
+  hasMeaningfulText,
+  isClosedStatus,
+  pickNumber,
+  pickText,
+  statusClass,
+  statusOptions,
+  validateMovementDraft
+} from "@/lib/production-helpers";
+import type { AuditEvent, OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
 import { AuditLogView } from "@/components/audit-log-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { PriceTableView } from "@/components/price-table-view";
@@ -103,205 +124,11 @@ import {
   type AppUser
 } from "@/lib/auth-service";
 
-const statusOptions: Array<Status | "Tất cả"> = ["Tất cả", "Đang xử lý", "Treo nợ", "Xác định", "Đã chốt"];
 const storageKey = "qlkt-k2-material-orders";
 const productionOrderHeaderKey = "qlkt-k2-production-order-headers";
 const auditKey = "qlkt-k2-audit-events";
 const movementDraftCacheKey = "qlkt-k2-movement-draft-cache";
 const productionHeaderDraftCacheKey = "qlkt-k2-production-header-draft-cache";
-
-const statusClass: Record<Status, string> = {
-  "Đang xử lý": "bg-sky-50 text-sky-700 ring-sky-200",
-  "Treo nợ": "bg-amber-50 text-amber-800 ring-amber-200",
-  "Xác định": "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  "Đã chốt": "bg-zinc-100 text-zinc-700 ring-zinc-300"
-};
-
-const deliveryStatusClass: Record<string, string> = {
-  "Hoàn tất": "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  "Chưa Hoàn Tất": "bg-sky-50 text-sky-700 ring-sky-200",
-  "Chưa giao đủ": "bg-amber-50 text-amber-800 ring-amber-200",
-  "Ngưng Sản Xuất": "bg-rose-50 text-rose-700 ring-rose-200"
-};
-
-function formatGram(value: number) {
-  return `${value.toLocaleString("vi-VN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}g`;
-}
-
-function validateMovementDraft(draft: ProductionOrder) {
-  const missing: string[] = [];
-  if (!draft.code.trim()) missing.push("Mã LSX");
-  if (!draft.sku.trim()) missing.push("Mã hàng");
-  if (!draft.occurredDate?.trim()) missing.push("Ngày nghiệp vụ");
-  if (!draft.destination?.trim()) missing.push("Nơi nhận");
-  if (!draft.stage?.trim()) missing.push("Công đoạn");
-  if (!draft.worker?.trim()) missing.push("Thợ phụ trách");
-  if (!draft.stageStatus?.trim()) missing.push("Trạng thái công đoạn");
-  if (!draft.status?.trim()) missing.push("Trạng thái tính hao");
-  return missing;
-}
-
-function pickText(...values: Array<string | null | undefined>) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim()) return value;
-  }
-  return "";
-}
-
-function hasMeaningfulText(value: string | null | undefined) {
-  return typeof value === "string" && value.trim().length > 0;
-}
-
-function hasMeaningfulDisplayValue(value: string | null | undefined) {
-  if (!hasMeaningfulText(value)) return false;
-  const normalized = value!.trim().toLowerCase();
-  return normalized !== "-" && normalized !== "chưa cập nhật" && normalized !== "chưa có";
-}
-
-function pickNumber(...values: Array<number | null | undefined>) {
-  for (const value of values) {
-    if (typeof value === "number" && Number.isFinite(value)) return value;
-  }
-  return 0;
-}
-
-function FieldShell({
-  label,
-  hint,
-  required,
-  children
-}: {
-  label: string;
-  hint?: string;
-  required?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <label className="grid gap-1 text-sm">
-      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-        {label}
-        {required ? <span className="ml-1 text-rose-500">*</span> : null}
-      </span>
-      {children}
-      {hint ? <span className="text-xs leading-5 text-zinc-500">{hint}</span> : null}
-    </label>
-  );
-}
-
-function SelectControl({
-  value,
-  onChange,
-  children
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  children: ReactNode;
-}) {
-  return (
-    <div className="relative">
-      <select
-        className={`${fieldControlClass} appearance-none pr-10`}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-    </div>
-  );
-}
-
-function InfoMetric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border border-line bg-white px-3 py-3">
-      <p className="text-xs uppercase tracking-wide text-zinc-500">{label}</p>
-      <p className="mt-1 text-lg font-bold text-ink">{value}</p>
-    </div>
-  );
-}
-
-function DetailGroup({
-  title,
-  items
-}: {
-  title: string;
-  items: Array<[string, string]>;
-}) {
-  const visibleItems = items.filter(([, value]) => hasMeaningfulDisplayValue(value));
-
-  return (
-    <div className="rounded-md border border-line bg-white p-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{title}</p>
-      {visibleItems.length > 0 ? (
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {visibleItems.map(([label, value]) => (
-            <div key={`${title}-${label}`} className="rounded-md bg-paper px-3 py-2">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">{label}</p>
-              <p className="mt-1 text-sm font-medium text-ink">{value}</p>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="mt-3 rounded-md border border-dashed border-line bg-paper px-3 py-4 text-sm text-zinc-500">
-          Chưa có dữ liệu cần hiển thị trong nhóm này.
-        </div>
-      )}
-    </div>
-  );
-}
-
-function DetailInlineList({
-  items
-}: {
-  items: Array<[string, string]>;
-}) {
-  const visibleItems = items.filter(([, value]) => hasMeaningfulDisplayValue(value));
-
-  if (visibleItems.length === 0) {
-    return <p className="text-sm text-zinc-500">Chưa có dữ liệu vận hành phát sinh.</p>;
-  }
-
-  return (
-    <div className="grid gap-2">
-      {visibleItems.map(([label, value]) => (
-        <div
-          key={`${label}-${value}`}
-          className="flex items-start justify-between gap-4 rounded-md border border-line bg-white px-3 py-2"
-        >
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{label}</p>
-          <p className="text-right text-sm font-medium text-ink">{value}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function DrawerSection({
-  title,
-  note,
-  children
-}: {
-  title: string;
-  note?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="rounded-lg border border-line bg-white shadow-sm">
-      <div className="border-b border-line/80 px-3 py-2">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">{title}</h4>
-            {note ? <p className="mt-0.5 text-xs leading-5 text-zinc-500">{note}</p> : null}
-          </div>
-        </div>
-      </div>
-      <div className="px-3 py-3">{children}</div>
-    </section>
-  );
-}
-
-const fieldControlClass =
-  "h-10 w-full rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
 
 function createEmptyOrder(): ProductionOrder {
   const today = toIsoDate();
@@ -392,134 +219,6 @@ function createEmptyAppUserDraft(): Omit<AppUser, "id"> {
     role: "nhan_vien"
   };
 }
-
-type AuditEvent = {
-  id: string;
-  action: string;
-  detail: string;
-  createdAt: string;
-};
-
-type OrderSummary = {
-  code: string;
-  sku: string;
-  productName?: string;
-  destination?: string;
-  orderDate?: string;
-  occurredDate?: string;
-  documentNo?: string;
-  documentInNo?: string;
-  documentLineNo?: string;
-  movementType?: ProductionOrder["movementType"];
-  qtyPiece?: number;
-  plannedDate?: string;
-  plannedStage?: string;
-  plannedWorker?: string;
-  plannedMaterial?: string;
-  materialSpec?: string;
-  plannedGoldAge?: number;
-  plannedMaterialType?: string;
-  deliveryStatus?: string;
-  orderMonth?: string;
-  salesType?: string;
-  customerName?: string;
-  specification?: string;
-  deadlineDate?: string;
-  completedDate?: string;
-  deliveredQty?: number;
-  actualProgressNote?: string;
-  completedWeightGram?: number;
-  issuedDefault?: number;
-  returnedDefault?: number;
-  powderDefault?: number;
-  transferred?: number;
-  lossPeriod?: string;
-  nxtPeriod?: string;
-  sourceMaterialName?: string;
-  sourceName?: string;
-  importSource?: string;
-  exportSource?: string;
-  nxtLinkCode?: string;
-  convertedIssueWeight?: number;
-  convertedReturnWeight?: number;
-  note?: string;
-  createdAt?: string;
-  headerStatus?: Status;
-  movementCount: number;
-  issued: number;
-  returned: number;
-  powder: number;
-  loss: number;
-  status: Status;
-  workers: string[];
-  materials: string[];
-};
-
-type ProductionOrderHeader = {
-  id: string;
-  code: string;
-  sku: string;
-  productName: string;
-  destination: string;
-  orderDate: string;
-  occurredDate: string;
-  documentNo: string;
-  documentInNo: string;
-  documentLineNo: string;
-  movementType: ProductionOrder["movementType"];
-  qtyPiece: number;
-  plannedDate: string;
-  plannedStage: string;
-  plannedWorker: string;
-  plannedMaterial: string;
-  materialSpec: string;
-  plannedGoldAge: number;
-  plannedMaterialType: string;
-  deliveryStatus: string;
-  orderMonth: string;
-  salesType: string;
-  customerName: string;
-  specification: string;
-  deadlineDate: string;
-  completedDate: string;
-  deliveredQty: number;
-  actualProgressNote: string;
-  completedWeightGram: number;
-  issued: number;
-  returned: number;
-  powder: number;
-  transferred: number;
-  lossPeriod: string;
-  nxtPeriod: string;
-  sourceMaterialName: string;
-  sourceName: string;
-  importSource: string;
-  exportSource: string;
-  nxtLinkCode: string;
-  convertedIssueWeight: number;
-  convertedReturnWeight: number;
-  note: string;
-  status: Status;
-  createdAt: string;
-};
-
-type PendingJournalRow = {
-  id: string;
-  kind: "pending";
-  code: string;
-  sku: string;
-  productName?: string;
-  material: string;
-  worker: string;
-  stage: string;
-  qtyPiece?: number;
-  occurredDate?: string;
-  lossPeriod?: string;
-  nxtPeriod?: string;
-  status: Status;
-  deliveryStatus?: string;
-  summary: OrderSummary;
-};
 
 function createEmptyProductionOrderHeaderDraft(): Omit<ProductionOrderHeader, "id" | "createdAt"> {
   const today = toIsoDate();
@@ -724,17 +423,6 @@ function mergeMovementWithContext(
     convertedReturnWeight: pickNumber(order.convertedReturnWeight, cachedDraft?.convertedReturnWeight, header?.convertedReturnWeight),
     status: order.status || cachedDraft?.status || header?.status || "Đang xử lý"
   };
-}
-
-function getSummaryStatus(statuses: Status[]): Status {
-  if (statuses.includes("Treo nợ")) return "Treo nợ";
-  if (statuses.includes("Đang xử lý")) return "Đang xử lý";
-  if (statuses.every((item) => item === "Đã chốt")) return "Đã chốt";
-  return "Xác định";
-}
-
-function isClosedStatus(status: Status) {
-  return status === "Đã chốt";
 }
 
 function normalizeStageCode(stage: string) {
