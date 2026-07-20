@@ -1,6 +1,7 @@
-import type { Dispatch, SetStateAction } from "react";
+"use client";
+
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { LockKeyhole, Pencil, Trash2 } from "lucide-react";
-import { modules } from "@/lib/demo-data";
 import type { MaterialMaster, WorkerMaster } from "@/lib/material-service";
 
 type MasterDataSettingsViewProps = {
@@ -23,6 +24,8 @@ type MasterDataSettingsViewProps = {
   onDeleteMaterial: (id: string) => void;
 };
 
+type CategoryTab = "materials" | "workers";
+
 export function MasterDataSettingsView({
   isVisible,
   materials,
@@ -42,60 +45,86 @@ export function MasterDataSettingsView({
   onCancelEditMaterial,
   onDeleteMaterial
 }: MasterDataSettingsViewProps) {
+  const [tab, setTab] = useState<CategoryTab>("materials");
+
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div className="flex items-center gap-2">
         <LockKeyhole className="text-jade" size={18} />
-        <h3 className="text-base font-bold text-ink">Cấu hình danh mục nền</h3>
+        <h3 className="text-base font-bold text-ink">Danh mục nền</h3>
       </div>
       <p className="mt-1 text-sm text-zinc-600">
-        Quản lý nhanh danh mục NVL và thợ để form nhật ký không phải nhập tự do.
+        Quản lý danh mục NVL và thợ để form nhật ký không phải nhập tự do.
       </p>
 
-      <div className="mt-4 balanced-grid">
-        <div className="rounded-md border border-line bg-paper p-3">
-          <div className="flex items-center justify-between gap-2">
-            <h4 className="font-semibold text-ink">Danh mục NVL</h4>
-            {editingMaterialId ? (
-              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
-                Đang sửa NVL
-              </span>
-            ) : null}
-          </div>
-          <div className="mt-3 grid gap-2">
-            <div className="grid grid-cols-2 gap-2">
-              <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Mã NVL" value={materialDraft.code} onChange={(event) => setMaterialDraft((current) => ({ ...current, code: event.target.value }))} />
-              <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Tên NVL" value={materialDraft.name} onChange={(event) => setMaterialDraft((current) => ({ ...current, name: event.target.value }))} />
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <select className="rounded-md border border-line px-3 py-2 text-sm" value={materialDraft.category} onChange={(event) => setMaterialDraft((current) => ({ ...current, category: event.target.value }))}>
-                <option value="gold">gold</option>
-                <option value="silver">silver</option>
-                <option value="platinum">platinum</option>
-                <option value="other">other</option>
-              </select>
-              <input className="rounded-md border border-line px-3 py-2 text-sm" type="number" step="0.0001" placeholder="Hàm lượng" value={materialDraft.purity} onChange={(event) => setMaterialDraft((current) => ({ ...current, purity: Number(event.target.value) }))} />
-              <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="ĐVT" value={materialDraft.unit} onChange={(event) => setMaterialDraft((current) => ({ ...current, unit: event.target.value }))} />
-            </div>
-            <div className="flex gap-2">
-              <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddMaterial}>
-                {editingMaterialId ? "Cập nhật NVL" : "Thêm NVL"}
-              </button>
+      <div className="mt-4 flex gap-1 border-b border-line">
+        <button
+          className={`border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
+            tab === "materials" ? "border-ink text-ink" : "border-transparent text-zinc-500 hover:text-ink"
+          }`}
+          type="button"
+          onClick={() => setTab("materials")}
+        >
+          Danh mục NVL
+        </button>
+        <button
+          className={`border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
+            tab === "workers" ? "border-ink text-ink" : "border-transparent text-zinc-500 hover:text-ink"
+          }`}
+          type="button"
+          onClick={() => setTab("workers")}
+        >
+          Danh mục thợ
+        </button>
+      </div>
+
+      {tab === "materials" ? (
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(280px,380px)_1fr]">
+          <div className="rounded-md border border-line bg-paper p-3">
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="font-semibold text-ink">{editingMaterialId ? "Sửa NVL" : "Thêm NVL"}</h4>
               {editingMaterialId ? (
-                <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onCancelEditMaterial}>
-                  Hủy
-                </button>
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                  Đang sửa
+                </span>
               ) : null}
             </div>
+            <div className="mt-3 grid gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Mã NVL" value={materialDraft.code} onChange={(event) => setMaterialDraft((current) => ({ ...current, code: event.target.value }))} />
+                <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Tên NVL" value={materialDraft.name} onChange={(event) => setMaterialDraft((current) => ({ ...current, name: event.target.value }))} />
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <select className="rounded-md border border-line px-3 py-2 text-sm" value={materialDraft.category} onChange={(event) => setMaterialDraft((current) => ({ ...current, category: event.target.value }))}>
+                  <option value="gold">gold</option>
+                  <option value="silver">silver</option>
+                  <option value="platinum">platinum</option>
+                  <option value="other">other</option>
+                </select>
+                <input className="rounded-md border border-line px-3 py-2 text-sm" type="number" step="0.0001" placeholder="Hàm lượng" value={materialDraft.purity} onChange={(event) => setMaterialDraft((current) => ({ ...current, purity: Number(event.target.value) }))} />
+                <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="ĐVT" value={materialDraft.unit} onChange={(event) => setMaterialDraft((current) => ({ ...current, unit: event.target.value }))} />
+              </div>
+              <div className="flex gap-2">
+                <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddMaterial}>
+                  {editingMaterialId ? "Cập nhật NVL" : "Thêm NVL"}
+                </button>
+                {editingMaterialId ? (
+                  <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onCancelEditMaterial}>
+                    Hủy
+                  </button>
+                ) : null}
+              </div>
+            </div>
           </div>
-          <div className="mt-4 max-h-72 overflow-y-auto rounded-md border border-line bg-white">
+
+          <div className="max-h-[420px] overflow-y-auto rounded-md border border-line bg-white">
             {materials.length === 0 ? (
               <div className="px-3 py-4 text-sm text-zinc-500">Chưa có NVL nào trong danh mục.</div>
             ) : null}
             {materials.map((material) => (
               <div
                 key={material.id}
-                className={`grid grid-cols-[80px_1fr_70px_auto] items-center gap-2 border-b border-line/70 px-3 py-2 text-sm last:border-b-0 ${
+                className={`grid grid-cols-[90px_1fr_90px_auto] items-center gap-2 border-b border-line/70 px-3 py-2 text-sm last:border-b-0 ${
                   editingMaterialId === material.id ? "bg-amber-50/60" : ""
                 }`}
               >
@@ -124,37 +153,40 @@ export function MasterDataSettingsView({
             ))}
           </div>
         </div>
-
-        <div className="rounded-md border border-line bg-paper p-3">
-          <div className="flex items-center justify-between gap-2">
-            <h4 className="font-semibold text-ink">Danh mục thợ</h4>
-            {editingWorkerId ? (
-              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
-                Đang sửa thợ
-              </span>
-            ) : null}
-          </div>
-          <div className="mt-3 grid gap-2">
-            <div className="grid grid-cols-2 gap-2">
-              <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Mã thợ" value={workerDraft.worker_code} onChange={(event) => setWorkerDraft((current) => ({ ...current, worker_code: event.target.value }))} />
-              <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Tên thợ" value={workerDraft.full_name} onChange={(event) => setWorkerDraft((current) => ({ ...current, full_name: event.target.value }))} />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Bộ phận" value={workerDraft.department} onChange={(event) => setWorkerDraft((current) => ({ ...current, department: event.target.value }))} />
-              <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Công đoạn" value={workerDraft.stage ?? ""} onChange={(event) => setWorkerDraft((current) => ({ ...current, stage: event.target.value }))} />
-            </div>
-            <div className="flex gap-2">
-              <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddWorker}>
-                {editingWorkerId ? "Cập nhật thợ" : "Thêm thợ"}
-              </button>
+      ) : (
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(280px,380px)_1fr]">
+          <div className="rounded-md border border-line bg-paper p-3">
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="font-semibold text-ink">{editingWorkerId ? "Sửa thợ" : "Thêm thợ"}</h4>
               {editingWorkerId ? (
-                <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onCancelEditWorker}>
-                  Hủy
-                </button>
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                  Đang sửa
+                </span>
               ) : null}
             </div>
+            <div className="mt-3 grid gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Mã thợ" value={workerDraft.worker_code} onChange={(event) => setWorkerDraft((current) => ({ ...current, worker_code: event.target.value }))} />
+                <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Tên thợ" value={workerDraft.full_name} onChange={(event) => setWorkerDraft((current) => ({ ...current, full_name: event.target.value }))} />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Bộ phận" value={workerDraft.department} onChange={(event) => setWorkerDraft((current) => ({ ...current, department: event.target.value }))} />
+                <input className="rounded-md border border-line px-3 py-2 text-sm" placeholder="Công đoạn" value={workerDraft.stage ?? ""} onChange={(event) => setWorkerDraft((current) => ({ ...current, stage: event.target.value }))} />
+              </div>
+              <div className="flex gap-2">
+                <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddWorker}>
+                  {editingWorkerId ? "Cập nhật thợ" : "Thêm thợ"}
+                </button>
+                {editingWorkerId ? (
+                  <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onCancelEditWorker}>
+                    Hủy
+                  </button>
+                ) : null}
+              </div>
+            </div>
           </div>
-          <div className="mt-4 max-h-72 overflow-y-auto rounded-md border border-line bg-white">
+
+          <div className="max-h-[420px] overflow-y-auto rounded-md border border-line bg-white">
             {workers.length === 0 ? (
               <div className="px-3 py-4 text-sm text-zinc-500">Chưa có thợ nào trong danh mục.</div>
             ) : null}
@@ -190,16 +222,7 @@ export function MasterDataSettingsView({
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {modules.map((module) => (
-          <article key={module.name} className="rounded-md border border-line bg-paper px-3 py-3">
-            <h4 className="font-semibold text-ink">{module.name}</h4>
-            <p className="mt-1 text-sm leading-6 text-zinc-600">{module.desc}</p>
-          </article>
-        ))}
-      </div>
+      )}
     </section>
   );
 }
