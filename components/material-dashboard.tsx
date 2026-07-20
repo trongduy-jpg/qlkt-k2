@@ -2499,6 +2499,20 @@ export function MaterialDashboard() {
     }
   }
 
+  function startNewOrderForSameCustomer() {
+    if (!selectedOrderSummary) return;
+
+    const emptyDraft = createEmptyProductionOrderHeaderDraft();
+    setEditingProductionCode(null);
+    setProductionHeaderDraft({
+      ...emptyDraft,
+      code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), orderSummaries.map((summary) => summary.code)),
+      customerName: selectedOrderSummary.customerName || "",
+      salesType: selectedOrderSummary.salesType || ""
+    });
+    setIsProductionFormOpen(true);
+  }
+
   async function addMaterial() {
     if (!materialDraft.code.trim() || !materialDraft.name.trim()) return;
 
@@ -3229,7 +3243,7 @@ export function MaterialDashboard() {
                 </div>
 
                 {selectedOrderDetail && selectedOrderSummary ? (
-                  <div className="shrink-0 border-t border-line bg-white px-5 py-4">
+                  <div className="shrink-0 space-y-2 border-t border-line bg-white px-5 py-4">
                     {isEditingSelectedOrder ? (
                       <div className="grid gap-2 sm:grid-cols-2">
                         <button
@@ -3273,6 +3287,14 @@ export function MaterialDashboard() {
                         </button>
                       </div>
                     )}
+                    <button
+                      className="w-full rounded-md border border-dashed border-line bg-paper px-3 py-2 text-sm font-semibold text-ink hover:border-ink"
+                      type="button"
+                      onClick={startNewOrderForSameCustomer}
+                      title="Tạo LSX mới, tự điền sẵn Khách hàng và SR/KH từ đơn đang xem"
+                    >
+                      + Tạo đơn mới cho khách này
+                    </button>
                   </div>
                 ) : null}
               </aside>
