@@ -1546,9 +1546,19 @@ export function MaterialDashboard() {
       pushAudit("large_weight_warning", `Giao dịch ${normalizedDraft.code} có trọng lượng trên 2000g, cần kiểm tra trước khi chốt.`);
     }
 
+    // Moi (LSX + khau) chi giu 1 dong: neu khau nay cua LSX da co dong roi
+    // thi cap nhat de len chinh dong do, khong tao them dong moi.
+    const normalizedStageCode = normalizeStageCode(normalizedDraft.stage);
+    const existingStageMovement = orders.find(
+      (order) =>
+        order.code === normalizedDraft.code.trim() &&
+        normalizeStageCode(order.stage) === normalizedStageCode
+    );
+    const effectiveEditingId = editingMovementId || existingStageMovement?.id || null;
+
     const nextOrder = {
       ...normalizedDraft,
-      id: editingMovementId || normalizedDraft.id || crypto.randomUUID(),
+      id: effectiveEditingId || normalizedDraft.id || crypto.randomUUID(),
       code: normalizedDraft.code.trim(),
       sku: normalizedDraft.sku.trim(),
       worker: normalizedDraft.worker.trim()
@@ -1556,7 +1566,7 @@ export function MaterialDashboard() {
 
     try {
       const savedOrder =
-        editingMovementId
+        effectiveEditingId
           ? isSupabaseConfigured
             ? await updateMaterialMovement(nextOrder)
             : nextOrder
@@ -1571,11 +1581,11 @@ export function MaterialDashboard() {
         });
       } else {
         setOrders((current) =>
-          editingMovementId ? current.map((item) => (item.id === editingMovementId ? savedOrder : item)) : [savedOrder, ...current]
+          effectiveEditingId ? current.map((item) => (item.id === effectiveEditingId ? savedOrder : item)) : [savedOrder, ...current]
         );
       }
       setSelectedOrderCode(savedOrder.code);
-      if (editingMovementId) {
+      if (effectiveEditingId) {
         pushAudit("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`);
         await createAuditLog("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
       } else {
