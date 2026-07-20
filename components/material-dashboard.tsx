@@ -2458,7 +2458,7 @@ export function MaterialDashboard() {
     );
   }
 
-  function prepareMovementForSummary(summary: OrderSummary | null) {
+  function prepareMovementForSummary(summary: OrderSummary | null, stageOverride?: string) {
     if (!summary) return;
     const cachedDraft = movementDraftCache[summary.code];
     const latestMovement = orders.find((order) => order.code === summary.code);
@@ -2483,9 +2483,15 @@ export function MaterialDashboard() {
       movementType: summary.movementType ?? baseDraft.movementType,
       qtyPiece: pickNumber(baseDraft.qtyPiece, summary.qtyPiece),
       occurredDate: pickText(baseDraft.occurredDate, summary.occurredDate, summary.plannedDate),
-      stage: pickText(baseDraft.stage, summary.plannedStage),
+      stage: stageOverride || pickText(baseDraft.stage, summary.plannedStage),
       stageStatus: baseDraft.stageStatus || "Đang thực hiện",
-      worker: pickText(baseDraft.worker, summary.plannedWorker),
+      worker: stageOverride
+        ? pickText(
+            selectedOrderMovements.find((movement) => normalizeProductionStageCode(movement.stage) === stageOverride)?.worker,
+            baseDraft.worker,
+            summary.plannedWorker
+          )
+        : pickText(baseDraft.worker, summary.plannedWorker),
       material: pickText(baseDraft.material, summary.plannedMaterial, summary.materials[0]),
       issued: pickNumber(baseDraft.issued, summary.issuedDefault),
       returned: pickNumber(baseDraft.returned, summary.returnedDefault),
@@ -2515,6 +2521,10 @@ export function MaterialDashboard() {
 
   function prepareMovementForSelectedOrder() {
     prepareMovementForSummary(selectedOrderSummary);
+  }
+
+  function openMovementForStage(stageCode: string) {
+    prepareMovementForSummary(selectedOrderSummary, stageCode);
   }
 
   function viewSelectedOrderMovements() {
@@ -3613,16 +3623,28 @@ export function MaterialDashboard() {
                                     </span>
                                   ) : null}
                                 </div>
-                                {stage.movementCount > 0 ? (
-                                  <div className="flex flex-wrap items-center gap-3 text-zinc-600">
-                                    <span>Xuất {formatGram(stage.issued)}</span>
-                                    <span>Nhập {formatGram(stage.returned)}</span>
-                                    {stage.qtyPiece > 0 ? <span>SL {stage.qtyPiece}</span> : null}
-                                    <span>{formatDisplayDate(stage.latestDate) || "-"}</span>
-                                  </div>
-                                ) : (
-                                  <span>Chưa thực hiện</span>
-                                )}
+                                <div className="flex flex-wrap items-center gap-3">
+                                  {stage.movementCount > 0 ? (
+                                    <div className="flex flex-wrap items-center gap-3 text-zinc-600">
+                                      <span>Xuất {formatGram(stage.issued)}</span>
+                                      <span>Nhập {formatGram(stage.returned)}</span>
+                                      {stage.qtyPiece > 0 ? <span>SL {stage.qtyPiece}</span> : null}
+                                      <span>{formatDisplayDate(stage.latestDate) || "-"}</span>
+                                    </div>
+                                  ) : (
+                                    <span>Chưa thực hiện</span>
+                                  )}
+                                  <button
+                                    className="rounded-full border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink hover:bg-paper"
+                                    type="button"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      openMovementForStage(stage.code);
+                                    }}
+                                  >
+                                    + Cập nhật khâu này
+                                  </button>
+                                </div>
                               </div>
                             ))}
                           </div>
