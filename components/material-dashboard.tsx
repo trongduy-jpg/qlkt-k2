@@ -54,23 +54,28 @@ import {
   normalizeStageCode as normalizeProductionStageCode,
   shouldForceDirectCharge,
   toIsoDate,
-  toMonthCode
+  toMonthCode,
+  type HaoHutRule
 } from "@/lib/production-business-rules";
 import {
   createAuditLog,
   createMaterial,
   createMaterialMovement,
   createProductionOrderHeader,
+  createStage,
   createWorker,
   deleteMaterial,
   deleteMaterialMovement,
+  deleteStage,
   deleteWorker,
   loadDatabaseHealth,
   loadMaterials,
   loadProductionOrderHeaders,
   loadProductionOrders,
+  loadStages,
   loadWorkers,
   updateMaterial,
+  updateStage,
   updateWorker,
   updateProductionOrderStatus,
   updateProductionOrderHeader,
@@ -78,6 +83,7 @@ import {
   updateMaterialMovementStatus,
   type DatabaseHealth,
   type MaterialMaster,
+  type StageMaster,
   type WorkerMaster
 } from "@/lib/material-service";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -334,6 +340,14 @@ function createEmptyWorkerDraft(): Omit<WorkerMaster, "id"> {
     full_name: "",
     department: "San xuat",
     stage: "CKE"
+  };
+}
+
+function createEmptyStageDraft(): Omit<StageMaster, "id"> {
+  return {
+    stage_code: "",
+    stage_name: "",
+    hao_hut_rule: "binh_thuong"
   };
 }
 
@@ -742,10 +756,13 @@ export function MaterialDashboard() {
   const [isAlertPanelOpen, setIsAlertPanelOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialMaster[]>([]);
   const [workers, setWorkers] = useState<WorkerMaster[]>([]);
+  const [stages, setStages] = useState<StageMaster[]>([]);
   const [materialDraft, setMaterialDraft] = useState<Omit<MaterialMaster, "id">>(createEmptyMaterialDraft());
   const [workerDraft, setWorkerDraft] = useState<Omit<WorkerMaster, "id">>(createEmptyWorkerDraft());
+  const [stageDraft, setStageDraft] = useState<Omit<StageMaster, "id">>(createEmptyStageDraft());
   const [editingWorkerId, setEditingWorkerId] = useState<string | null>(null);
   const [editingMaterialId, setEditingMaterialId] = useState<string | null>(null);
+  const [editingStageId, setEditingStageId] = useState<string | null>(null);
 
   async function reloadOperationalData(options?: {
     movementDraftOverrides?: Record<string, ProductionOrder>;
@@ -753,11 +770,12 @@ export function MaterialDashboard() {
   }) {
     if (!isSupabaseConfigured) return;
 
-    const [remoteOrders, remoteHeaders, remoteMaterials, remoteWorkers, remoteDatabaseHealth] = await Promise.all([
+    const [remoteOrders, remoteHeaders, remoteMaterials, remoteWorkers, remoteStages, remoteDatabaseHealth] = await Promise.all([
       loadProductionOrders(),
       loadProductionOrderHeaders(),
       loadMaterials(),
       loadWorkers(),
+      loadStages(),
       loadDatabaseHealth()
     ]);
 
@@ -801,6 +819,7 @@ export function MaterialDashboard() {
     setProductionHeaders(mappedHeaders);
     setMaterials(remoteMaterials);
     setWorkers(remoteWorkers);
+    setStages(remoteStages);
     setDatabaseHealth(remoteDatabaseHealth);
 
     return { remoteMaterials, remoteWorkers };
@@ -1360,6 +1379,21 @@ export function MaterialDashboard() {
     return exactMatches.length > 0 ? exactMatches : workers;
   }, [draft.stage, workers]);
 
+  const stageRules = useMemo(() => {
+    const rules: Record<string, HaoHutRule> = {};
+    for (const stage of stages) rules[stage.stage_code] = stage.hao_hut_rule;
+    return rules;
+  }, [stages]);
+
+  const stageOptionsForDropdown = useMemo(() => {
+    if (stages.length === 0) return journalStages;
+    const merged = new Map(journalStages.map((item) => [item.value, item]));
+    for (const stage of stages) {
+      merged.set(stage.stage_code, { value: stage.stage_code, label: `${stage.stage_code} – ${stage.stage_name}` });
+    }
+    return Array.from(merged.values());
+  }, [stages]);
+
   function updateDraft<K extends keyof ProductionOrder>(key: K, value: ProductionOrder[K]) {
     setDraft((current) => {
       const next = { ...current, [key]: value };
@@ -1395,7 +1429,7 @@ export function MaterialDashboard() {
     const existingSummary = orderSummaries.find((summary) => summary.code === draft.code.trim());
     const normalizedDraft = applyProductionBusinessRules(draft, orders);
 
-    if (shouldForceDirectCharge(normalizedDraft.stage, normalizedDraft.status)) {
+    if (shouldForceDirectCharge(normalizedDraft.stage, normalizedDraft.status, stageRules)) {
       const detail = "Trạng thái Xác định chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến.";
       pushAudit("blocked_direct_charge_stage", detail);
       setRemoteError(detail);
@@ -2575,6 +2609,63 @@ export function MaterialDashboard() {
     }
   }
 
+  async function addStage() {
+    if (!stageDraft.stage_code.trim() || !stageDraft.stage_name.trim()) return;
+
+    const normalizedStage = {
+      ...stageDraft,
+      stage_code: stageDraft.stage_code.trim().toUpperCase(),
+      stage_name: stageDraft.stage_name.trim()
+    };
+
+    try {
+      if (editingStageId) {
+        const savedStage = await updateStage(editingStageId, normalizedStage);
+        setStages((current) =>
+          current.map((item) => (item.id === editingStageId ? savedStage : item)).sort((a, b) => a.stage_code.localeCompare(b.stage_code))
+        );
+        setEditingStageId(null);
+        setStageDraft(createEmptyStageDraft());
+        pushAudit("update_stage", `Cập nhật công đoạn ${savedStage.stage_code} - ${savedStage.stage_name}`);
+        await createAuditLog("update_stage", `Cập nhật công đoạn ${savedStage.stage_code} - ${savedStage.stage_name}`, savedStage.id);
+      } else {
+        const savedStage = await createStage(normalizedStage);
+        setStages((current) => [...current, savedStage].sort((a, b) => a.stage_code.localeCompare(b.stage_code)));
+        setStageDraft(createEmptyStageDraft());
+        pushAudit("create_stage", `Thêm công đoạn ${savedStage.stage_code} - ${savedStage.stage_name}`);
+        await createAuditLog("create_stage", `Thêm công đoạn ${savedStage.stage_code} - ${savedStage.stage_name}`, savedStage.id);
+      }
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không lưu được công đoạn");
+    }
+  }
+
+  function startEditStage(stage: StageMaster) {
+    setEditingStageId(stage.id);
+    setStageDraft({
+      stage_code: stage.stage_code,
+      stage_name: stage.stage_name,
+      hao_hut_rule: stage.hao_hut_rule
+    });
+  }
+
+  function cancelEditStage() {
+    setEditingStageId(null);
+    setStageDraft(createEmptyStageDraft());
+  }
+
+  async function removeStage(id: string) {
+    try {
+      await deleteStage(id);
+      setStages((current) => current.filter((item) => item.id !== id));
+      if (editingStageId === id) cancelEditStage();
+      pushAudit("delete_stage", `Xóa công đoạn ${id}`);
+      await createAuditLog("delete_stage", `Xóa công đoạn ${id}`, id);
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không xóa được công đoạn");
+    }
+  }
+
   async function addWorker() {
     if (!workerDraft.worker_code.trim() || !workerDraft.full_name.trim()) return;
 
@@ -2658,7 +2749,7 @@ export function MaterialDashboard() {
   const isDraftForClosedOrder = Boolean(draftOrderSummary && isClosedStatus(draftOrderSummary.status));
   const normalizedDraftStage = normalizeStageCode(draft.stage);
   const isDraftLargeWeight = isLargeWeightMovement(draft);
-  const isDraftDirectChargeInvalid = shouldForceDirectCharge(normalizedDraftStage, draft.status);
+  const isDraftDirectChargeInvalid = shouldForceDirectCharge(normalizedDraftStage, draft.status, stageRules);
 
   return (
     <main className="min-h-screen">
@@ -3545,7 +3636,7 @@ export function MaterialDashboard() {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <FieldShell label="Công đoạn" required>
                         <SelectControl value={draft.stage} onChange={(value) => updateDraft("stage", value)}>
-                          {journalStages.map((item) => (
+                          {stageOptionsForDropdown.map((item) => (
                             <option key={item.value} value={item.value}>{item.label}</option>
                           ))}
                         </SelectControl>
@@ -3763,12 +3854,16 @@ export function MaterialDashboard() {
               isVisible={isSettings}
               materials={materials}
               workers={workers}
+              stages={stages}
               materialDraft={materialDraft}
               workerDraft={workerDraft}
+              stageDraft={stageDraft}
               setMaterialDraft={setMaterialDraft}
               setWorkerDraft={setWorkerDraft}
+              setStageDraft={setStageDraft}
               onAddMaterial={addMaterial}
               onAddWorker={addWorker}
+              onAddStage={addStage}
               editingWorkerId={editingWorkerId}
               onStartEditWorker={startEditWorker}
               onCancelEditWorker={cancelEditWorker}
@@ -3777,6 +3872,10 @@ export function MaterialDashboard() {
               onStartEditMaterial={startEditMaterial}
               onCancelEditMaterial={cancelEditMaterial}
               onDeleteMaterial={removeMaterial}
+              editingStageId={editingStageId}
+              onStartEditStage={startEditStage}
+              onCancelEditStage={cancelEditStage}
+              onDeleteStage={removeStage}
             />
           </div>
           {renderProductionFormOverlay()}

@@ -1,7 +1,18 @@
 import type { ProductionOrder, Status } from "@/lib/demo-data";
 
-const directChargeStages = new Set(["CKE", "DAN", "BIEN"]);
-const controlledRiskStages = new Set(["BAO", "PI"]);
+export type HaoHutRule = "truc_tiep" | "kiem_soat_rui_ro" | "binh_thuong";
+
+const defaultStageRules: Record<string, HaoHutRule> = {
+  CKE: "truc_tiep",
+  DAN: "truc_tiep",
+  BIEN: "truc_tiep",
+  BAO: "kiem_soat_rui_ro",
+  PI: "kiem_soat_rui_ro"
+};
+
+function resolveStageRule(stageCode: string, stageRules?: Record<string, HaoHutRule>): HaoHutRule {
+  return stageRules?.[stageCode] ?? defaultStageRules[stageCode] ?? "binh_thuong";
+}
 
 export function toIsoDate(date = new Date()) {
   return date.toISOString().slice(0, 10);
@@ -119,8 +130,8 @@ export function normalizeStageForStorage(stage: string) {
   return getStageLabel(normalizeStageCode(stage));
 }
 
-export function shouldForceDirectCharge(stage: string, status: Status) {
-  return status === "Xác định" && !directChargeStages.has(normalizeStageCode(stage));
+export function shouldForceDirectCharge(stage: string, status: Status, stageRules?: Record<string, HaoHutRule>) {
+  return status === "Xác định" && resolveStageRule(normalizeStageCode(stage), stageRules) !== "truc_tiep";
 }
 
 export function isLargeWeightMovement(order: Pick<ProductionOrder, "issued" | "returned" | "transferred">) {
@@ -131,10 +142,10 @@ export function convertToPureGoldWeight(weight: number, purity?: number) {
   return Number((weight * (purity || 1)).toFixed(4));
 }
 
-export function getWorkerInventoryRiskStatus(stage: string, diffGram: number) {
+export function getWorkerInventoryRiskStatus(stage: string, diffGram: number, stageRules?: Record<string, HaoHutRule>) {
   const absDiff = Math.abs(diffGram);
   if (absDiff < 5) return "An toàn";
-  if (controlledRiskStages.has(normalizeStageCode(stage))) return "Đang kiểm soát";
+  if (resolveStageRule(normalizeStageCode(stage), stageRules) === "kiem_soat_rui_ro") return "Đang kiểm soát";
   return "Rủi ro";
 }
 
