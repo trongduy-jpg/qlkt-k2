@@ -18,6 +18,30 @@ export function toIsoDate(date = new Date()) {
   return date.toISOString().slice(0, 10);
 }
 
+// Chuan hoa moi truong ngay/thang/nam day du hien thi ra man hinh ve
+// cung dinh dang dd/mm/yy (khong dung cho cac truong chi co thang/nam).
+export function formatDisplayDate(dateString?: string | null) {
+  if (!dateString) return "";
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateString);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    return `${day}/${month}/${year.slice(2)}`;
+  }
+  const parsed = new Date(dateString);
+  if (Number.isNaN(parsed.getTime())) return dateString;
+  return formatDisplayDateTime(parsed).slice(0, 8);
+}
+
+export function formatDisplayDateTime(date: Date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(2);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
+
 export function toMonthCode(dateString: string) {
   return dateString.slice(0, 7);
 }

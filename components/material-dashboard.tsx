@@ -49,6 +49,8 @@ import {
   applyProductionBusinessRules,
   buildProductionOrderCode,
   buildUniqueProductionOrderCode,
+  formatDisplayDate,
+  formatDisplayDateTime,
   getCarryOverLossPeriod,
   getStageLabel,
   isLargeWeightMovement,
@@ -1557,7 +1559,7 @@ export function MaterialDashboard() {
         id: crypto.randomUUID(),
         action,
         detail,
-        createdAt: new Date().toLocaleString("vi-VN")
+        createdAt: formatDisplayDateTime(new Date())
       },
       ...current
     ].slice(0, 20));
@@ -1638,7 +1640,7 @@ export function MaterialDashboard() {
       convertedIssueWeight: Number(productionHeaderDraft.convertedIssueWeight || (issued * goldAge).toFixed(4)),
       convertedReturnWeight: Number(productionHeaderDraft.convertedReturnWeight || (returned * goldAge).toFixed(4)),
       note: productionHeaderDraft.note.trim(),
-      createdAt: createdAt ?? new Date().toLocaleString("vi-VN")
+      createdAt: createdAt ?? formatDisplayDateTime(new Date())
     };
   }
 
@@ -3384,7 +3386,7 @@ export function MaterialDashboard() {
                               {summary.salesType || "Chưa cập nhật"}
                             </td>
                             <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
-                              {summary.deadlineDate || "Chưa cập nhật"}
+                              {formatDisplayDate(summary.deadlineDate) || "Chưa cập nhật"}
                             </td>
                             <td className="px-3 py-3 text-right align-top text-zinc-700">
                               {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
@@ -3500,9 +3502,9 @@ export function MaterialDashboard() {
                           <DetailGroup
                             title="Kế hoạch"
                             items={[
-                              ["Ngày kế hoạch", selectedOrderDetail.plannedDate || "-"],
-                              ["Deadline", selectedOrderDetail.deadlineDate || "-"],
-                              ["Ngày HT", selectedOrderDetail.completedDate || "-"],
+                              ["Ngày kế hoạch", formatDisplayDate(selectedOrderDetail.plannedDate) || "-"],
+                              ["Deadline", formatDisplayDate(selectedOrderDetail.deadlineDate) || "-"],
+                              ["Ngày HT", formatDisplayDate(selectedOrderDetail.completedDate) || "-"],
                               ["SL đã giao", selectedOrderDetail.deliveredQty !== null ? String(selectedOrderDetail.deliveredQty) : "-"]
                             ]}
                           />
@@ -3692,7 +3694,7 @@ export function MaterialDashboard() {
                         >
                           <td className="px-3 py-3">
                             <div className="font-semibold text-ink">{order.documentNo || order.documentInNo || "-"}</div>
-                            <div className="text-xs text-zinc-500">{order.occurredDate || "-"}</div>
+                            <div className="text-xs text-zinc-500">{formatDisplayDate(order.occurredDate) || "-"}</div>
                           </td>
                           <td className="px-3 py-3">
                             <div className="font-semibold text-ink">{order.sku}</div>

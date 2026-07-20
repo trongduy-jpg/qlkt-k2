@@ -13,6 +13,7 @@ import {
   type WorkerBoxMetalFilter,
   type WorkerBoxReviewFilter
 } from "@/lib/worker-box-service";
+import { formatDisplayDate } from "@/lib/production-business-rules";
 
 type WorkerBoxViewProps = {
   isVisible: boolean;
@@ -268,7 +269,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
 
         {selectedPeriod ? (
           <div className="mt-3 text-xs text-zinc-600">
-            <strong className="text-ink">{selectedPeriod.label}</strong> · {selectedPeriod.fromDate} đến {selectedPeriod.toDate} ·
+            <strong className="text-ink">{selectedPeriod.label}</strong> · {formatDisplayDate(selectedPeriod.fromDate)} đến {formatDisplayDate(selectedPeriod.toDate)} ·
             Nguồn: <strong className="text-ink"> {selectedPeriod.source}</strong>
           </div>
         ) : null}
