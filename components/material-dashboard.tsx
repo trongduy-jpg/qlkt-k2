@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/components/auth-context";
 import { AuditLogView } from "@/components/audit-log-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { PriceTableView } from "@/components/price-table-view";
@@ -92,6 +93,13 @@ import {
   type WorkerMaster
 } from "@/lib/material-service";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import {
+  createAppUser,
+  deleteAppUser,
+  loadAppUsers,
+  updateAppUser,
+  type AppUser
+} from "@/lib/auth-service";
 
 const statusOptions: Array<Status | "Tất cả"> = ["Tất cả", "Đang xử lý", "Treo nợ", "Xác định", "Đã chốt"];
 const storageKey = "qlkt-k2-material-orders";
@@ -372,6 +380,14 @@ function createEmptyReferenceDraft(listKey: string): Omit<ReferenceOption, "id">
     option_code: "",
     option_label: "",
     sort_order: 0
+  };
+}
+
+function createEmptyAppUserDraft(): Omit<AppUser, "id"> {
+  return {
+    email: "",
+    full_name: "",
+    role: "nhan_vien"
   };
 }
 
@@ -791,6 +807,9 @@ export function MaterialDashboard() {
   const [editingMaterialId, setEditingMaterialId] = useState<string | null>(null);
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
   const [editingReferenceId, setEditingReferenceId] = useState<string | null>(null);
+  const [appUsers, setAppUsers] = useState<AppUser[]>([]);
+  const [appUserDraft, setAppUserDraft] = useState<Omit<AppUser, "id">>(createEmptyAppUserDraft());
+  const [editingAppUserId, setEditingAppUserId] = useState<string | null>(null);
 
   async function reloadOperationalData(options?: {
     movementDraftOverrides?: Record<string, ProductionOrder>;
@@ -2776,6 +2795,61 @@ export function MaterialDashboard() {
     setReferenceDraft(createEmptyReferenceDraft(key));
   }
 
+  async function addAppUser() {
+    if (!appUserDraft.email.trim()) return;
+
+    const normalizedUser = {
+      ...appUserDraft,
+      email: appUserDraft.email.trim().toLowerCase(),
+      full_name: appUserDraft.full_name?.trim() || null
+    };
+
+    try {
+      if (editingAppUserId) {
+        const saved = await updateAppUser(editingAppUserId, normalizedUser);
+        setAppUsers((current) => current.map((item) => (item.id === editingAppUserId ? saved : item)));
+        setEditingAppUserId(null);
+        setAppUserDraft(createEmptyAppUserDraft());
+        pushAudit("update_app_user", `Cập nhật người dùng ${saved.email}`);
+        await createAuditLog("update_app_user", `Cập nhật người dùng ${saved.email}`, saved.id);
+      } else {
+        const saved = await createAppUser(normalizedUser);
+        setAppUsers((current) => [...current, saved].sort((a, b) => a.email.localeCompare(b.email)));
+        setAppUserDraft(createEmptyAppUserDraft());
+        pushAudit("create_app_user", `Thêm người dùng ${saved.email}`);
+        await createAuditLog("create_app_user", `Thêm người dùng ${saved.email}`, saved.id);
+      }
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không lưu được người dùng");
+    }
+  }
+
+  function startEditAppUser(user: AppUser) {
+    setEditingAppUserId(user.id);
+    setAppUserDraft({ email: user.email, full_name: user.full_name, role: user.role });
+  }
+
+  function cancelEditAppUser() {
+    setEditingAppUserId(null);
+    setAppUserDraft(createEmptyAppUserDraft());
+  }
+
+  async function removeAppUser(id: string) {
+    if (appUser?.id === id) {
+      setRemoteError("Không thể tự xóa chính tài khoản đang đăng nhập.");
+      return;
+    }
+    try {
+      await deleteAppUser(id);
+      setAppUsers((current) => current.filter((item) => item.id !== id));
+      if (editingAppUserId === id) cancelEditAppUser();
+      pushAudit("delete_app_user", `Xóa người dùng ${id}`);
+      await createAuditLog("delete_app_user", `Xóa người dùng ${id}`, id);
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không xóa được người dùng");
+    }
+  }
+
   async function addWorker() {
     if (!workerDraft.worker_code.trim() || !workerDraft.full_name.trim()) return;
 
@@ -2860,6 +2934,24 @@ export function MaterialDashboard() {
   const normalizedDraftStage = normalizeStageCode(draft.stage);
   const isDraftLargeWeight = isLargeWeightMovement(draft);
   const isDraftDirectChargeInvalid = shouldForceDirectCharge(normalizedDraftStage, draft.status, stageRules);
+  const { appUser, signOut } = useAuth();
+  const isAdmin = appUser?.role === "admin";
+  const visibleNavItems = isAdmin ? navItems : navItems.filter(([label]) => label !== "Cấu hình");
+
+  useEffect(() => {
+    if (isSettings && !isAdmin) {
+      router.replace("/");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSettings, isAdmin]);
+
+  useEffect(() => {
+    if (!isSettings || !isAdmin || !isSupabaseConfigured) return;
+    loadAppUsers()
+      .then(setAppUsers)
+      .catch((error) => setRemoteError(error instanceof Error ? error.message : "Không tải được danh sách người dùng"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSettings, isAdmin]);
 
   return (
     <main className="min-h-screen">
@@ -2889,7 +2981,7 @@ export function MaterialDashboard() {
           </div>
 
           <nav className="mt-8 space-y-0.5">
-            {navItems.map(([label, Icon]) => (
+            {visibleNavItems.map(([label, Icon]) => (
               <button
                 key={label}
                 className={`flex w-full items-center gap-3 border-l-2 px-3 py-2 text-left text-sm transition-colors ${
@@ -2908,6 +3000,20 @@ export function MaterialDashboard() {
 
           {isLoadingRemote ? (
             <p className="mt-8 text-xs font-semibold text-brass">Đang tải dữ liệu...</p>
+          ) : null}
+
+          {appUser ? (
+            <div className="mt-8 border-t border-line pt-4">
+              <p className="truncate text-sm font-medium text-ink">{appUser.full_name || appUser.email}</p>
+              <p className="mt-0.5 text-xs text-zinc-500">{isAdmin ? "Quản trị viên" : "Nhân viên"}</p>
+              <button
+                className="mt-2 text-xs font-semibold text-zinc-500 underline hover:text-ink"
+                type="button"
+                onClick={signOut}
+              >
+                Đăng xuất
+              </button>
+            </div>
           ) : null}
         </aside>
 
@@ -3997,6 +4103,15 @@ export function MaterialDashboard() {
               onStartEditReferenceOption={startEditReferenceOption}
               onCancelEditReferenceOption={cancelEditReferenceOption}
               onDeleteReferenceOption={removeReferenceOption}
+              appUsers={appUsers}
+              currentUserId={appUser?.id}
+              appUserDraft={appUserDraft}
+              setAppUserDraft={setAppUserDraft}
+              onAddAppUser={addAppUser}
+              editingAppUserId={editingAppUserId}
+              onStartEditAppUser={startEditAppUser}
+              onCancelEditAppUser={cancelEditAppUser}
+              onDeleteAppUser={removeAppUser}
             />
           </div>
           {renderProductionFormOverlay()}

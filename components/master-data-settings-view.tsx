@@ -3,11 +3,17 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { LockKeyhole, Pencil, Trash2 } from "lucide-react";
 import type { MaterialMaster, ReferenceOption, StageMaster, WorkerMaster } from "@/lib/material-service";
+import type { AppUser } from "@/lib/auth-service";
 
 const haoHutRuleLabels: Record<StageMaster["hao_hut_rule"], string> = {
   truc_tiep: "Trực tiếp tính chi phí",
   kiem_soat_rui_ro: "Kiểm soát rủi ro",
   binh_thuong: "Bình thường"
+};
+
+const appUserRoleLabels: Record<AppUser["role"], string> = {
+  admin: "Quản trị viên",
+  nhan_vien: "Nhân viên"
 };
 
 type MasterDataSettingsViewProps = {
@@ -19,18 +25,23 @@ type MasterDataSettingsViewProps = {
   referenceListKeys: Array<{ key: string; label: string }>;
   referenceListKey: string;
   onChangeReferenceListKey: (key: string) => void;
+  appUsers: AppUser[];
+  currentUserId?: string;
   materialDraft: Omit<MaterialMaster, "id">;
   workerDraft: Omit<WorkerMaster, "id">;
   stageDraft: Omit<StageMaster, "id">;
   referenceDraft: Omit<ReferenceOption, "id">;
+  appUserDraft: Omit<AppUser, "id">;
   setMaterialDraft: Dispatch<SetStateAction<Omit<MaterialMaster, "id">>>;
   setWorkerDraft: Dispatch<SetStateAction<Omit<WorkerMaster, "id">>>;
   setStageDraft: Dispatch<SetStateAction<Omit<StageMaster, "id">>>;
   setReferenceDraft: Dispatch<SetStateAction<Omit<ReferenceOption, "id">>>;
+  setAppUserDraft: Dispatch<SetStateAction<Omit<AppUser, "id">>>;
   onAddMaterial: () => void;
   onAddWorker: () => void;
   onAddStage: () => void;
   onAddReferenceOption: () => void;
+  onAddAppUser: () => void;
   editingWorkerId: string | null;
   onStartEditWorker: (worker: WorkerMaster) => void;
   onCancelEditWorker: () => void;
@@ -47,9 +58,13 @@ type MasterDataSettingsViewProps = {
   onStartEditReferenceOption: (option: ReferenceOption) => void;
   onCancelEditReferenceOption: () => void;
   onDeleteReferenceOption: (id: string) => void;
+  editingAppUserId: string | null;
+  onStartEditAppUser: (user: AppUser) => void;
+  onCancelEditAppUser: () => void;
+  onDeleteAppUser: (id: string) => void;
 };
 
-type CategoryTab = "materials" | "workers" | "stages" | "reference";
+type CategoryTab = "materials" | "workers" | "stages" | "reference" | "users";
 
 export function MasterDataSettingsView({
   isVisible,
@@ -60,18 +75,23 @@ export function MasterDataSettingsView({
   referenceListKeys,
   referenceListKey,
   onChangeReferenceListKey,
+  appUsers,
+  currentUserId,
   materialDraft,
   workerDraft,
   stageDraft,
   referenceDraft,
+  appUserDraft,
   setMaterialDraft,
   setWorkerDraft,
   setStageDraft,
   setReferenceDraft,
+  setAppUserDraft,
   onAddMaterial,
   onAddWorker,
   onAddStage,
   onAddReferenceOption,
+  onAddAppUser,
   editingWorkerId,
   onStartEditWorker,
   onCancelEditWorker,
@@ -87,7 +107,11 @@ export function MasterDataSettingsView({
   editingReferenceId,
   onStartEditReferenceOption,
   onCancelEditReferenceOption,
-  onDeleteReferenceOption
+  onDeleteReferenceOption,
+  editingAppUserId,
+  onStartEditAppUser,
+  onCancelEditAppUser,
+  onDeleteAppUser
 }: MasterDataSettingsViewProps) {
   const [tab, setTab] = useState<CategoryTab>("materials");
 
@@ -137,6 +161,15 @@ export function MasterDataSettingsView({
           onClick={() => setTab("reference")}
         >
           Danh mục khác
+        </button>
+        <button
+          className={`border-b-2 px-4 py-2 text-sm font-semibold transition-colors ${
+            tab === "users" ? "border-ink text-ink" : "border-transparent text-zinc-500 hover:text-ink"
+          }`}
+          type="button"
+          onClick={() => setTab("users")}
+        >
+          Người dùng
         </button>
       </div>
 
@@ -364,7 +397,7 @@ export function MasterDataSettingsView({
             ))}
           </div>
         </div>
-      ) : (
+      ) : tab === "reference" ? (
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(280px,380px)_1fr]">
           <div className="rounded-md border border-line bg-paper p-3">
             <div>
@@ -442,6 +475,94 @@ export function MasterDataSettingsView({
                   </div>
                 </div>
               ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(280px,380px)_1fr]">
+          <div className="rounded-md border border-line bg-paper p-3">
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="font-semibold text-ink">{editingAppUserId ? "Sửa người dùng" : "Thêm người dùng"}</h4>
+              {editingAppUserId ? (
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                  Đang sửa
+                </span>
+              ) : null}
+            </div>
+            <div className="mt-3 grid gap-2">
+              <input
+                className="rounded-md border border-line px-3 py-2 text-sm"
+                type="email"
+                placeholder="Email"
+                value={appUserDraft.email}
+                onChange={(event) => setAppUserDraft((current) => ({ ...current, email: event.target.value }))}
+              />
+              <input
+                className="rounded-md border border-line px-3 py-2 text-sm"
+                placeholder="Họ tên (tùy chọn)"
+                value={appUserDraft.full_name ?? ""}
+                onChange={(event) => setAppUserDraft((current) => ({ ...current, full_name: event.target.value }))}
+              />
+              <select
+                className="rounded-md border border-line px-3 py-2 text-sm"
+                value={appUserDraft.role}
+                onChange={(event) => setAppUserDraft((current) => ({ ...current, role: event.target.value as AppUser["role"] }))}
+              >
+                <option value="nhan_vien">{appUserRoleLabels.nhan_vien}</option>
+                <option value="admin">{appUserRoleLabels.admin}</option>
+              </select>
+              <p className="text-xs text-zinc-500">
+                Chỉ email trong danh sách này mới đăng nhập được. Quản trị viên vào được cả màn Cấu hình.
+              </p>
+              <div className="flex gap-2">
+                <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddAppUser}>
+                  {editingAppUserId ? "Cập nhật người dùng" : "Thêm người dùng"}
+                </button>
+                {editingAppUserId ? (
+                  <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onCancelEditAppUser}>
+                    Hủy
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+
+          <div className="max-h-[420px] overflow-y-auto rounded-md border border-line bg-white">
+            {appUsers.length === 0 ? (
+              <div className="px-3 py-4 text-sm text-zinc-500">Chưa có người dùng nào được cấp quyền.</div>
+            ) : null}
+            {appUsers.map((user) => (
+              <div
+                key={user.id}
+                className={`grid grid-cols-[1fr_110px_auto] items-center gap-2 border-b border-line/70 px-3 py-2 text-sm last:border-b-0 ${
+                  editingAppUserId === user.id ? "bg-amber-50/60" : ""
+                }`}
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-ink">{user.email}</p>
+                  {user.full_name ? <p className="truncate text-xs text-zinc-500">{user.full_name}</p> : null}
+                </div>
+                <span className="text-right text-xs text-zinc-500">{appUserRoleLabels[user.role]}</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"
+                    type="button"
+                    title="Sửa người dùng"
+                    onClick={() => onStartEditAppUser(user)}
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                    type="button"
+                    title={user.id === currentUserId ? "Không thể tự xóa chính mình" : "Xóa người dùng"}
+                    disabled={user.id === currentUserId}
+                    onClick={() => onDeleteAppUser(user.id)}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
