@@ -48,6 +48,7 @@ import {
 import {
   applyProductionBusinessRules,
   buildProductionOrderCode,
+  buildUniqueProductionOrderCode,
   getCarryOverLossPeriod,
   getStageLabel,
   isLargeWeightMovement,
@@ -2928,7 +2929,11 @@ export function MaterialDashboard() {
                     type="button"
                     onClick={() => {
                       setEditingProductionCode(null);
-                      setProductionHeaderDraft(createEmptyProductionOrderHeaderDraft());
+                      const emptyDraft = createEmptyProductionOrderHeaderDraft();
+                      setProductionHeaderDraft({
+                        ...emptyDraft,
+                        code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), orderSummaries.map((summary) => summary.code))
+                      });
                       setIsProductionFormOpen((current) => !current);
                     }}
                   >

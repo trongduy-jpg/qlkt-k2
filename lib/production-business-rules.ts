@@ -16,6 +16,20 @@ export function buildProductionOrderCode(prefix: string, dateString: string) {
   return `${prefix}-${compactDate}`;
 }
 
+export function buildUniqueProductionOrderCode(prefix: string, dateString: string, existingCodes: Iterable<string>) {
+  const baseCode = buildProductionOrderCode(prefix, dateString);
+  const taken = new Set(existingCodes);
+  if (!taken.has(baseCode)) return baseCode;
+
+  let sequence = 2;
+  let candidate = `${baseCode}-${sequence}`;
+  while (taken.has(candidate)) {
+    sequence += 1;
+    candidate = `${baseCode}-${sequence}`;
+  }
+  return candidate;
+}
+
 export function buildDocumentNo(dateString: string, sequence: number) {
   const compactDate = dateString.replaceAll("-", "");
   return `${compactDate}-${String(sequence).padStart(3, "0")}`;

@@ -413,7 +413,7 @@ export async function createProductionOrderHeader(input: ProductionOrderHeaderIn
 
   let result = await supabase
     .from("production_orders")
-    .upsert(
+    .insert(
       {
         order_code: input.code,
         sku: input.sku,
@@ -458,13 +458,15 @@ export async function createProductionOrderHeader(input: ProductionOrderHeaderIn
         converted_return_weight: input.convertedReturnWeight || null,
         note: input.note || null,
         status: toDbStatus(input.status)
-      },
-      { onConflict: "order_code" }
+      }
     )
     .select("id")
     .single();
 
   if (result.error || !result.data) {
+    if (result.error?.code === "23505" || result.error?.message.includes("duplicate key")) {
+      throw new Error(`LSX ${input.code} đã tồn tại. Vui lòng chọn mã khác.`);
+    }
     throw new Error(
       `Không lưu được LSX (thiếu cột trên Supabase? hãy chạy production_business_rules_upgrade.sql): ${result.error?.message ?? "unknown error"}`
     );
