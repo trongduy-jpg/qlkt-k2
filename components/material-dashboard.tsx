@@ -3011,7 +3011,7 @@ export function MaterialDashboard() {
         </div>
       ) : null}
       <div className="shell-grid min-h-screen">
-        <aside className="border-r border-line bg-white/70 px-5 py-6">
+        <aside className="border-r border-line bg-[#ece6de] px-5 py-6">
           <div>
             <p className="font-display text-2xl font-semibold tracking-wide text-ink">ASIANA GOLD</p>
             <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">QLKT K2</p>
