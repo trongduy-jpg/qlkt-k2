@@ -72,26 +72,7 @@ export const journalStages: SelectOption[] = [
   { value: "BAO", label: "BAO – Bào dây" },
   { value: "GEP", label: "GEP – Ghép dây" },
   { value: "BAS", label: "BAS – Dập bass, bông khoen" },
-  { value: "SXK", label: "SXK – Sản xuất khóa" },
-  { value: "KHO", label: "KHO – Kho cấp phát" },
-  { value: "GSK", label: "GSK" },
-  { value: "CDA", label: "CDA – Cắt ra dây" },
-  { value: "DLL", label: "DLL – Dập lưỡi lam" },
-  { value: "KDA", label: "KDA – Khắc dấu" },
-  { value: "HAN", label: "HAN – Hàn băng tải" },
-  { value: "TV", label: "TV – Tư vấn" },
-  { value: "CVB", label: "CVB – Cắt/vo bi" },
-  { value: "XMA", label: "XMA – Xi mạ" },
-  { value: "NAUPK", label: "NAUPK – Nấu phân kim" },
-  { value: "KCH", label: "KCH – Kéo chi" },
-  { value: "CCD", label: "CCD – Cán/cắt dát" },
-  { value: "HCO", label: "HCO – Hàn cuốn ống" },
-  { value: "DBI", label: "DBI – Dập trái châu" },
-  { value: "HBK", label: "HBK – Hàn khóa bass" },
-  { value: "HUY", label: "HUY – Hủy sản phẩm" },
-  { value: "HBT", label: "HBT – Hàn băng tải" },
-  { value: "BHH", label: "BHH – Bảo hành sản phẩm" },
-  { value: "NPK", label: "NPK – Nấu phân kim" }
+  { value: "SXK", label: "SXK – Sản xuất khóa" }
 ];
 
 export const journalMovementReasons: SelectOption[] = [

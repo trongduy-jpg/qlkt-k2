@@ -54,6 +54,11 @@ project da co chi can chay file con thieu):
     TD004) de tranh vi pham khoa ngoai neu da co giao dich gan voi ho -
     xoa thu cong qua Cau hinh neu can, sau khi da chuyen giao dich sang
     tho khac.
+16. `0016_revert_extra_stages.sql` - rut gon danh muc cong doan ve lai
+    dung 12 khau xu ly NVL (bo 19 ma cua 0015 - cac ma do thuc ra la vai
+    tro/cong viec khac nhu KHO=thu kho, TV=tu van, khong phai khau xu ly
+    NVL). Loc lai `stages` cua tung tho, chi giu ma nam trong 12 khau.
+    **Phai chay sau 0015**.
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 
