@@ -3269,11 +3269,7 @@ export function MaterialDashboard() {
                         <FieldShell label="Thợ phụ trách" hint="Danh sách thợ được lọc theo công đoạn nếu có dữ liệu." required>
                           <SelectControl
                             value={draft.worker}
-                            onChange={(value) => {
-                              const worker = workers.find((item) => item.full_name === value);
-                              updateDraft("worker", value);
-                              if (worker?.stage) updateDraft("stage", normalizeStageCode(worker.stage));
-                            }}
+                            onChange={(value) => updateDraft("worker", value)}
                           >
                             <option value="">Chọn thợ</option>
                             {workerOptionsForDraft.map((worker) => (
@@ -3392,23 +3388,13 @@ export function MaterialDashboard() {
                     <button
                       className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
                       type="button"
-                      onClick={() => addOrder(false)}
+                      onClick={() => addOrder(!editingMovementId)}
                       disabled={isDraftDirectChargeInvalid}
+                      title={editingMovementId ? undefined : "Lưu khâu này, drawer vẫn mở để chọn khâu tiếp theo của cùng LSX"}
                     >
                       <Plus size={16} />
-                      {editingMovementId ? "Cập nhật NVL" : "Thêm vào bảng"}
+                      {editingMovementId ? "Cập nhật NVL" : "Lưu"}
                     </button>
-                    {draft.code.trim() ? (
-                      <button
-                        className="inline-flex items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:border-zinc-200 disabled:text-zinc-400"
-                        type="button"
-                        onClick={() => addOrder(true)}
-                        disabled={isDraftDirectChargeInvalid}
-                        title="Lưu khâu này và tiếp tục nhập khâu khác của cùng LSX"
-                      >
-                        Lưu & tiếp khâu khác
-                      </button>
-                    ) : null}
                     {editingMovementId ? (
                       <button
                         className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400"
