@@ -36,6 +36,11 @@ project da co chi can chay file con thieu):
     (Cán chỉ/cán dát) va DKB (Ra dây). **Chi can chay neu ban da chay 0007
     TRUOC khi file 0007 duoc sua lai** (0007 hien tai da co san danh muc
     dung cho lan chay dau tien).
+13. `0013_update_nguon_nvl_ma_nxt.sql` - thay 7 dong demo cua danh muc
+    "Ma noi NXT" (reference_options, list_key `nguon_nvl`) bang ~74 ma
+    thuc te (NL/BOT/VAYHAN/PK/BTPBI/BTPDAY/TP x Vang/Bac/PT). Dropdown
+    "Ma noi NXT" trong Nhat ky NVL da tu dong nhom theo loai hinh
+    (optgroup) de de chon giua danh sach dai.
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 

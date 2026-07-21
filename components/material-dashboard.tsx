@@ -81,6 +81,7 @@ import {
   type ProductionOrder
 } from "@/lib/demo-data";
 import {
+  groupNxtLinkOptions,
   journalDestinations,
   journalStages,
   movementExportSourceOptions,
@@ -3338,11 +3339,15 @@ export function MaterialDashboard() {
                             ))}
                           </SelectControl>
                         </FieldShell>
-                        <FieldShell label="Mã nối NXT">
+                        <FieldShell label="Mã nối NXT" hint="Gõ chữ cái đầu để nhảy nhanh trong danh sách.">
                           <SelectControl value={draft.nxtLinkCode ?? ""} onChange={(value) => updateDraft("nxtLinkCode", value)}>
                             <option value="">Chọn mã nối</option>
-                            {getDynamicOptions("nguon_nvl", sourceMaterialOptions).map((item) => (
-                              <option key={item.value} value={item.value}>{item.label}</option>
+                            {groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions)).map((group) => (
+                              <optgroup key={group.label} label={group.label}>
+                                {group.options.map((item) => (
+                                  <option key={item.value} value={item.value}>{item.label}</option>
+                                ))}
+                              </optgroup>
                             ))}
                           </SelectControl>
                         </FieldShell>

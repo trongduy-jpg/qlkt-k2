@@ -98,15 +98,119 @@ export const goldAgeOptions: SelectOption[] = [
   { value: "0.925", label: "Bạc 92.5%" }
 ];
 
+// Danh sach day du ma nhom NXT theo thuc te (fallback khi bang
+// reference_options chua co du lieu). Cau truc ma = {Loai hinh}{Kim loai/tuoi}:
+// NL = Nguyen lieu, BOT = Bot, VAYHAN = Vay han, PK = Phe khac,
+// BTPBI = BTP bi, BTPDAY = BTP day, TP = Thanh pham.
 export const sourceMaterialOptions: SelectOption[] = [
-  { value: "750Y", label: "750Y – Vàng 18K màu vàng" },
-  { value: "750W", label: "750W – Vàng 18K màu trắng" },
-  { value: "750R", label: "750R – Vàng 18K màu hồng" },
-  { value: "BAC925", label: "BAC925 – Bạc 92.5" },
-  { value: "Nau moi", label: "NM – Nấu mới" },
-  { value: "Nau quay dau", label: "NQD – Nấu quay đầu" },
-  { value: "TP", label: "TP – Thành phẩm nhập lại" }
+  // Vang
+  { value: "NL24K", label: "NL24K – Nguyên liệu Vàng 24K" },
+  { value: "NL23K", label: "NL23K – Nguyên liệu Vàng 23K" },
+  { value: "NL99", label: "NL99 – Nguyên liệu Vàng 99" },
+  { value: "NL999", label: "NL999 – Nguyên liệu Vàng 999" },
+  { value: "NL18K", label: "NL18K – Nguyên liệu Vàng 18K" },
+  { value: "NL17K", label: "NL17K – Nguyên liệu Vàng 17K" },
+  { value: "NL16K", label: "NL16K – Nguyên liệu Vàng 16K" },
+  { value: "NL15K", label: "NL15K – Nguyên liệu Vàng 15K" },
+  { value: "NL10K", label: "NL10K – Nguyên liệu Vàng 10K" },
+  { value: "BOT18K", label: "BOT18K – Bột Vàng 18K" },
+  { value: "BOT16K", label: "BOT16K – Bột Vàng 16K" },
+  { value: "BOT15K", label: "BOT15K – Bột Vàng 15K" },
+  { value: "BOT24K", label: "BOT24K – Bột Vàng 24K" },
+  { value: "BOT23K", label: "BOT23K – Bột Vàng 23K" },
+  { value: "BOT10K", label: "BOT10K – Bột Vàng 10K" },
+  { value: "BOT17K", label: "BOT17K – Bột Vàng 17K" },
+  { value: "VAYHAN18K", label: "VAYHAN18K – Vảy hàn Vàng 18K" },
+  { value: "VAYHAN16K", label: "VAYHAN16K – Vảy hàn Vàng 16K" },
+  { value: "VAYHAN15K", label: "VAYHAN15K – Vảy hàn Vàng 15K" },
+  { value: "PK18K", label: "PK18K – Phế khác Vàng 18K" },
+  { value: "PK16K", label: "PK16K – Phế khác Vàng 16K" },
+  { value: "PK15K", label: "PK15K – Phế khác Vàng 15K" },
+  { value: "PK24K", label: "PK24K – Phế khác Vàng 24K" },
+  { value: "PK10K", label: "PK10K – Phế khác Vàng 10K" },
+  { value: "BTPBI18K", label: "BTPBI18K – BTP bi Vàng 18K" },
+  { value: "BTPDAY18K", label: "BTPDAY18K – BTP dây Vàng 18K" },
+  { value: "BTPDAY17K", label: "BTPDAY17K – BTP dây Vàng 17K" },
+  { value: "BTPBI16K", label: "BTPBI16K – BTP bi Vàng 16K" },
+  { value: "BTPDAY16K", label: "BTPDAY16K – BTP dây Vàng 16K" },
+  { value: "BTPBI15K", label: "BTPBI15K – BTP bi Vàng 15K" },
+  { value: "BTPDAY15K", label: "BTPDAY15K – BTP dây Vàng 15K" },
+  { value: "BTPDAY24K", label: "BTPDAY24K – BTP dây Vàng 24K" },
+  { value: "BTPDAY23K", label: "BTPDAY23K – BTP dây Vàng 23K" },
+  { value: "BTPDAY10K", label: "BTPDAY10K – BTP dây Vàng 10K" },
+  { value: "BTPBI10K", label: "BTPBI10K – BTP bi Vàng 10K" },
+  { value: "TP18K", label: "TP18K – Thành phẩm Vàng 18K" },
+  { value: "TP16K", label: "TP16K – Thành phẩm Vàng 16K" },
+  { value: "TP15K", label: "TP15K – Thành phẩm Vàng 15K" },
+  { value: "TP24K", label: "TP24K – Thành phẩm Vàng 24K" },
+  { value: "TP17K", label: "TP17K – Thành phẩm Vàng 17K" },
+  { value: "TP10K", label: "TP10K – Thành phẩm Vàng 10K" },
+  // Bac
+  { value: "BACNTO", label: "BACNTO – Bạc NTO" },
+  { value: "NLBAC9999", label: "NLBAC9999 – Nguyên liệu Bạc 9999" },
+  { value: "NLBAC999", label: "NLBAC999 – Nguyên liệu Bạc 999" },
+  { value: "NLBAC950", label: "NLBAC950 – Nguyên liệu Bạc 950" },
+  { value: "NLBAC92.5", label: "NLBAC92.5 – Nguyên liệu Bạc 92.5" },
+  { value: "BOTBAC92.5", label: "BOTBAC92.5 – Bột Bạc 92.5" },
+  { value: "VAYHANBAC92.5", label: "VAYHANBAC92.5 – Vảy hàn Bạc 92.5" },
+  { value: "BTPBIBAC92.5", label: "BTPBIBAC92.5 – BTP bi Bạc 92.5" },
+  { value: "BTPDAYBAC92.5", label: "BTPDAYBAC92.5 – BTP dây Bạc 92.5" },
+  { value: "PKBAC92.5", label: "PKBAC92.5 – Phế khác Bạc 92.5" },
+  { value: "TPBAC92.5", label: "TPBAC92.5 – Thành phẩm Bạc 92.5" },
+  // Bach kim (PT)
+  { value: "NLPT900", label: "NLPT900 – Nguyên liệu PT 900" },
+  { value: "NLPT950", label: "NLPT950 – Nguyên liệu PT 950" },
+  { value: "NLPT999", label: "NLPT999 – Nguyên liệu PT 999" },
+  { value: "NLPT9999", label: "NLPT9999 – Nguyên liệu PT 9999" },
+  { value: "NLPT99", label: "NLPT99 – Nguyên liệu PT 99" },
+  { value: "NLPT900-PD", label: "NLPT900-PD – Nguyên liệu PT 900-PD" },
+  { value: "NLPT950-PD", label: "NLPT950-PD – Nguyên liệu PT 950-PD" },
+  { value: "NLPTPK", label: "NLPTPK – Nguyên liệu PT phế khác" },
+  { value: "BOTPT900-PD", label: "BOTPT900-PD – Bột PT 900-PD" },
+  { value: "BOTPT900", label: "BOTPT900 – Bột PT 900" },
+  { value: "PKPT900", label: "PKPT900 – Phế khác PT 900" },
+  { value: "PKPT900-PD", label: "PKPT900-PD – Phế khác PT 900-PD" },
+  { value: "PKPT950-PD", label: "PKPT950-PD – Phế khác PT 950-PD" },
+  { value: "PKPT950", label: "PKPT950 – Phế khác PT 950" },
+  { value: "BTPDAYPT900", label: "BTPDAYPT900 – BTP dây PT 900" },
+  { value: "BTPDAYPT900-PD", label: "BTPDAYPT900-PD – BTP dây PT 900-PD" },
+  { value: "BTPDAYPT950-PD", label: "BTPDAYPT950-PD – BTP dây PT 950-PD" },
+  { value: "BTPDAYPT950", label: "BTPDAYPT950 – BTP dây PT 950" },
+  { value: "TPPT900", label: "TPPT900 – Thành phẩm PT 900" },
+  { value: "TPPT900-PD", label: "TPPT900-PD – Thành phẩm PT 900-PD" },
+  { value: "TPPT950-PD", label: "TPPT950-PD – Thành phẩm PT 950-PD" },
+  { value: "TPPT970-PD", label: "TPPT970-PD – Thành phẩm PT 970-PD" }
 ];
+
+// Nhom cac ma nhom NXT theo tien to loai hinh (Nguyen lieu/Bot/Vay han/
+// Phe khac/BTP bi/BTP day/Thanh pham) de hien thi dropdown co optgroup
+// thay vi 1 danh sach phang ~90 dong.
+const NXT_GROUP_PREFIXES: Array<{ prefix: string; label: string }> = [
+  { prefix: "BTPBI", label: "BTP bi" },
+  { prefix: "BTPDAY", label: "BTP dây" },
+  { prefix: "VAYHAN", label: "Vảy hàn" },
+  { prefix: "BOT", label: "Bột" },
+  { prefix: "PK", label: "Phế khác" },
+  { prefix: "NL", label: "Nguyên liệu" },
+  { prefix: "TP", label: "Thành phẩm" }
+];
+
+export function groupNxtLinkOptions(options: SelectOption[]): Array<{ label: string; options: SelectOption[] }> {
+  const order: string[] = [];
+  const groups = new Map<string, SelectOption[]>();
+
+  for (const option of options) {
+    const match = NXT_GROUP_PREFIXES.find((item) => option.value.toUpperCase().startsWith(item.prefix));
+    const groupLabel = match?.label ?? "Khác";
+    if (!groups.has(groupLabel)) {
+      groups.set(groupLabel, []);
+      order.push(groupLabel);
+    }
+    groups.get(groupLabel)!.push(option);
+  }
+
+  return order.map((label) => ({ label, options: groups.get(label)! }));
+}
 
 export const materialTypeOptions: SelectOption[] = [
   { value: "NL18K", label: "NL18K – Nguyên liệu vàng 18K" },
