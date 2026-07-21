@@ -21,21 +21,30 @@ create policy "app_users_select_all" on app_users
 -- nguoi dung khac. So sanh qua email trong JWT (khong can lien ket id
 -- voi auth.users) de dam bao admin dau tien co the duoc seed truoc khi
 -- ho tung dang nhap lan nao.
+--
+-- Dieu kien "la admin" phai nam trong ham SECURITY DEFINER (khong duoc
+-- viet truc tiep "exists (select 1 from app_users ...)" ngay trong dieu
+-- kien policy) - neu khong se gay loi "infinite recursion detected in
+-- policy for relation app_users": de danh gia policy nay cho 1 cau lenh
+-- SELECT tren app_users, Postgres phai chay lai chinh no, lap vo han.
+create or replace function is_admin_user()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from app_users au
+    where au.email = auth.jwt() ->> 'email' and au.role = 'admin'
+  );
+$$;
+
 drop policy if exists "app_users_admin_write" on app_users;
 create policy "app_users_admin_write" on app_users
   for all
-  using (
-    exists (
-      select 1 from app_users au
-      where au.email = auth.jwt() ->> 'email' and au.role = 'admin'
-    )
-  )
-  with check (
-    exists (
-      select 1 from app_users au
-      where au.email = auth.jwt() ->> 'email' and au.role = 'admin'
-    )
-  );
+  using (is_admin_user())
+  with check (is_admin_user());
 
 -- QUAN TRONG: doi email ben duoi thanh email that cua ban roi moi chay
 -- file nay, de co san 1 tai khoan admin dau tien (neu khong se khong ai
