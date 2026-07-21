@@ -14,6 +14,7 @@ create table if not exists workers (
   full_name text not null,
   department text not null,
   stage text,
+  stages text[] not null default '{}',
   created_at timestamptz not null default now()
 );
 

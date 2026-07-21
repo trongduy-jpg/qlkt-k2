@@ -17,7 +17,10 @@ export type WorkerMaster = {
   worker_code: string;
   full_name: string;
   department: string;
-  stage: string | null;
+  // Danh sach cac ma khau tho nay co the dam nhan. Hau het khau cho phep
+  // nhieu tho luan chuyen; chi rieng CKE/DAN/KBI la co dinh 1 tho
+  // (xem isSingleWorkerStage trong lib/production-business-rules.ts).
+  stages: string[];
 };
 
 export type StageMaster = {

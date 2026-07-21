@@ -19,7 +19,7 @@ export function createEmptyWorkerDraft(): Omit<WorkerMaster, "id"> {
     worker_code: "",
     full_name: "",
     department: "San xuat",
-    stage: "CKE"
+    stages: []
   };
 }
 

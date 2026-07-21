@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { LockKeyhole, Pencil, Trash2 } from "lucide-react";
 import type { StageMaster } from "@/lib/material-service";
 import type { AppUser } from "@/lib/auth-service";
 import { useMasterData } from "@/components/master-data-context";
 import { FieldShell, SelectControl, fieldControlClass } from "@/components/production-ui";
+import { journalStages } from "@/lib/production-journal-options";
+import { buildStageOptionsForDropdown } from "@/lib/production-summary";
 
 const haoHutRuleLabels: Record<StageMaster["hao_hut_rule"], string> = {
   truc_tiep: "Trực tiếp tính chi phí",
@@ -123,6 +125,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
     onDeleteAppUser
   } = useMasterData();
   const [tab, setTab] = useState<CategoryTab>("materials");
+  const workerStageOptions = useMemo(() => buildStageOptionsForDropdown(stages, journalStages), [stages]);
 
   const filteredReferenceOptions = referenceOptions
     .filter((item) => item.list_key === referenceListKey)
@@ -242,14 +245,33 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                   <input className={fieldControlClass} placeholder="Họ và tên" value={workerDraft.full_name} onChange={(event) => setWorkerDraft((current) => ({ ...current, full_name: event.target.value }))} />
                 </FieldShell>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <FieldShell label="Bộ phận">
-                  <input className={fieldControlClass} placeholder="VD: Sản xuất" value={workerDraft.department} onChange={(event) => setWorkerDraft((current) => ({ ...current, department: event.target.value }))} />
-                </FieldShell>
-                <FieldShell label="Công đoạn">
-                  <input className={fieldControlClass} placeholder="VD: CKE" value={workerDraft.stage ?? ""} onChange={(event) => setWorkerDraft((current) => ({ ...current, stage: event.target.value }))} />
-                </FieldShell>
-              </div>
+              <FieldShell label="Bộ phận">
+                <input className={fieldControlClass} placeholder="VD: Sản xuất" value={workerDraft.department} onChange={(event) => setWorkerDraft((current) => ({ ...current, department: event.target.value }))} />
+              </FieldShell>
+              <FieldShell label="Các khâu có thể đảm nhận" hint="Thợ có thể chọn nhiều khâu; các khâu chỉ 1 thợ (Cán chỉ/Đan dây/Khắc bi) vẫn khai báo bình thường.">
+                <div className="grid grid-cols-2 gap-1.5 rounded-md border border-line bg-white p-2 sm:grid-cols-3">
+                  {workerStageOptions.map((stage) => {
+                    const checked = workerDraft.stages.includes(stage.value);
+                    return (
+                      <label key={stage.value} className="flex items-center gap-1.5 text-xs text-zinc-700">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(event) =>
+                            setWorkerDraft((current) => ({
+                              ...current,
+                              stages: event.target.checked
+                                ? [...current.stages, stage.value]
+                                : current.stages.filter((code) => code !== stage.value)
+                            }))
+                          }
+                        />
+                        {stage.value}
+                      </label>
+                    );
+                  })}
+                </div>
+              </FieldShell>
               <div className="flex gap-2">
                 <button className="flex-1 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white" type="button" onClick={onAddWorker}>
                   {editingWorkerId ? "Cập nhật thợ" : "Thêm thợ"}
@@ -273,7 +295,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
               >
                 <span className="font-semibold text-ink">{worker.worker_code}</span>
                 <span className="truncate text-zinc-700">{worker.full_name}</span>
-                <span className="text-right text-zinc-500">{worker.stage}</span>
+                <span className="truncate text-right text-xs text-zinc-500">{worker.stages.join(", ") || "-"}</span>
                 <div className="flex items-center gap-1">
                   <button
                     className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"

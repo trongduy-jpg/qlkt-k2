@@ -41,6 +41,19 @@ project da co chi can chay file con thieu):
     thuc te (NL/BOT/VAYHAN/PK/BTPBI/BTPDAY/TP x Vang/Bac/PT). Dropdown
     "Ma noi NXT" trong Nhat ky NVL da tu dong nhom theo loai hinh
     (optgroup) de de chon giua danh sach dai.
+14. `0014_worker_multi_stage.sql` - doi bang `workers` tu "1 tho - 1 khau
+    co dinh" sang "1 tho - nhieu khau co the dam nhan" (them cot
+    `stages text[]`, backfill tu cot `stage` cu). **Chi can chay neu ban
+    da chay 0001 TRUOC khi file 0001 duoc cap nhat** (0001 hien tai da co
+    san cot `stages` cho lan chay dau tien).
+15. `0015_real_workers_and_new_stages.sql` - them 19 ma cong doan moi
+    phat hien tu danh muc tho thuc te (KHO, GSK, CDA, DLL, KDA, HAN, TV,
+    CVB, XMA, NAUPK, KCH, CCD, HCO, DBI, HBK, HUY, HBT, BHH, NPK) va nhap
+    18 tho thuc te (worker_code = "Ma ten" trong file goc, vi "Ma so" bi
+    trung giua 2 nguoi trong file goc). **Khong xoa tho demo cu** (TD003/
+    TD004) de tranh vi pham khoa ngoai neu da co giao dich gan voi ho -
+    xoa thu cong qua Cau hinh neu can, sau khi da chuyen giao dich sang
+    tho khac.
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 

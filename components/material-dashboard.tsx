@@ -366,7 +366,7 @@ export function MaterialDashboard() {
           ...current,
           material: remoteState?.remoteMaterials[0]?.name ?? current.material,
           worker: remoteState?.remoteWorkers[0]?.full_name ?? current.worker,
-          stage: remoteState?.remoteWorkers[0]?.stage ? normalizeStageCode(remoteState.remoteWorkers[0].stage) : current.stage
+          stage: remoteState?.remoteWorkers[0]?.stages[0] ? normalizeStageCode(remoteState.remoteWorkers[0].stages[0]) : current.stage
         }));
       } catch (error) {
         setRemoteError(error instanceof Error ? error.message : "Không tải được dữ liệu Supabase");
@@ -604,9 +604,9 @@ export function MaterialDashboard() {
   const lossReportRows = useMemo(() => buildLossReportRows(orders), [orders]);
 
   const workerOptionsForDraft = useMemo(() => {
-    const selectedStage = draft.stage.toLowerCase();
-    const exactMatches = workers.filter((worker) => normalizeStageCode(worker.stage ?? "").toLowerCase() === selectedStage);
-    return exactMatches.length > 0 ? exactMatches : workers;
+    const selectedStage = normalizeStageCode(draft.stage);
+    const matches = workers.filter((worker) => worker.stages.includes(selectedStage));
+    return matches.length > 0 ? matches : workers;
   }, [draft.stage, workers]);
 
   const stageRules = useMemo(() => {
@@ -1804,7 +1804,7 @@ export function MaterialDashboard() {
       setEditingMovementId(existing.id);
       setDraft((current) => ({ ...current, ...existing }));
     } else {
-      const suggestedWorker = workers.find((item) => item.stage && normalizeStageCode(item.stage) === stageCode);
+      const suggestedWorker = workers.find((item) => item.stages.includes(stageCode));
       setEditingMovementId(null);
       setDraft((current) => ({
         ...current,
@@ -2189,7 +2189,7 @@ export function MaterialDashboard() {
       worker_code: workerDraft.worker_code.trim().toUpperCase(),
       full_name: workerDraft.full_name.trim(),
       department: workerDraft.department.trim() || "San xuat",
-      stage: workerDraft.stage?.trim() || null
+      stages: workerDraft.stages
     };
 
     try {
@@ -2220,7 +2220,7 @@ export function MaterialDashboard() {
       worker_code: worker.worker_code,
       full_name: worker.full_name,
       department: worker.department,
-      stage: worker.stage
+      stages: worker.stages
     });
   }
 

@@ -14,18 +14,18 @@ export function buildWorkerCode(workerName: string) {
 export async function loadWorkers(): Promise<WorkerMaster[]> {
   if (!isSupabaseConfigured || !supabase) {
     return [
-      { id: "local-td003", worker_code: "TD003", full_name: "Le Van Tung", department: "San xuat", stage: "Can keo" },
-      { id: "local-td004", worker_code: "TD004", full_name: "Nguyen Van An", department: "San xuat", stage: "Can dat" }
+      { id: "local-td003", worker_code: "TD003", full_name: "Le Van Tung", department: "San xuat", stages: ["CKE"] },
+      { id: "local-td004", worker_code: "TD004", full_name: "Nguyen Van An", department: "San xuat", stages: ["DAN"] }
     ];
   }
 
   const { data, error } = await supabase
     .from("workers")
-    .select("id, worker_code, full_name, department, stage")
+    .select("id, worker_code, full_name, department, stages")
     .order("worker_code", { ascending: true });
 
   if (error || !data) throw new Error(`Cannot load workers: ${error?.message ?? "unknown error"}`);
-  return data as WorkerMaster[];
+  return data.map((item) => ({ ...item, stages: item.stages ?? [] })) as WorkerMaster[];
 }
 
 export async function createWorker(input: Omit<WorkerMaster, "id">): Promise<WorkerMaster> {
@@ -36,11 +36,11 @@ export async function createWorker(input: Omit<WorkerMaster, "id">): Promise<Wor
   const { data, error } = await supabase
     .from("workers")
     .insert(input)
-    .select("id, worker_code, full_name, department, stage")
+    .select("id, worker_code, full_name, department, stages")
     .single();
 
   if (error || !data) throw new Error(`Cannot create worker: ${error?.message ?? "unknown error"}`);
-  return data as WorkerMaster;
+  return { ...data, stages: data.stages ?? [] } as WorkerMaster;
 }
 
 export async function updateWorker(id: string, input: Omit<WorkerMaster, "id">): Promise<WorkerMaster> {
@@ -52,11 +52,11 @@ export async function updateWorker(id: string, input: Omit<WorkerMaster, "id">):
     .from("workers")
     .update(input)
     .eq("id", id)
-    .select("id, worker_code, full_name, department, stage")
+    .select("id, worker_code, full_name, department, stages")
     .single();
 
   if (error || !data) throw new Error(`Cannot update worker: ${error?.message ?? "unknown error"}`);
-  return data as WorkerMaster;
+  return { ...data, stages: data.stages ?? [] } as WorkerMaster;
 }
 
 export async function deleteWorker(id: string): Promise<void> {

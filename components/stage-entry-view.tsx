@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { formatGram } from "@/lib/production-helpers";
-import { getStageLabel, isSingleWorkerStage, normalizeStageCode } from "@/lib/production-business-rules";
+import { isSingleWorkerStage } from "@/lib/production-business-rules";
 import { fieldControlClass } from "@/components/production-ui";
 import type { StageOption } from "@/lib/production-summary";
 import type { OrderSummary } from "@/lib/production-types";
@@ -60,7 +60,7 @@ export function StageEntryView({
   }
 
   function workerOptions(stageCode: string) {
-    const matched = workers.filter((w) => normalizeStageCode(w.stage ?? "") === stageCode);
+    const matched = workers.filter((w) => w.stages.includes(stageCode));
     return matched.length > 0 ? matched : workers;
   }
 
