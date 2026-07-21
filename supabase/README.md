@@ -30,6 +30,12 @@ project da co chi can chay file con thieu):
     policy `app_users_admin_write` cua 0009 ban cu, tu truy van lai chinh
     no). **Chi can chay neu ban da chay 0009 TRUOC khi file 0009 duoc sua
     lai** (0009 hien tai da fix san loi nay cho lan chay dau tien).
+12. `0012_update_production_stages.sql` - cap nhat danh muc cong doan
+    (production_stages) theo dung quy trinh thuc te: xoa ma cu khong con
+    dung (CDT, BIEN, PI, HTH), them ma moi (KBI, NEN, BAS), doi nghia CKE
+    (Cán chỉ/cán dát) va DKB (Ra dây). **Chi can chay neu ban da chay 0007
+    TRUOC khi file 0007 duoc sua lai** (0007 hien tai da co san danh muc
+    dung cho lan chay dau tien).
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 

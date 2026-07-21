@@ -5,9 +5,7 @@ export type HaoHutRule = "truc_tiep" | "kiem_soat_rui_ro" | "binh_thuong";
 const defaultStageRules: Record<string, HaoHutRule> = {
   CKE: "truc_tiep",
   DAN: "truc_tiep",
-  BIEN: "truc_tiep",
-  BAO: "kiem_soat_rui_ro",
-  PI: "kiem_soat_rui_ro"
+  BAO: "kiem_soat_rui_ro"
 };
 
 function resolveStageRule(stageCode: string, stageRules?: Record<string, HaoHutRule>): HaoHutRule {
@@ -97,41 +95,56 @@ export function getCarryOverLossPeriod(occurredDate: string, status: Status) {
 export function normalizeStageCode(stage: string) {
   const normalized = stage.trim().toLowerCase();
   const stageByName: Record<string, string> = {
+    "nấu nguyên liệu": "NAU",
+    "nau nguyen lieu": "NAU",
+    "nấu": "NAU",
+    "nau": "NAU",
+    "cán chỉ/cán dát": "CKE",
+    "can chi/can dat": "CKE",
     "cán kéo": "CKE",
     "can keo": "CKE",
+    "cán dát": "CKE",
+    "can dat": "CKE",
     "cán": "CKE",
     "can": "CKE",
     "kéo": "CKE",
     "keo": "CKE",
-    "cán dát": "CDT",
-    "can dat": "CDT",
+    "đúc": "CKE",
+    "duc": "CKE",
     "đan": "DAN",
     "đan dây": "DAN",
     "dan day": "DAN",
-    "biến": "BIEN",
-    "bien": "BIEN",
-    "bào dây": "BAO",
-    "bao day": "BAO",
-    "pi": "PI",
-    "đúc": "CKE",
-    "duc": "CKE",
-    "hoàn thiện": "HTH",
-    "hoan thien": "HTH",
-    "nấu": "NAU",
-    "nau": "NAU",
+    "khắc bi": "KBI",
+    "khac bi": "KBI",
+    "quay bóng": "QBI",
+    "quay bong": "QBI",
     "quay bi": "QBI",
+    "dập định hình": "DAP",
+    "dap dinh hinh": "DAP",
+    "dập": "DAP",
+    "dap": "DAP",
+    "nén khít": "NEN",
+    "nen khit": "NEN",
+    "nén": "NEN",
+    "nen": "NEN",
+    "ra dây": "DKB",
+    "ra day": "DKB",
     "đánh bóng": "DKB",
     "danh bong": "DKB",
+    "bào dây": "BAO",
+    "bao day": "BAO",
     "ghép dây": "GEP",
     "ghep day": "GEP",
     "ghép": "GEP",
     "ghep": "GEP",
+    "dập bass, bông khoen": "BAS",
+    "dap bass, bong khoen": "BAS",
+    "dập bass": "BAS",
+    "dap bass": "BAS",
+    "bông khoen": "BAS",
+    "bong khoen": "BAS",
     "sản xuất khóa": "SXK",
-    "san xuat khoa": "SXK",
-    "dập định hình": "DAP",
-    "dap dinh hinh": "DAP",
-    "dập": "DAP",
-    "dap": "DAP"
+    "san xuat khoa": "SXK"
   };
 
   return stageByName[normalized] ?? stage;
@@ -139,19 +152,18 @@ export function normalizeStageCode(stage: string) {
 
 export function getStageLabel(stageCode: string) {
   const labels: Record<string, string> = {
-    CKE: "Cán kéo",
-    CDT: "Cán dát",
+    NAU: "Nấu nguyên liệu",
+    CKE: "Cán chỉ/cán dát",
     DAN: "Đan dây",
-    BIEN: "Biến",
-    QBI: "Quay bi",
-    BAO: "Bào dây",
-    PI: "Pi",
+    KBI: "Khắc bi",
+    QBI: "Quay bóng",
     DAP: "Dập định hình",
-    DKB: "Đánh bóng",
+    NEN: "Nén khít",
+    DKB: "Ra dây",
+    BAO: "Bào dây",
     GEP: "Ghép dây",
-    NAU: "Nấu",
-    SXK: "Sản xuất khóa",
-    HTH: "Hoàn thiện"
+    BAS: "Dập bass, bông khoen",
+    SXK: "Sản xuất khóa"
   };
 
   return labels[stageCode] ?? stageCode;

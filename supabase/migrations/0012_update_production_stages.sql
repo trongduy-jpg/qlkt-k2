@@ -1,12 +1,9 @@
-create table if not exists production_stages (
-  id uuid primary key default gen_random_uuid(),
-  stage_code text not null unique,
-  stage_name text not null,
-  hao_hut_rule text not null default 'binh_thuong',
-  created_at timestamptz not null default now()
-);
+-- Cap nhat danh muc cong doan (production_stages) cho khop voi quy trinh
+-- thuc te (thay cho danh sach tam thoi luc dau o 0007). Xoa cac ma cu
+-- khong con dung (CDT, BIEN, PI, HTH da gop/bo), them cac ma moi
+-- (KBI, NEN, BAS), doi ten hien thi cua CKE va DKB cho dung nghia moi.
 
-create index if not exists idx_production_stages_code on production_stages(stage_code);
+delete from production_stages where stage_code in ('CDT', 'BIEN', 'PI', 'HTH');
 
 insert into production_stages (stage_code, stage_name, hao_hut_rule)
 values
@@ -22,4 +19,6 @@ values
   ('GEP', 'Ghép dây', 'binh_thuong'),
   ('BAS', 'Dập bass, bông khoen', 'binh_thuong'),
   ('SXK', 'Sản xuất khóa', 'binh_thuong')
-on conflict (stage_code) do nothing;
+on conflict (stage_code) do update set
+  stage_name = excluded.stage_name,
+  hao_hut_rule = excluded.hao_hut_rule;

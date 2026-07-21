@@ -8,6 +8,7 @@ import {
   Database,
   FileWarning,
   History,
+  ListChecks,
   Plus,
   Scale,
   Settings2,
@@ -64,6 +65,7 @@ import {
   selectMovementsForOrder
 } from "@/lib/production-summary";
 import { LossReportView } from "@/components/loss-report-view";
+import { StageEntryView } from "@/components/stage-entry-view";
 import { AuditLogView } from "@/components/audit-log-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { MasterDataProvider } from "@/components/master-data-context";
@@ -164,6 +166,7 @@ const moduleSlugs: Record<string, string> = {
   "Dashboard": "/",
   "Lệnh sản xuất": "/lenh-san-xuat",
   "Nhật ký NVL": "/nhat-ky-nvl",
+  "Ghi nhận công đoạn": "/ghi-nhan-cong-doan",
   "Giá & định mức": "/gia-dinh-muc",
   "Tồn hộp thợ": "/ton-hop-tho",
   "Báo cáo hao hụt": "/bao-cao-hao-hut",
@@ -195,6 +198,8 @@ export function MaterialDashboard() {
   const [productionDeadlineFilter, setProductionDeadlineFilter] = useState("Tất cả deadline");
   const [selectedOrderCode, setSelectedOrderCode] = useState<string | null>(null);
   const [isProductionDetailOpen, setIsProductionDetailOpen] = useState(false);
+  const [stageEntryQuery, setStageEntryQuery] = useState("");
+  const [stageEntryOrderCode, setStageEntryOrderCode] = useState<string | null>(null);
   const [orders, setOrders] = useState<ProductionOrder[]>(productionOrders);
   const [productionHeaders, setProductionHeaders] = useState<ProductionOrderHeader[]>([]);
   const [productionHeaderDraft, setProductionHeaderDraft] = useState<Omit<ProductionOrderHeader, "id" | "createdAt">>(createEmptyProductionOrderHeaderDraft());
@@ -622,6 +627,33 @@ export function MaterialDashboard() {
   const selectedOrderStageProgress = useMemo(
     () => buildStageProgress(stageOptionsForDropdown, selectedOrderMovements),
     [stageOptionsForDropdown, selectedOrderMovements]
+  );
+
+  const stageEntryFilteredOrders = useMemo(() => {
+    const normalizedQuery = stageEntryQuery.trim().toLowerCase();
+    if (!normalizedQuery) return orderSummaries.slice(0, 30);
+    return orderSummaries
+      .filter((summary) =>
+        `${summary.code} ${summary.sku} ${summary.productName ?? ""} ${summary.customerName ?? ""}`
+          .toLowerCase()
+          .includes(normalizedQuery)
+      )
+      .slice(0, 30);
+  }, [orderSummaries, stageEntryQuery]);
+
+  const stageEntryOrderSummary = useMemo(
+    () => orderSummaries.find((summary) => summary.code === stageEntryOrderCode) ?? null,
+    [orderSummaries, stageEntryOrderCode]
+  );
+
+  const stageEntryMovements = useMemo(
+    () => selectMovementsForOrder(orders, stageEntryOrderSummary?.code),
+    [orders, stageEntryOrderSummary]
+  );
+
+  const stageEntryProgress = useMemo(
+    () => buildStageProgress(stageOptionsForDropdown, stageEntryMovements),
+    [stageOptionsForDropdown, stageEntryMovements]
   );
 
   const referenceOptionsByKey = useMemo(() => {
@@ -1711,6 +1743,10 @@ export function MaterialDashboard() {
     prepareMovementForSummary(selectedOrderSummary, stageCode);
   }
 
+  function openMovementForStageEntry(stageCode: string) {
+    prepareMovementForSummary(stageEntryOrderSummary, stageCode);
+  }
+
   function selectStageTab(stageCode: string) {
     const existing = draftStageMovements.get(stageCode);
     if (existing) {
@@ -2158,6 +2194,7 @@ export function MaterialDashboard() {
     ["Dashboard", ClipboardList],
     ["Lệnh sản xuất", Boxes],
     ["Nhật ký NVL", Scale],
+    ["Ghi nhận công đoạn", ListChecks],
     ["Giá & định mức", CircleDollarSign],
     ["Tồn hộp thợ", Boxes],
     ["Báo cáo hao hụt", FileWarning],
@@ -2168,6 +2205,7 @@ export function MaterialDashboard() {
   const isDashboard = activeModule === "Dashboard";
   const isProduction = activeModule === "Lệnh sản xuất";
   const isMovement = activeModule === "Nhật ký NVL";
+  const isStageEntry = activeModule === "Ghi nhận công đoạn";
   const isPricing = activeModule === "Giá & định mức";
   const isReport = activeModule === "Báo cáo hao hụt";
   const isWorkerBox = activeModule === "Tồn hộp thợ";
@@ -3363,6 +3401,18 @@ export function MaterialDashboard() {
               ) : null}
             </section>
           </div>
+
+          <StageEntryView
+            isVisible={isStageEntry}
+            query={stageEntryQuery}
+            onQueryChange={setStageEntryQuery}
+            filteredOrders={stageEntryFilteredOrders}
+            selectedOrderCode={stageEntryOrderCode}
+            onSelectOrder={setStageEntryOrderCode}
+            selectedSummary={stageEntryOrderSummary}
+            stageProgress={stageEntryProgress}
+            onUpdateStage={openMovementForStageEntry}
+          />
 
           <AuditLogView isVisible={isAudit} events={auditEvents} />
 

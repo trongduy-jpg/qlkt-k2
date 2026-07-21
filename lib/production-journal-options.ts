@@ -61,19 +61,18 @@ export const productionOrderSalesTypeOptions: SelectOption[] = [
 ];
 
 export const journalStages: SelectOption[] = [
-  { value: "CKE", label: "CKE – Cán kéo" },
-  { value: "CDT", label: "CDT – Cán dát" },
+  { value: "NAU", label: "NAU – Nấu nguyên liệu" },
+  { value: "CKE", label: "CKE – Cán chỉ/cán dát" },
   { value: "DAN", label: "DAN – Đan dây" },
-  { value: "BIEN", label: "BIEN – Biến" },
-  { value: "QBI", label: "QBI – Quay bi" },
-  { value: "BAO", label: "BAO – Bao dây" },
-  { value: "PI", label: "PI – Pi" },
-  { value: "DAP", label: "DAP – Đập định hình" },
-  { value: "DKB", label: "DKB – Đánh bóng" },
+  { value: "KBI", label: "KBI – Khắc bi" },
+  { value: "QBI", label: "QBI – Quay bóng" },
+  { value: "DAP", label: "DAP – Dập định hình" },
+  { value: "NEN", label: "NEN – Nén khít" },
+  { value: "DKB", label: "DKB – Ra dây" },
+  { value: "BAO", label: "BAO – Bào dây" },
   { value: "GEP", label: "GEP – Ghép dây" },
-  { value: "NAU", label: "NAU – Nấu" },
-  { value: "SXK", label: "SXK – Sản xuất khóa" },
-  { value: "HTH", label: "HTH – Hoàn thiện" }
+  { value: "BAS", label: "BAS – Dập bass, bông khoen" },
+  { value: "SXK", label: "SXK – Sản xuất khóa" }
 ];
 
 export const journalMovementReasons: SelectOption[] = [

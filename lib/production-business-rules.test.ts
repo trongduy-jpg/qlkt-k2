@@ -39,10 +39,13 @@ describe("buildProductionOrderCode", () => {
 
 describe("normalizeStageCode", () => {
   it("nhan dien ten cong doan co dau va khong dau", () => {
-    expect(normalizeStageCode("Cán kéo")).toBe("CKE");
+    expect(normalizeStageCode("Cán chỉ/cán dát")).toBe("CKE");
     expect(normalizeStageCode("can keo")).toBe("CKE");
-    expect(normalizeStageCode("Đánh bóng")).toBe("DKB");
+    expect(normalizeStageCode("Ra dây")).toBe("DKB");
     expect(normalizeStageCode("ghep day")).toBe("GEP");
+    expect(normalizeStageCode("Khắc bi")).toBe("KBI");
+    expect(normalizeStageCode("Nén khít")).toBe("NEN");
+    expect(normalizeStageCode("Dập bass, bông khoen")).toBe("BAS");
   });
 
   it("giu nguyen ma da chuan hoa (khong khop bang ten)", () => {
@@ -53,8 +56,9 @@ describe("normalizeStageCode", () => {
 
 describe("getStageLabel", () => {
   it("tra ve ten day du cua ma cong doan hop le", () => {
-    expect(getStageLabel("DKB")).toBe("Đánh bóng");
-    expect(getStageLabel("CKE")).toBe("Cán kéo");
+    expect(getStageLabel("DKB")).toBe("Ra dây");
+    expect(getStageLabel("CKE")).toBe("Cán chỉ/cán dát");
+    expect(getStageLabel("BAS")).toBe("Dập bass, bông khoen");
   });
 
   it("tra ve chinh ma neu khong nhan dien duoc", () => {
@@ -68,10 +72,9 @@ describe("shouldForceDirectCharge", () => {
     expect(shouldForceDirectCharge("DKB", "Xác định")).toBe(true);
   });
 
-  it("cho phep Xac dinh o cong doan Can keo/Dan day/Bien (mac dinh truc_tiep)", () => {
+  it("cho phep Xac dinh o cong doan Can chi/Dan day (mac dinh truc_tiep)", () => {
     expect(shouldForceDirectCharge("CKE", "Xác định")).toBe(false);
     expect(shouldForceDirectCharge("DAN", "Xác định")).toBe(false);
-    expect(shouldForceDirectCharge("BIEN", "Xác định")).toBe(false);
   });
 
   it("khong chan cac trang thai khac Xac dinh", () => {
@@ -120,12 +123,11 @@ describe("getWorkerInventoryRiskStatus", () => {
 
   it("dang kiem soat o cong doan kiem_soat_rui_ro khi vuot 5g", () => {
     expect(getWorkerInventoryRiskStatus("BAO", 10)).toBe("Đang kiểm soát");
-    expect(getWorkerInventoryRiskStatus("PI", -10)).toBe("Đang kiểm soát");
   });
 
   it("rui ro o cong doan binh thuong/truc_tiep khi vuot 5g", () => {
     expect(getWorkerInventoryRiskStatus("CKE", 10)).toBe("Rủi ro");
-    expect(getWorkerInventoryRiskStatus("HTH", 10)).toBe("Rủi ro");
+    expect(getWorkerInventoryRiskStatus("SXK", 10)).toBe("Rủi ro");
   });
 });
 
