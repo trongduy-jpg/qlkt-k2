@@ -173,6 +173,14 @@ export function normalizeStageForStorage(stage: string) {
   return getStageLabel(normalizeStageCode(stage));
 }
 
+// Cac khau chi do 1 tho lam (Can chi/keo, Dan day, Khac bi). Cac khau con
+// lai co the co nhieu tho cung tham gia -> cho phep them nhieu dong.
+export const SINGLE_WORKER_STAGE_CODES = ["CKE", "DAN", "KBI"];
+
+export function isSingleWorkerStage(stageCode: string) {
+  return SINGLE_WORKER_STAGE_CODES.includes(normalizeStageCode(stageCode));
+}
+
 export function shouldForceDirectCharge(stage: string, status: Status, stageRules?: Record<string, HaoHutRule>) {
   return status === "Xác định" && resolveStageRule(normalizeStageCode(stage), stageRules) !== "truc_tiep";
 }

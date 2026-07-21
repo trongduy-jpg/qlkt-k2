@@ -651,10 +651,14 @@ export function MaterialDashboard() {
     [orders, stageEntryOrderSummary]
   );
 
-  const stageEntryProgress = useMemo(
-    () => buildStageProgress(stageOptionsForDropdown, stageEntryMovements),
-    [stageOptionsForDropdown, stageEntryMovements]
-  );
+  const stageEntriesByStage = useMemo(() => {
+    const map: Record<string, ProductionOrder[]> = {};
+    for (const movement of stageEntryMovements) {
+      const code = normalizeProductionStageCode(movement.stage);
+      (map[code] ||= []).push(movement);
+    }
+    return map;
+  }, [stageEntryMovements]);
 
   const referenceOptionsByKey = useMemo(() => {
     const grouped = new Map<string, ReferenceOption[]>();
@@ -1743,8 +1747,49 @@ export function MaterialDashboard() {
     prepareMovementForSummary(selectedOrderSummary, stageCode);
   }
 
-  function openMovementForStageEntry(stageCode: string) {
-    prepareMovementForSummary(stageEntryOrderSummary, stageCode);
+  async function recordStageEntry(input: {
+    stage: string;
+    worker: string;
+    issued: number;
+    returned: number;
+    status: Status;
+  }) {
+    if (!stageEntryOrderSummary) return;
+    if (!input.worker.trim()) {
+      setRemoteError("Vui lòng chọn thợ cho khâu này.");
+      return;
+    }
+
+    const seed = buildSeedMovementFromSummary(stageEntryOrderSummary);
+    const nextOrder = applyProductionBusinessRules(
+      {
+        ...seed,
+        id: crypto.randomUUID(),
+        stage: input.stage,
+        stageStatus: "Đang thực hiện",
+        worker: input.worker.trim(),
+        issued: Number(input.issued || 0),
+        returned: Number(input.returned || 0),
+        powder: 0,
+        status: input.status
+      },
+      orders
+    );
+
+    try {
+      const saved = isSupabaseConfigured ? await createMaterialMovement(nextOrder) : nextOrder;
+      if (isSupabaseConfigured) {
+        await reloadOperationalData();
+      } else {
+        setOrders((current) => [saved, ...current]);
+      }
+      const label = `Ghi nhận khâu ${getStageLabel(input.stage)} - ${saved.worker} cho LSX ${saved.code}`;
+      pushAudit("create_movement", label);
+      await createAuditLog("create_movement", label, saved.id);
+      setRemoteError(null);
+    } catch (error) {
+      setRemoteError(error instanceof Error ? error.message : "Không ghi nhận được khâu này");
+    }
   }
 
   function selectStageTab(stageCode: string) {
@@ -3410,8 +3455,12 @@ export function MaterialDashboard() {
             selectedOrderCode={stageEntryOrderCode}
             onSelectOrder={setStageEntryOrderCode}
             selectedSummary={stageEntryOrderSummary}
-            stageProgress={stageEntryProgress}
-            onUpdateStage={openMovementForStageEntry}
+            stageOptions={stageOptionsForDropdown}
+            entriesByStage={stageEntriesByStage}
+            workers={workers}
+            lossStatusOptions={movementLossStatusOptions}
+            onRecord={recordStageEntry}
+            onDeleteEntry={removeOrder}
           />
 
           <AuditLogView isVisible={isAudit} events={auditEvents} />
