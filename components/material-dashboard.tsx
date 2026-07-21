@@ -3227,7 +3227,7 @@ export function MaterialDashboard() {
                   {movementFormTab === "stage" ? (
                   <DrawerSection title="Công đoạn & số lượng" note="Chọn khâu rồi điền Thợ/Xuất/Nhập ngay bên dưới; khâu có dấu ✓ là đã ghi nhận, khâu ○ chưa nhập thì có thể bỏ qua.">
                     <FieldShell label="Chọn khâu để cập nhật" hint={draft.code ? "Mỗi khâu lưu thành một dòng riêng trong Nhật ký NVL." : "Nhập Mã LSX ở trên trước rồi mới chọn khâu."} required>
-                      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                      <div className="grid grid-cols-3 gap-1.5">
                         {stageOptionsForDropdown.map((item) => {
                           const done = draftStageMovements.has(item.value);
                           const active = normalizeStageCode(draft.stage) === item.value;
@@ -3237,26 +3237,28 @@ export function MaterialDashboard() {
                               type="button"
                               disabled={!draft.code.trim()}
                               onClick={() => selectStageTab(item.value)}
-                              className={`flex items-center justify-between gap-1 rounded-md border px-2.5 py-1.5 text-left text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                              className={`relative flex h-9 items-center justify-center rounded-md border text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                                 active
-                                  ? "border-ink bg-ink text-white"
+                                  ? "border-jade bg-jade text-white ring-2 ring-jade/30"
                                   : done
-                                    ? "border-line bg-white text-ink hover:border-ink/50"
+                                    ? "border-jade/40 bg-jade/10 text-ink hover:border-jade/60"
                                     : "border-dashed border-line/70 text-zinc-400 hover:border-line"
                               }`}
                               title={item.label}
                             >
-                              <span className="truncate">{item.value}</span>
-                              <span className={active ? "text-white" : done ? "text-ink" : "text-zinc-400"}>{done ? "✓" : "○"}</span>
+                              {item.value}
+                              {done && !active ? (
+                                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-jade text-[10px] text-white">✓</span>
+                              ) : null}
                             </button>
                           );
                         })}
                       </div>
                     </FieldShell>
 
-                    <div className="mt-4 rounded-md border border-line bg-paper/60 p-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                        {draft.stage ? `Đang nhập: ${getStageLabel(draft.stage)}` : "Chưa chọn khâu"}
+                    <div className={`mt-4 rounded-md border-2 p-3 ${draft.stage ? "border-jade bg-jade/10" : "border-dashed border-line bg-paper/60"}`}>
+                      <p className={`text-sm font-bold ${draft.stage ? "text-jade" : "text-zinc-400"}`}>
+                        {draft.stage ? `● Đang nhập: ${getStageLabel(draft.stage)}` : "Chưa chọn khâu — bấm 1 ô ở trên"}
                       </p>
                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
                         <FieldShell label="Trạng thái công đoạn" required>
