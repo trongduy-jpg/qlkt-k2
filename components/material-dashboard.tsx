@@ -217,7 +217,7 @@ export function MaterialDashboard() {
   const [remoteError, setRemoteError] = useState<string | null>(null);
   const [databaseHealth, setDatabaseHealth] = useState<DatabaseHealth | null>(null);
   const [isMovementFormOpen, setIsMovementFormOpen] = useState(false);
-  const [isMovementAdvancedOpen, setIsMovementAdvancedOpen] = useState(false);
+  const [movementFormTab, setMovementFormTab] = useState<"info" | "stage" | "quantity" | "advanced">("info");
   const [isProductionFormOpen, setIsProductionFormOpen] = useState(false);
   const [isAlertPanelOpen, setIsAlertPanelOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialMaster[]>([]);
@@ -1242,6 +1242,7 @@ export function MaterialDashboard() {
     setEditingMovementId(order.id);
     setDraft({ ...order });
     setSelectedOrderCode(order.code);
+    setMovementFormTab("info");
     setIsMovementFormOpen(true);
     setActiveModule("Nhật ký NVL");
   }
@@ -1734,6 +1735,7 @@ export function MaterialDashboard() {
     setQuery(summary.code);
     setStatus("Tất cả");
     setEditingMovementId(null);
+    setMovementFormTab(stageOverride ? "stage" : "info");
     setIsMovementFormOpen(true);
     setActiveModule("Nhật ký NVL");
     setRemoteError(null);
@@ -2977,7 +2979,8 @@ export function MaterialDashboard() {
                       setEditingMovementId(null);
                       setDraft(createEmptyOrder());
                       setRemoteError(null);
-                      setIsMovementFormOpen(true);
+                      setMovementFormTab("info");
+    setIsMovementFormOpen(true);
                     }}
                   >
                     <Plus size={16} />
@@ -3143,7 +3146,27 @@ export function MaterialDashboard() {
                     )}
                   </div>
 
-                  {!editingMovementId ? (
+                  <div className="inline-flex flex-wrap gap-1 rounded-full border border-line bg-paper p-1">
+                    {([
+                      ["info", "Thông tin"],
+                      ["stage", "Công đoạn"],
+                      ["quantity", "Số lượng"],
+                      ["advanced", "Nâng cao"]
+                    ] as const).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                          movementFormTab === key ? "bg-ink text-white" : "text-zinc-600 hover:bg-white/70 hover:text-ink"
+                        }`}
+                        onClick={() => setMovementFormTab(key)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {movementFormTab === "info" && !editingMovementId ? (
                     <DrawerSection title="Thông tin LSX" note="Nhóm nhận diện đơn và sản phẩm đang thao tác.">
                       <div className="grid gap-3 sm:grid-cols-2">
                         <FieldShell label="Mã LSX" required>
@@ -3176,6 +3199,7 @@ export function MaterialDashboard() {
                     </DrawerSection>
                   ) : null}
 
+                  {movementFormTab === "info" ? (
                   <DrawerSection title="Thông tin chứng từ" note="Phục vụ đối chiếu ngày nghiệp vụ và số chứng từ nhập/xuất.">
                     <div className="grid gap-3 sm:grid-cols-2">
                       <FieldShell label="Ngày nghiệp vụ" hint="Ngày phát sinh xuất/nhập NVL." required>
@@ -3199,7 +3223,9 @@ export function MaterialDashboard() {
                       </FieldShell>
                     </div>
                   </DrawerSection>
+                  ) : null}
 
+                  {movementFormTab === "stage" ? (
                   <DrawerSection title="Công đoạn xử lý" note="Bấm vào từng khâu để nhập xuất/nhập; khâu có dấu ✓ là đã ghi nhận, khâu ○ chưa nhập thì có thể bỏ qua.">
                     <FieldShell label="Chọn khâu để cập nhật" hint={draft.code ? "Mỗi khâu lưu thành một dòng riêng trong Nhật ký NVL." : "Nhập Mã LSX ở trên trước rồi mới chọn khâu."} required>
                       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
@@ -3258,7 +3284,9 @@ export function MaterialDashboard() {
                       </FieldShell>
                     </div>
                   </DrawerSection>
+                  ) : null}
 
+                  {movementFormTab === "quantity" ? (
                   <DrawerSection title="Số lượng & trọng lượng" note="Đây là nhóm ảnh hưởng trực tiếp đến tổng xuất, tổng nhập và hao hụt.">
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                       <FieldShell label="Số lượng viên/sợi">
@@ -3291,24 +3319,11 @@ export function MaterialDashboard() {
                       </FieldShell>
                     </div>
                   </DrawerSection>
+                  ) : null}
 
-                  <DrawerSection title="Thông tin NXT / tính hao" note="Nhóm phục vụ báo cáo nhập xuất tồn và quy đổi hao hụt theo tuổi vàng.">
-                    <div className="rounded-md border border-dashed border-line bg-paper/70 px-3 py-3">
-                      <button
-                        className="flex w-full items-center justify-between gap-3 text-left"
-                        type="button"
-                        onClick={() => setIsMovementAdvancedOpen((current) => !current)}
-                      >
-                        <div>
-                          <p className="text-sm font-semibold text-ink">Trường nâng cao</p>
-                          <p className="mt-1 text-xs text-zinc-500">Chỉ mở khi cần nhập NXT, quy đổi KCP hoặc nguồn nhập/xuất.</p>
-                        </div>
-                        <span className="rounded-full border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-600">
-                          {isMovementAdvancedOpen ? "Thu gọn" : "Mở rộng"}
-                        </span>
-                      </button>
-                    </div>
-                    <div className={`${isMovementAdvancedOpen ? "grid" : "hidden"} gap-3`}>
+                  {movementFormTab === "advanced" ? (
+                  <DrawerSection title="Thông tin NXT / tính hao" note="Nhóm phục vụ báo cáo nhập xuất tồn và quy đổi hao hụt theo tuổi vàng. Chỉ nhập khi cần NXT, quy đổi KCP hoặc nguồn nhập/xuất.">
+                    <div className="grid gap-3">
                       <div className="grid grid-cols-2 gap-2">
                         <FieldShell label="Tháng tính hao" hint="Kỳ dùng để quyết toán hao hụt.">
                           <input className={fieldControlClass} type="month" value={draft.lossPeriod ?? ""} onChange={(e) => updateDraft("lossPeriod", e.target.value)} />
@@ -3363,8 +3378,9 @@ export function MaterialDashboard() {
                       </div>
                     </div>
                   </DrawerSection>
+                  ) : null}
                   <p className="text-xs leading-5 text-zinc-500">
-                    Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Nên hoàn thành nhóm trên trước rồi mới mở phần nâng cao.
+                    Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Chuyển tab để nhập từng nhóm; nút lưu luôn ở dưới đáy.
                   </p>
                   {isDraftForClosedOrder ? (
                     <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
