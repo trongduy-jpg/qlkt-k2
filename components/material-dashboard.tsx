@@ -217,7 +217,7 @@ export function MaterialDashboard() {
   const [remoteError, setRemoteError] = useState<string | null>(null);
   const [databaseHealth, setDatabaseHealth] = useState<DatabaseHealth | null>(null);
   const [isMovementFormOpen, setIsMovementFormOpen] = useState(false);
-  const [movementFormTab, setMovementFormTab] = useState<"info" | "stage" | "quantity" | "advanced">("info");
+  const [movementFormTab, setMovementFormTab] = useState<"info" | "stage" | "advanced">("info");
   const [isProductionFormOpen, setIsProductionFormOpen] = useState(false);
   const [isAlertPanelOpen, setIsAlertPanelOpen] = useState(false);
   const [materials, setMaterials] = useState<MaterialMaster[]>([]);
@@ -3150,7 +3150,6 @@ export function MaterialDashboard() {
                     {([
                       ["info", "Thông tin"],
                       ["stage", "Công đoạn"],
-                      ["quantity", "Số lượng"],
                       ["advanced", "Nâng cao"]
                     ] as const).map(([key, label]) => (
                       <button
@@ -3226,7 +3225,7 @@ export function MaterialDashboard() {
                   ) : null}
 
                   {movementFormTab === "stage" ? (
-                  <DrawerSection title="Công đoạn xử lý" note="Bấm vào từng khâu để nhập xuất/nhập; khâu có dấu ✓ là đã ghi nhận, khâu ○ chưa nhập thì có thể bỏ qua.">
+                  <DrawerSection title="Công đoạn & số lượng" note="Chọn khâu rồi điền Thợ/Xuất/Nhập ngay bên dưới; khâu có dấu ✓ là đã ghi nhận, khâu ○ chưa nhập thì có thể bỏ qua.">
                     <FieldShell label="Chọn khâu để cập nhật" hint={draft.code ? "Mỗi khâu lưu thành một dòng riêng trong Nhật ký NVL." : "Nhập Mã LSX ở trên trước rồi mới chọn khâu."} required>
                       <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
                         {stageOptionsForDropdown.map((item) => {
@@ -3254,69 +3253,66 @@ export function MaterialDashboard() {
                         })}
                       </div>
                     </FieldShell>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <FieldShell label="Khâu đang nhập">
-                        <input className={`${fieldControlClass} bg-paper`} value={draft.stage ? getStageLabel(draft.stage) : "Chưa chọn khâu"} readOnly />
-                      </FieldShell>
-                      <FieldShell label="Trạng thái công đoạn" required>
-                        <SelectControl value={draft.stageStatus ?? "Đang thực hiện"} onChange={(value) => updateDraft("stageStatus", value)}>
-                          {movementStageStatusOptions.map((item) => (
-                            <option key={item.value} value={item.value}>{item.label}</option>
-                          ))}
-                        </SelectControl>
-                      </FieldShell>
-                    </div>
-                    <div className="mt-3">
-                      <FieldShell label="Thợ phụ trách" hint="Danh sách thợ được lọc theo công đoạn nếu có dữ liệu." required>
-                        <SelectControl
-                          value={draft.worker}
-                          onChange={(value) => {
-                            const worker = workers.find((item) => item.full_name === value);
-                            updateDraft("worker", value);
-                            if (worker?.stage) updateDraft("stage", normalizeStageCode(worker.stage));
-                          }}
-                        >
-                          <option value="">Chọn thợ</option>
-                          {workerOptionsForDraft.map((worker) => (
-                            <option key={worker.id} value={worker.full_name}>{worker.worker_code} - {worker.full_name}</option>
-                          ))}
-                        </SelectControl>
-                      </FieldShell>
-                    </div>
-                  </DrawerSection>
-                  ) : null}
 
-                  {movementFormTab === "quantity" ? (
-                  <DrawerSection title="Số lượng & trọng lượng" note="Đây là nhóm ảnh hưởng trực tiếp đến tổng xuất, tổng nhập và hao hụt.">
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                      <FieldShell label="Số lượng viên/sợi">
-                        <input className={fieldControlClass} min="0" type="number" placeholder="0" value={draft.qtyPiece || ""} onChange={(e) => updateDraft("qtyPiece", Number(e.target.value))} />
-                      </FieldShell>
-                      <FieldShell label="Xuất gram">
-                        <input className={fieldControlClass} min="0" type="number" placeholder="0.00" value={draft.issued || ""} onChange={(e) => updateDraft("issued", Number(e.target.value))} />
-                      </FieldShell>
-                      <FieldShell label="Nhập gram">
-                        <input className={fieldControlClass} min="0" type="number" placeholder="0.00" value={draft.returned || ""} onChange={(e) => updateDraft("returned", Number(e.target.value))} />
-                      </FieldShell>
-                    </div>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <FieldShell label="Trạng thái tính hao" required>
-                        <SelectControl value={draft.status} onChange={(value) => updateDraft("status", value as Status)}>
-                          {movementLossStatusOptions.map((item) => (
-                            <option key={item.value} value={item.value}>{item.label}</option>
-                          ))}
-                        </SelectControl>
-                      </FieldShell>
-                    </div>
-                    <div className="mt-3">
-                      <FieldShell label="Diễn giải giao dịch">
-                        <input
-                          className={fieldControlClass}
-                          placeholder="Nhập diễn giải giao dịch (VD: Xuất cán kéo)"
-                          value={draft.sourceMaterialName ?? ""}
-                          onChange={(e) => updateDraft("sourceMaterialName", e.target.value)}
-                        />
-                      </FieldShell>
+                    <div className="mt-4 rounded-md border border-line bg-paper/60 p-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                        {draft.stage ? `Đang nhập: ${getStageLabel(draft.stage)}` : "Chưa chọn khâu"}
+                      </p>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <FieldShell label="Trạng thái công đoạn" required>
+                          <SelectControl value={draft.stageStatus ?? "Đang thực hiện"} onChange={(value) => updateDraft("stageStatus", value)}>
+                            {movementStageStatusOptions.map((item) => (
+                              <option key={item.value} value={item.value}>{item.label}</option>
+                            ))}
+                          </SelectControl>
+                        </FieldShell>
+                        <FieldShell label="Thợ phụ trách" hint="Danh sách thợ được lọc theo công đoạn nếu có dữ liệu." required>
+                          <SelectControl
+                            value={draft.worker}
+                            onChange={(value) => {
+                              const worker = workers.find((item) => item.full_name === value);
+                              updateDraft("worker", value);
+                              if (worker?.stage) updateDraft("stage", normalizeStageCode(worker.stage));
+                            }}
+                          >
+                            <option value="">Chọn thợ</option>
+                            {workerOptionsForDraft.map((worker) => (
+                              <option key={worker.id} value={worker.full_name}>{worker.worker_code} - {worker.full_name}</option>
+                            ))}
+                          </SelectControl>
+                        </FieldShell>
+                      </div>
+
+                      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                        <FieldShell label="Số lượng viên/sợi">
+                          <input className={fieldControlClass} min="0" type="number" placeholder="0" value={draft.qtyPiece || ""} onChange={(e) => updateDraft("qtyPiece", Number(e.target.value))} />
+                        </FieldShell>
+                        <FieldShell label="Xuất gram">
+                          <input className={fieldControlClass} min="0" type="number" placeholder="0.00" value={draft.issued || ""} onChange={(e) => updateDraft("issued", Number(e.target.value))} />
+                        </FieldShell>
+                        <FieldShell label="Nhập gram">
+                          <input className={fieldControlClass} min="0" type="number" placeholder="0.00" value={draft.returned || ""} onChange={(e) => updateDraft("returned", Number(e.target.value))} />
+                        </FieldShell>
+                      </div>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <FieldShell label="Trạng thái tính hao" required>
+                          <SelectControl value={draft.status} onChange={(value) => updateDraft("status", value as Status)}>
+                            {movementLossStatusOptions.map((item) => (
+                              <option key={item.value} value={item.value}>{item.label}</option>
+                            ))}
+                          </SelectControl>
+                        </FieldShell>
+                      </div>
+                      <div className="mt-3">
+                        <FieldShell label="Diễn giải giao dịch">
+                          <input
+                            className={fieldControlClass}
+                            placeholder="Nhập diễn giải giao dịch (VD: Xuất cán kéo)"
+                            value={draft.sourceMaterialName ?? ""}
+                            onChange={(e) => updateDraft("sourceMaterialName", e.target.value)}
+                          />
+                        </FieldShell>
+                      </div>
                     </div>
                   </DrawerSection>
                   ) : null}
