@@ -770,12 +770,15 @@ export function MaterialDashboard() {
         await createAuditLog("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
       }
       if (keepOpen) {
-        // Giu drawer mo de nhap tiep khau khac cua cung LSX, chi xoa cac
-        // truong so lieu cua khau vua luu, giu lai thong tin chung.
+        // Giu drawer mo de nhap tiep khau khac cua cung LSX. Xoa ca khau
+        // dang chon (khong chi xoa so lieu) de "Dang nhap: ..." quay ve
+        // trang thai "Chua chon khau" - tranh cam giac du lieu vua luu bi
+        // mat khi form van hien khau vua xong nhung trong trơn.
         setEditingMovementId(null);
         setDraft((current) => ({
           ...current,
           id: "",
+          stage: "",
           worker: "",
           qtyPiece: 0,
           issued: 0,
@@ -3239,7 +3242,7 @@ export function MaterialDashboard() {
                               onClick={() => selectStageTab(item.value)}
                               className={`relative flex h-9 items-center justify-center rounded-md border text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                                 active
-                                  ? "border-jade bg-jade text-white ring-2 ring-jade/30"
+                                  ? "border-jade bg-jade text-white"
                                   : done
                                     ? "border-jade/40 bg-jade/10 text-ink hover:border-jade/60"
                                     : "border-dashed border-line/70 text-zinc-400 hover:border-line"
