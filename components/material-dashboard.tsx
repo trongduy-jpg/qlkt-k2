@@ -2179,8 +2179,7 @@ export function MaterialDashboard() {
   const isDraftLargeWeight = isLargeWeightMovement(draft);
   const isDraftDirectChargeInvalid = shouldForceDirectCharge(normalizedDraftStage, draft.status, stageRules);
   const { appUser, signOut } = useAuth();
-  // Dang tam tat cong dang nhap de demo: khong co phien dang nhap van duoc xem la Admin.
-  const isAdmin = appUser ? appUser.role === "admin" : true;
+  const isAdmin = appUser?.role === "admin";
   const visibleNavItems = isAdmin ? navItems : navItems.filter(([label]) => label !== "Cấu hình");
 
   useEffect(() => {

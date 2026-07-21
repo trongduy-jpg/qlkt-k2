@@ -20,6 +20,11 @@ project da co chi can chay file con thieu):
 9. `0009_app_users_schema.sql` - whitelist dang nhap (app_users) + RLS.
    **QUAN TRONG**: truoc khi chay, sua email `admin@example.com` trong file
    thanh email that cua ban - day la buoc bootstrap tai khoan Admin dau tien.
+10. `0010_business_tables_rls.sql` - bat RLS cho toan bo bang nghiep vu con
+    lai (materials, workers, production_orders, material_movements,
+    price_periods, audit_logs, production_stages, reference_options).
+    **Phai chay sau 0009** va phai co san it nhat 1 dong trong `app_users`
+    truoc khi bat, neu khong se khong ai doc/ghi duoc gi sau khi bat RLS.
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 
@@ -44,10 +49,13 @@ sach o tren.
 
 ## Ghi chu bao mat
 
-- Hien tai **chi bang `app_users` co RLS** (bat trong 0009). Cac bang
-  nghiep vu con lai (production_orders, material_movements, materials,
-  workers...) **chua co RLS** - anon key dang co quyen doc/ghi toan bo.
-  Day la rui ro can xu ly truoc khi dung voi du lieu that/noi bo chinh thuc.
-- Demo hien tai (xem `app/layout.tsx`) dang **tat man dang nhap** de tien
-  trinh bay - AuthGate chua duoc bat lai trong layout. Nho bat lai truoc
-  khi dua he thong vao dung that.
+- Sau khi chay du 0001-0010, toan bo bang nghiep vu deu co RLS: chi tai
+  khoan da dang nhap VA co email trong `app_users` moi doc/ghi duoc
+  (khong phan biet admin/nhan_vien o muc RLS - phan quyen Cau hinh chi
+  admin moi vao duoc van do man hinh tu kiem soat, khop voi cach app dang
+  hoat dong).
+- `app/layout.tsx` da bat lai `AuthGate` - moi nguoi truy cap deu phai
+  dang nhap bang email da duoc admin them vao `app_users` truoc.
+- Neu can demo/trinh bay ma khong muon bat buoc dang nhap, co the tam
+  thoi bo `<AuthGate>` khoi `app/layout.tsx` - nhung nen nho bat lai va
+  dam bao 0010 da chay truoc khi dua du lieu that vao he thong.
