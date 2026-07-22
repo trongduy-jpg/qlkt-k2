@@ -6,15 +6,17 @@
 --
 -- Chi can chay tren DB da tung nhap tho bang ma ten (0015/0017 ban cu).
 
--- Don 2 tho demo cu (TD003 Le Van Tung, TD004 Nguyen Van An) dang chiem
--- ma TD003/TD004 ma tho that can dung: xoa neu khong con giao dich, con
--- neu con giao dich thi doi ma de nhuong cho tho that.
+-- Don 4 tho demo cu (seed 0006: Le Van Tung, Nguyen Van An, Tran Minh
+-- Khoi, Pham Quoc Huy) dang chiem ma TD003..TD006 ma tho that can dung.
+-- Nhan dien theo TEN demo (khong dau) de an toan du ho dang o ma nao.
+-- Xoa neu khong con giao dich, con neu con thi doi ma sang OLD-* de
+-- nhuong ma cho tho that.
 delete from workers w
-where w.worker_code in ('TD003','TD004')
+where w.full_name in ('Le Van Tung','Nguyen Van An','Tran Minh Khoi','Pham Quoc Huy')
   and not exists (select 1 from material_movements m where m.worker_id = w.id);
 
 update workers set worker_code = 'OLD-' || worker_code
-where worker_code in ('TD003','TD004');
+where full_name in ('Le Van Tung','Nguyen Van An','Tran Minh Khoi','Pham Quoc Huy');
 
 update workers set worker_code = 'CP001'  where worker_code = 'HHPHONG';
 update workers set worker_code = 'GS001'  where worker_code = 'MTMTRAN';
