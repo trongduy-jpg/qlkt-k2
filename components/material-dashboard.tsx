@@ -12,7 +12,6 @@ import {
   Plus,
   Scale,
   Settings2,
-  Trash2,
   X
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -30,22 +29,18 @@ import {
 import {
   deliveryStatusClass,
   formatGram,
-  getSummaryStatus,
   hasMeaningfulText,
   isClosedStatus,
   pickNumber,
   pickText,
   statusClass,
-  statusOptions,
-  validateMovementDraft
+  statusOptions
 } from "@/lib/production-helpers";
 import type { AuditEvent, OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
 import {
   createEmptyOrder,
   createEmptyProductionOrderHeaderDraft,
-  mapRemoteHeaderToProductionHeader,
   mergeMovementWithContext,
-  mergeProductionHeaderWithDraft
 } from "@/lib/production-mappers";
 import { referenceListKeys } from "@/lib/master-data-drafts";
 import {
@@ -57,12 +52,23 @@ import {
   computeMovementTotals,
   selectMovementsForOrder
 } from "@/lib/production-summary";
+import {
+  buildProductionOverview,
+  buildSelectedOrderDetail,
+  filterJournalOrders,
+  filterProductionSummaries
+} from "@/lib/production-workflow";
 import { LossReportView } from "@/components/loss-report-view";
 import { StageEntryView } from "@/components/stage-entry-view";
 import { AuditLogView } from "@/components/audit-log-view";
 import { MasterDataSettingsView } from "@/components/master-data-settings-view";
 import { MasterDataProvider } from "@/components/master-data-context";
+import { MaterialJournalView } from "@/components/material-journal-view";
+import { MaterialMovementDrawer } from "@/components/material-movement-drawer";
+import { ProductionOrdersView } from "@/components/production-orders-view";
 import { useMasterDataCrud } from "@/components/use-master-data-crud";
+import { useMaterialMovements } from "@/components/use-material-movements";
+import { useOperationalData } from "@/components/use-operational-data";
 import { useProductionOrders } from "@/components/use-production-orders";
 import { PriceTableView } from "@/components/price-table-view";
 import { WorkerBoxView } from "@/components/worker-box-view";
@@ -76,60 +82,34 @@ import {
   type ProductionOrder
 } from "@/lib/demo-data";
 import {
-  groupNxtLinkOptions,
-  journalDestinations,
   journalStages,
   mainJournalStageCodes,
-  materialTypeOptions,
-  movementExportSourceOptions,
-  movementGoldAgeOptions,
-  movementImportSourceOptions,
   movementLossStatusOptions,
-  movementStageStatusOptions,
   productionOrderDeliveryStatusOptions,
   productionOrderDestinations,
   productionOrderMaterialSpecOptions,
   productionOrderSalesTypeOptions,
-  sourceMaterialOptions
 } from "@/lib/production-journal-options";
 import {
   applyProductionBusinessRules,
-  buildProductionOrderCode,
   buildUniqueProductionOrderCode,
   formatDisplayDate,
   formatDisplayDateTime,
-  getCarryOverLossPeriod,
   getStageLabel,
-  isLargeWeightMovement,
   isSingleWorkerStage,
   normalizeStageCode as normalizeProductionStageCode,
   shouldForceDirectCharge,
   toIsoDate,
-  toMonthCode,
   type HaoHutRule
 } from "@/lib/production-business-rules";
 import {
   createAuditLog,
   createMaterialMovement,
-  deleteMaterialMovement,
-  loadDatabaseHealth,
-  loadMaterials,
-  loadProductionOrderHeaders,
-  loadProductionOrders,
-  loadReferenceOptions,
-  loadStages,
-  loadWorkers,
   updateProductionOrderStatus,
-  updateMaterialMovement,
-  updateMaterialMovementStatus,
-  type DatabaseHealth,
-  type MaterialMaster,
   type ReferenceOption,
-  type StageMaster,
-  type WorkerMaster
 } from "@/lib/material-service";
 import { isSupabaseConfigured } from "@/lib/supabase";
-import { loadAppUsers, type AppUser } from "@/lib/auth-service";
+import { loadAppUsers } from "@/lib/auth-service";
 
 const storageKey = "qlkt-k2-material-orders";
 const productionOrderHeaderKey = "qlkt-k2-production-order-headers";
@@ -179,29 +159,37 @@ export function MaterialDashboard() {
   const [isProductionDetailOpen, setIsProductionDetailOpen] = useState(false);
   const [stageEntryQuery, setStageEntryQuery] = useState("");
   const [stageEntryOrderCode, setStageEntryOrderCode] = useState<string | null>(null);
-  const [orders, setOrders] = useState<ProductionOrder[]>(productionOrders);
-  const [productionHeaders, setProductionHeaders] = useState<ProductionOrderHeader[]>([]);
   const [recentCreatedOrderCode, setRecentCreatedOrderCode] = useState<string | null>(null);
-  const [draft, setDraft] = useState<ProductionOrder>(createEmptyOrder());
-  const [editingMovementId, setEditingMovementId] = useState<string | null>(null);
   const [movementDraftCache, setMovementDraftCache] = useState<Record<string, ProductionOrder>>({});
   const [productionHeaderDraftCache, setProductionHeaderDraftCache] = useState<
     Record<string, Omit<ProductionOrderHeader, "id" | "createdAt">>
   >({});
+  const {
+    orders,
+    setOrders,
+    productionHeaders,
+    setProductionHeaders,
+    materials,
+    setMaterials,
+    workers,
+    setWorkers,
+    stages,
+    setStages,
+    referenceOptions,
+    setReferenceOptions,
+    appUsers,
+    setAppUsers,
+    databaseHealth,
+    isLoadingRemote,
+    setIsLoadingRemote,
+    remoteError,
+    setRemoteError,
+    reloadOperationalData
+  } = useOperationalData({ movementDraftCache, productionHeaderDraftCache });
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [hasLoadedStorage, setHasLoadedStorage] = useState(false);
-  const [isLoadingRemote, setIsLoadingRemote] = useState(false);
-  const [remoteError, setRemoteError] = useState<string | null>(null);
-  const [databaseHealth, setDatabaseHealth] = useState<DatabaseHealth | null>(null);
-  const [isMovementFormOpen, setIsMovementFormOpen] = useState(false);
-  const [movementFormTab, setMovementFormTab] = useState<"info" | "stage" | "advanced">("info");
   const [isProductionFormOpen, setIsProductionFormOpen] = useState(false);
   const [isAlertPanelOpen, setIsAlertPanelOpen] = useState(false);
-  const [materials, setMaterials] = useState<MaterialMaster[]>([]);
-  const [workers, setWorkers] = useState<WorkerMaster[]>([]);
-  const [stages, setStages] = useState<StageMaster[]>([]);
-  const [referenceOptions, setReferenceOptions] = useState<ReferenceOption[]>([]);
-  const [appUsers, setAppUsers] = useState<AppUser[]>([]);
   const { appUser, signOut } = useAuth();
 
   // Toan bo state + handler CRUD danh muc nen (Cau hinh) da tach ra hook rieng.
@@ -215,69 +203,6 @@ export function MaterialDashboard() {
     pushAudit,
     setRemoteError
   });
-
-  async function reloadOperationalData(options?: {
-    movementDraftOverrides?: Record<string, ProductionOrder>;
-    productionHeaderDraftOverrides?: Record<string, Omit<ProductionOrderHeader, "id" | "createdAt">>;
-  }) {
-    if (!isSupabaseConfigured) return;
-
-    const [remoteOrders, remoteHeaders, remoteMaterials, remoteWorkers, remoteStages, remoteReferenceOptions, remoteDatabaseHealth] = await Promise.all([
-      loadProductionOrders(),
-      loadProductionOrderHeaders(),
-      loadMaterials(),
-      loadWorkers(),
-      loadStages(),
-      loadReferenceOptions(),
-      loadDatabaseHealth()
-    ]);
-
-    const mergedHeaderDrafts = {
-      ...productionHeaderDraftCache,
-      ...(options?.productionHeaderDraftOverrides ?? {})
-    };
-    const mappedHeaders = remoteHeaders
-      .map(mapRemoteHeaderToProductionHeader)
-      .map((header) => mergeProductionHeaderWithDraft(header, mergedHeaderDrafts[header.code]));
-    const headerByCode = new Map(mappedHeaders.map((header) => [header.code, header]));
-    const headerById = new Map(mappedHeaders.map((header) => [header.id, header]));
-    const mergedMovementDrafts = {
-      ...movementDraftCache,
-      ...(options?.movementDraftOverrides ?? {})
-    };
-    const mappedOrders = remoteOrders.map((order) => {
-      const headerMatch = order.code ? headerByCode.get(order.code) : undefined;
-      const headerFromId = !headerMatch && order.orderId ? headerById.get(order.orderId) : undefined;
-      const resolvedOrder =
-        headerFromId && !order.code
-          ? {
-              ...order,
-              code: headerFromId.code,
-              sku: pickText(order.sku, headerFromId.sku),
-              productName: pickText(order.productName, headerFromId.productName),
-              destination: pickText(order.destination, headerFromId.destination),
-              occurredDate: pickText(order.occurredDate, headerFromId.occurredDate, headerFromId.plannedDate),
-              documentNo: pickText(order.documentNo, headerFromId.documentNo),
-              documentInNo: pickText(order.documentInNo, headerFromId.documentInNo),
-              documentLineNo: pickText(order.documentLineNo, headerFromId.documentLineNo),
-              qtyPiece: pickNumber(order.qtyPiece, headerFromId.qtyPiece)
-            }
-          : order;
-
-      const resolvedHeader = headerMatch ?? headerFromId;
-      return mergeMovementWithContext(resolvedOrder, mergedMovementDrafts[resolvedOrder.code], resolvedHeader);
-    });
-
-    setOrders(mappedOrders);
-    setProductionHeaders(mappedHeaders);
-    setMaterials(remoteMaterials);
-    setWorkers(remoteWorkers);
-    setStages(remoteStages);
-    setReferenceOptions(remoteReferenceOptions);
-    setDatabaseHealth(remoteDatabaseHealth);
-
-    return { remoteMaterials, remoteWorkers };
-  }
 
   useEffect(() => {
     const savedOrders = window.localStorage.getItem(storageKey);
@@ -358,43 +283,9 @@ export function MaterialDashboard() {
   }, []);
 
   useEffect(() => {
-    if (isSupabaseConfigured) return;
-
-    void Promise.all([loadMaterials(), loadWorkers()]).then(([localMaterials, localWorkers]) => {
-      setMaterials(localMaterials);
-      setWorkers(localWorkers);
-      setDatabaseHealth({
-        usingRealSupabase: false,
-        counts: {
-          productionOrders: 0,
-          materialMovements: 0,
-          materials: localMaterials.length,
-          workers: localWorkers.length,
-          auditLogs: 0
-        },
-        hasOperationalData: false
-      });
-    });
-  }, []);
-
-  useEffect(() => {
     if (!hasLoadedStorage) return;
     window.localStorage.setItem(storageKey, JSON.stringify(orders));
   }, [hasLoadedStorage, orders]);
-
-  useEffect(() => {
-    if (!isMovementFormOpen) return;
-    const code = draft.code.trim();
-    if (!code) return;
-
-    setMovementDraftCache((current) => {
-      const previous = current[code];
-      if (previous && JSON.stringify(previous) === JSON.stringify(draft)) {
-        return current;
-      }
-      return { ...current, [code]: draft };
-    });
-  }, [draft, isMovementFormOpen]);
 
   useEffect(() => {
     if (!hasLoadedStorage) return;
@@ -416,15 +307,7 @@ export function MaterialDashboard() {
     window.localStorage.setItem(productionHeaderDraftCacheKey, JSON.stringify(productionHeaderDraftCache));
   }, [hasLoadedStorage, productionHeaderDraftCache]);
 
-  const filteredOrders = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return orders.filter((order) => {
-      const matchStatus = status === "Tất cả" || order.status === status;
-      const searchable = `${order.code} ${order.sku} ${order.material} ${order.worker} ${order.stage}`.toLowerCase();
-      return matchStatus && (!normalizedQuery || searchable.includes(normalizedQuery));
-    });
-  }, [orders, query, status]);
+  const filteredOrders = useMemo(() => filterJournalOrders(orders, { query, status }), [orders, query, status]);
 
   const orderSummaries = useMemo(() => buildOrderSummaries(orders, productionHeaders), [orders, productionHeaders]);
 
@@ -454,38 +337,16 @@ export function MaterialDashboard() {
     setRemoteError
   });
 
-  const filteredOrderSummaries = useMemo(() => {
-    const normalizedCustomer = productionCustomerQuery.trim().toLowerCase();
-    const today = toIsoDate();
-    const sevenDaysLater = new Date(`${today}T00:00:00`);
-    sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
-    const sevenDayLimit = sevenDaysLater.toISOString().slice(0, 10);
-
-    return orderSummaries.filter((summary) => {
-      const matchDeliveryStatus =
-        productionDeliveryStatus === "Tất cả trạng thái LSX" || summary.deliveryStatus === productionDeliveryStatus;
-      const matchSalesType =
-        productionSalesType === "Tất cả SR/KH" || summary.salesType === productionSalesType;
-      const matchCustomer =
-        !normalizedCustomer ||
-        `${summary.customerName || ""} ${summary.sku || ""} ${summary.productName || ""} ${summary.code || ""}`
-          .toLowerCase()
-          .includes(normalizedCustomer);
-
-      let matchDeadline = true;
-      if (productionDeadlineFilter === "Quá hạn") {
-        matchDeadline = Boolean(summary.deadlineDate && summary.deadlineDate < today && summary.deliveryStatus !== "Hoàn tất");
-      } else if (productionDeadlineFilter === "Hôm nay") {
-        matchDeadline = summary.deadlineDate === today;
-      } else if (productionDeadlineFilter === "7 ngày tới") {
-        matchDeadline = Boolean(summary.deadlineDate && summary.deadlineDate >= today && summary.deadlineDate <= sevenDayLimit);
-      } else if (productionDeadlineFilter === "Chưa có deadline") {
-        matchDeadline = !summary.deadlineDate;
-      }
-
-      return matchDeliveryStatus && matchSalesType && matchCustomer && matchDeadline;
-    });
-  }, [orderSummaries, productionCustomerQuery, productionDeadlineFilter, productionDeliveryStatus, productionSalesType]);
+  const filteredOrderSummaries = useMemo(
+    () =>
+      filterProductionSummaries(orderSummaries, {
+        deliveryStatus: productionDeliveryStatus,
+        salesType: productionSalesType,
+        deadlineFilter: productionDeadlineFilter,
+        query: productionCustomerQuery
+      }),
+    [orderSummaries, productionCustomerQuery, productionDeadlineFilter, productionDeliveryStatus, productionSalesType]
+  );
 
   const selectedOrderSummary = useMemo(() => {
     return filteredOrderSummaries.find((item) => item.code === selectedOrderCode) ?? filteredOrderSummaries[0] ?? null;
@@ -511,69 +372,14 @@ export function MaterialDashboard() {
 
   const selectedOrderMovementStats = useMemo(() => computeMovementTotals(selectedOrderMovements), [selectedOrderMovements]);
 
-  const selectedOrderDetail = useMemo(() => {
-    if (!selectedOrderSummary) return null;
-
-    const matchingHeader = productionHeaders.find((header) => header.code === selectedOrderSummary.code);
-    const latestMovement = selectedOrderMovements[0] ?? null;
-    const movementWorkers = Array.from(
-      new Set(selectedOrderMovements.map((item) => item.worker).filter((item) => item && item.trim().length > 0))
-    );
-    const movementMaterials = Array.from(
-      new Set(selectedOrderMovements.map((item) => item.material).filter((item) => item && item.trim().length > 0))
-    );
-    const movementStages = Array.from(
-      new Set(selectedOrderMovements.map((item) => item.stage).filter((item) => item && item.trim().length > 0))
-    );
-
-    return {
-      code: selectedOrderSummary.code,
-      sku: pickText(selectedOrderSummary.sku, matchingHeader?.sku),
-      productName: pickText(selectedOrderSummary.productName, matchingHeader?.productName),
-      deliveryStatus: pickText(selectedOrderSummary.deliveryStatus, matchingHeader?.deliveryStatus),
-      operationalStatus: latestMovement?.status || selectedOrderSummary.status,
-      customerName: pickText(selectedOrderSummary.customerName, matchingHeader?.customerName),
-      qtyPiece:
-        pickNumber(latestMovement?.qtyPiece, selectedOrderSummary.qtyPiece, matchingHeader?.qtyPiece) > 0
-          ? pickNumber(latestMovement?.qtyPiece, selectedOrderSummary.qtyPiece, matchingHeader?.qtyPiece)
-          : null,
-      salesType: pickText(selectedOrderSummary.salesType, matchingHeader?.salesType),
-      plannedDate: pickText(selectedOrderSummary.plannedDate, matchingHeader?.plannedDate),
-      deadlineDate: pickText(selectedOrderSummary.deadlineDate, matchingHeader?.deadlineDate),
-      completedDate: pickText(selectedOrderSummary.completedDate, matchingHeader?.completedDate),
-      deliveredQty:
-        pickNumber(selectedOrderSummary.deliveredQty, matchingHeader?.deliveredQty) > 0
-          ? pickNumber(selectedOrderSummary.deliveredQty, matchingHeader?.deliveredQty)
-          : null,
-      destination: pickText(latestMovement?.destination, selectedOrderSummary.destination, matchingHeader?.destination),
-      stage: pickText(latestMovement?.stage, movementStages[0], selectedOrderSummary.plannedStage, matchingHeader?.plannedStage),
-      worker: pickText(latestMovement?.worker, movementWorkers[0], selectedOrderSummary.plannedWorker, matchingHeader?.plannedWorker),
-      plannedMaterial: pickText(latestMovement?.material, movementMaterials[0], selectedOrderSummary.plannedMaterial, matchingHeader?.plannedMaterial),
-      materialSpec: pickText(selectedOrderSummary.materialSpec, matchingHeader?.materialSpec),
-      goldAgeValue: pickNumber(latestMovement?.goldAge, selectedOrderSummary.plannedGoldAge, matchingHeader?.plannedGoldAge),
-      actualProgressNote: pickText(selectedOrderSummary.actualProgressNote, matchingHeader?.actualProgressNote),
-      movementMaterials,
-      movementWorkers,
-      movementCount: selectedOrderMovements.length
-    };
-  }, [productionHeaders, selectedOrderMovements, selectedOrderSummary]);
+  const selectedOrderDetail = useMemo(
+    () => buildSelectedOrderDetail(selectedOrderSummary, selectedOrderMovements, productionHeaders),
+    [productionHeaders, selectedOrderMovements, selectedOrderSummary]
+  );
 
   const isEditingSelectedOrder = Boolean(selectedOrderSummary && editingProductionCode === selectedOrderSummary.code);
 
-  const productionOverview = useMemo(() => {
-    const noMovementCount = filteredOrderSummaries.filter((summary) => summary.movementCount === 0).length;
-    const overdueCount = filteredOrderSummaries.filter(
-      (summary) => Boolean(summary.deadlineDate && summary.deadlineDate < toIsoDate() && summary.deliveryStatus !== "Hoàn tất")
-    ).length;
-    const inProgressCount = filteredOrderSummaries.filter((summary) => summary.status === "Đang xử lý").length;
-
-    return {
-      total: filteredOrderSummaries.length,
-      noMovementCount,
-      overdueCount,
-      inProgressCount
-    };
-  }, [filteredOrderSummaries]);
+  const productionOverview = useMemo(() => buildProductionOverview(filteredOrderSummaries), [filteredOrderSummaries]);
 
   const totals = useMemo(() => {
     return orders.reduce(
@@ -593,17 +399,47 @@ export function MaterialDashboard() {
 
   const lossReportRows = useMemo(() => buildLossReportRows(orders), [orders]);
 
-  const workerOptionsForDraft = useMemo(() => {
-    const selectedStage = normalizeStageCode(draft.stage);
-    const matches = workers.filter((worker) => worker.stages.includes(selectedStage));
-    return matches.length > 0 ? matches : workers;
-  }, [draft.stage, workers]);
-
   const stageRules = useMemo(() => {
     const rules: Record<string, HaoHutRule> = {};
     for (const stage of stages) rules[stage.stage_code] = stage.hao_hut_rule;
     return rules;
   }, [stages]);
+
+  const {
+    draft,
+    setDraft,
+    editingMovementId,
+    setEditingMovementId,
+    isMovementFormOpen,
+    setIsMovementFormOpen,
+    setMovementFormTab,
+    movementFormTab,
+    updateDraft,
+    addOrder,
+    addOrderAsync,
+    changeOrderStatus,
+    removeOrder,
+    openMovementForEdit,
+    closeMovementForm,
+    openEmptyMovementForm
+  } = useMaterialMovements({
+    orders,
+    stageRules,
+    movementDraftCache,
+    setOrders,
+    setMovementDraftCache,
+    setSelectedOrderCode,
+    setActiveModule,
+    reloadOperationalData,
+    pushAudit,
+    setRemoteError
+  });
+
+  const workerOptionsForDraft = useMemo(() => {
+    const selectedStage = normalizeStageCode(draft.stage);
+    const matches = workers.filter((worker) => worker.stages.includes(selectedStage));
+    return matches.length > 0 ? matches : workers;
+  }, [draft.stage, workers]);
 
   const stageOptionsForDropdown = useMemo(() => {
     const all = buildStageOptionsForDropdown(stages, journalStages);
@@ -683,148 +519,6 @@ export function MaterialDashboard() {
     return dbOptions.map((item) => ({ value: item.option_code, label: item.option_label }));
   }
 
-  function updateDraft<K extends keyof ProductionOrder>(key: K, value: ProductionOrder[K]) {
-    setDraft((current) => {
-      const next = { ...current, [key]: value };
-      const occurredDate = key === "occurredDate" ? String(value || toIsoDate()) : next.occurredDate || toIsoDate();
-      const statusValue = key === "status" ? (value as Status) : next.status;
-      const issued = key === "issued" ? Number(value) : next.issued;
-      const returned = key === "returned" ? Number(value) : next.returned;
-      const transferred = key === "transferred" ? Number(value) : (next.transferred ?? 0);
-      const goldAge = key === "goldAge" ? Number(value) : Number(next.goldAge || 1);
-
-      next.loss = Math.max(0, Number((issued - returned - transferred).toFixed(4)));
-      next.powder = 0;
-      next.nxtPeriod = key === "occurredDate" ? toMonthCode(occurredDate) : next.nxtPeriod;
-      next.lossPeriod = key === "occurredDate" || key === "status" ? getCarryOverLossPeriod(occurredDate, statusValue) : next.lossPeriod;
-      next.code = key === "occurredDate" && (!current.code || current.code.startsWith("DHAG-")) ? buildProductionOrderCode("DHAG", occurredDate) : next.code;
-      next.convertedIssueWeight = Number((issued * goldAge).toFixed(4));
-      next.convertedReturnWeight = Number((returned * goldAge).toFixed(4));
-      return next;
-    });
-    setRemoteError(null);
-  }
-
-  function addOrder(resetMode: "close" | "clearStage" | "keepStage" = "close") {
-    void addOrderAsync(resetMode);
-  }
-
-  async function addOrderAsync(resetMode: "close" | "clearStage" | "keepStage" = "close") {
-    const missingFields = validateMovementDraft(draft);
-    if (missingFields.length > 0) {
-      setRemoteError(`Chưa thể lưu giao dịch. Vui lòng bổ sung: ${missingFields.join(", ")}.`);
-      return;
-    }
-    const existingSummary = orderSummaries.find((summary) => summary.code === draft.code.trim());
-    const normalizedDraft = applyProductionBusinessRules(draft, orders);
-
-    if (shouldForceDirectCharge(normalizedDraft.stage, normalizedDraft.status, stageRules)) {
-      const detail = "Trạng thái Xác định chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến.";
-      pushAudit("blocked_direct_charge_stage", detail);
-      setRemoteError(detail);
-      return;
-    }
-
-    if (isLargeWeightMovement(normalizedDraft)) {
-      pushAudit("large_weight_warning", `Giao dịch ${normalizedDraft.code} có trọng lượng trên 2000g, cần kiểm tra trước khi chốt.`);
-    }
-
-    // Khau chi 1 tho (CKE/DAN/KBI): moi (LSX + khau) chi giu 1 dong - neu
-    // khau nay cua LSX da co dong roi thi cap nhat len chinh dong do,
-    // khong tao them dong moi. Khau nhieu tho: moi lan luu la 1 dong rieng
-    // (them tho khac), tru khi dang sua 1 dong co san (editingMovementId).
-    const normalizedStageCode = normalizeStageCode(normalizedDraft.stage);
-    const existingStageMovement = isSingleWorkerStage(normalizedStageCode)
-      ? orders.find(
-          (order) =>
-            order.code === normalizedDraft.code.trim() &&
-            normalizeStageCode(order.stage) === normalizedStageCode
-        )
-      : undefined;
-    const effectiveEditingId = editingMovementId || existingStageMovement?.id || null;
-
-    const nextOrder = {
-      ...normalizedDraft,
-      id: effectiveEditingId || normalizedDraft.id || crypto.randomUUID(),
-      code: normalizedDraft.code.trim(),
-      sku: normalizedDraft.sku.trim(),
-      worker: normalizedDraft.worker.trim()
-    };
-
-    try {
-      const savedOrder =
-        effectiveEditingId
-          ? isSupabaseConfigured
-            ? await updateMaterialMovement(nextOrder)
-            : nextOrder
-          : isSupabaseConfigured
-            ? await createMaterialMovement(nextOrder)
-            : nextOrder;
-      const nextMovementDraftCache = { ...movementDraftCache, [savedOrder.code]: savedOrder };
-      setMovementDraftCache(nextMovementDraftCache);
-      if (isSupabaseConfigured) {
-        await reloadOperationalData({
-          movementDraftOverrides: nextMovementDraftCache
-        });
-      } else {
-        setOrders((current) =>
-          effectiveEditingId ? current.map((item) => (item.id === effectiveEditingId ? savedOrder : item)) : [savedOrder, ...current]
-        );
-      }
-      setSelectedOrderCode(savedOrder.code);
-      if (effectiveEditingId) {
-        pushAudit("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`);
-        await createAuditLog("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
-      } else {
-        pushAudit("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`);
-        await createAuditLog("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
-      }
-      if (resetMode === "close") {
-        setDraft(createEmptyOrder());
-        setEditingMovementId(null);
-        setIsMovementFormOpen(false);
-        setActiveModule("Nhật ký NVL");
-      } else if (resetMode === "keepStage") {
-        // "+ Them tho khac": giu nguyen khau dang chon, chi xoa Tho/So
-        // lieu de nhap tiep 1 tho khac cho DUNG khau nay (danh cho khau
-        // nhieu tho).
-        setEditingMovementId(null);
-        setDraft((current) => ({
-          ...current,
-          id: "",
-          worker: "",
-          qtyPiece: 0,
-          issued: 0,
-          returned: 0,
-          transferred: 0,
-          loss: 0,
-          sourceMaterialName: ""
-        }));
-      } else {
-        // "clearStage": giu drawer mo de chuyen sang khau khac cua cung
-        // LSX. Xoa ca khau dang chon (khong chi xoa so lieu) de "Dang
-        // nhap: ..." quay ve trang thai "Chua chon khau" - tranh cam giac
-        // du lieu vua luu bi mat khi form van hien khau vua xong nhung
-        // trong tron.
-        setEditingMovementId(null);
-        setDraft((current) => ({
-          ...current,
-          id: "",
-          stage: "",
-          worker: "",
-          qtyPiece: 0,
-          issued: 0,
-          returned: 0,
-          transferred: 0,
-          loss: 0,
-          sourceMaterialName: ""
-        }));
-      }
-    } catch (error) {
-      setRemoteError(error instanceof Error ? error.message : editingMovementId ? "Không cập nhật được giao dịch" : "Không thêm được giao dịch");
-    }
-  }
-
   function pushAudit(action: string, detail: string) {
     setAuditEvents((current) => [
       {
@@ -835,60 +529,6 @@ export function MaterialDashboard() {
       },
       ...current
     ].slice(0, 20));
-  }
-
-  function changeOrderStatus(id: string, nextStatus: Status) {
-    const target = orders.find((order) => order.id === id);
-    if (!target) return;
-
-    if (isClosedStatus(target.status) && !isClosedStatus(nextStatus)) {
-      const detail = `Không thể đổi trạng thái giao dịch ${target.code} vì LSX đã chốt`;
-      pushAudit("blocked_update_status", detail);
-      setRemoteError(detail);
-      return;
-    }
-
-    const nextOrdersSnapshot = orders.map((order) => (order.id === id ? { ...order, status: nextStatus } : order));
-
-    setOrders((current) =>
-      current.map((order) => {
-        if (order.id !== id) return order;
-        if (order.status !== nextStatus) {
-          pushAudit("update_status", `${order.code}: ${order.status} -> ${nextStatus}`);
-        }
-        return { ...order, status: nextStatus };
-      })
-    );
-
-    const nextOrderStatus = getSummaryStatus(
-      nextOrdersSnapshot.filter((order) => order.code === target.code).map((order) => order.status)
-    );
-
-    void updateMaterialMovementStatus(id, nextStatus).catch((error) => {
-      setRemoteError(error instanceof Error ? error.message : "Không cập nhật được trạng thái");
-    });
-    void updateProductionOrderStatus(target.code, nextOrderStatus).catch((error) => {
-      setRemoteError(error instanceof Error ? error.message : "Không đồng bộ được trạng thái LSX");
-    });
-    void createAuditLog("update_status", `${target.code}: ${target.status} -> ${nextStatus}`, id);
-  }
-
-  function removeOrder(id: string) {
-    const target = orders.find((order) => order.id === id);
-    if (target && isClosedStatus(target.status)) {
-      const detail = `Không thể xóa giao dịch ${target.code} vì LSX đã chốt`;
-      pushAudit("blocked_delete_movement", detail);
-      setRemoteError(detail);
-      return;
-    }
-
-    setOrders((current) => current.filter((order) => order.id !== id));
-    if (target) pushAudit("delete_movement", `Xóa giao dịch ${target.code} - ${target.worker}`);
-
-    void deleteMaterialMovement(id).catch((error) => {
-      setRemoteError(error instanceof Error ? error.message : "Không xóa được giao dịch");
-    });
-    if (target) void createAuditLog("delete_movement", `Xóa giao dịch ${target.code} - ${target.worker}`, id);
   }
 
   function resetDemoData() {
@@ -936,22 +576,6 @@ export function MaterialDashboard() {
     setEditingProductionCode(summary.code);
     setProductionHeaderDraft(buildProductionHeaderDraftFromSummary(summary));
     setIsProductionFormOpen(true);
-  }
-
-  function openMovementForEdit(order: ProductionOrder) {
-    setEditingMovementId(order.id);
-    setDraft({ ...order });
-    setSelectedOrderCode(order.code);
-    setMovementFormTab("info");
-    setIsMovementFormOpen(true);
-    setActiveModule("Nhật ký NVL");
-  }
-
-  function closeMovementForm() {
-    setIsMovementFormOpen(false);
-    setEditingMovementId(null);
-    setDraft(createEmptyOrder());
-    setRemoteError(null);
   }
 
   function renderProductionFormOverlay() {
@@ -1669,7 +1293,6 @@ export function MaterialDashboard() {
   const draftOrderSummary = orderSummaries.find((summary) => summary.code === draft.code.trim());
   const isDraftForClosedOrder = Boolean(draftOrderSummary && isClosedStatus(draftOrderSummary.status));
   const normalizedDraftStage = normalizeStageCode(draft.stage);
-  const isDraftLargeWeight = isLargeWeightMovement(draft);
   const isDraftDirectChargeInvalid = shouldForceDirectCharge(normalizedDraftStage, draft.status, stageRules);
   const isAdmin = appUser?.role === "admin";
   const visibleNavItems = isAdmin ? navItems : navItems.filter(([label]) => label !== "Cấu hình");
@@ -1912,204 +1535,35 @@ export function MaterialDashboard() {
             </div>
           </section>
 
-          <section className={`${isProduction ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-ink">Quản lý lệnh sản xuất</h3>
-                  <p className="mt-1 text-sm text-zinc-600">
-                    Tạo LSX trước, sau đó mới ghi nhận xuất/nhập nguyên vật liệu trong Nhật ký NVL.
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white"
-                    type="button"
-                    onClick={() => {
-                      setEditingProductionCode(null);
-                      const emptyDraft = createEmptyProductionOrderHeaderDraft();
-                      setProductionHeaderDraft({
-                        ...emptyDraft,
-                        code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), orderSummaries.map((summary) => summary.code))
-                      });
-                      setIsProductionFormOpen((current) => !current);
-                    }}
-                  >
-                    <Plus size={16} />
-                    Tạo LSX
-                  </button>
-                  <button
-                    className="inline-flex items-center justify-center rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
-                    type="button"
-                    onClick={() => {
-                      setSelectedOrderCode(null);
-                      setIsProductionDetailOpen(false);
-                    }}
-                  >
-                    Xem tất cả LSX
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-3">
-                <div className="rounded-md border border-line bg-paper px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tổng LSX</p>
-                  <p className="mt-2 text-2xl font-bold text-ink">{productionOverview.total}</p>
-                </div>
-                <div className="rounded-md border border-sky-200 bg-sky-50/70 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Đang xử lý</p>
-                  <p className="mt-2 text-2xl font-bold text-sky-900">{productionOverview.inProgressCount}</p>
-                </div>
-                <div className="rounded-md border border-rose-200 bg-rose-50/70 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">Quá hạn deadline</p>
-                  <p className="mt-2 text-2xl font-bold text-rose-900">{productionOverview.overdueCount}</p>
-                </div>
-              </div>
-
-              <div className="grid gap-3 rounded-md border border-line bg-paper p-3 lg:grid-cols-4">
-                <select
-                  className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-                  value={productionDeliveryStatus}
-                  onChange={(event) => setProductionDeliveryStatus(event.target.value)}
-                >
-                  <option>Tất cả trạng thái LSX</option>
-                  {productionOrderDeliveryStatusOptions.map((item) => (
-                    <option key={item.value} value={item.value}>{item.label}</option>
-                  ))}
-                </select>
-                <select
-                  className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-                  value={productionSalesType}
-                  onChange={(event) => setProductionSalesType(event.target.value)}
-                >
-                  <option>Tất cả SR/KH</option>
-                  {productionOrderSalesTypeOptions.map((item) => (
-                    <option key={item.value} value={item.value}>{item.label}</option>
-                  ))}
-                </select>
-                <select
-                  className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-                  value={productionDeadlineFilter}
-                  onChange={(event) => setProductionDeadlineFilter(event.target.value)}
-                >
-                  <option>Tất cả deadline</option>
-                  <option>Quá hạn</option>
-                  <option>Hôm nay</option>
-                  <option>7 ngày tới</option>
-                  <option>Chưa có deadline</option>
-                </select>
-                <input
-                  className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-                  placeholder="Tìm LSX, mã hàng, khách hàng..."
-                  value={productionCustomerQuery}
-                  onChange={(event) => setProductionCustomerQuery(event.target.value)}
-                />
-              </div>
-
-              <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-bold text-ink">Danh sách lệnh sản xuất</h4>
-                      <p className="mt-1 text-xs text-zinc-500">Bấm vào dòng để mở chi tiết.</p>
-                    </div>
-                    <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
-                      {filteredOrderSummaries.length} LSX
-                    </span>
-                  </div>
-                  <div className="overflow-x-auto rounded-md border border-line bg-white">
-                    <table className="w-full min-w-[1360px] border-collapse text-sm">
-                      <thead>
-                        <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
-                          <th className="px-3 py-3">Mã LSX</th>
-                          <th className="px-3 py-3">Mã hàng</th>
-                          <th className="px-3 py-3">Tên hàng</th>
-                          <th className="px-3 py-3">Khách hàng</th>
-                          <th className="px-3 py-3">SR/KH</th>
-                          <th className="px-3 py-3">Deadline đơn hàng</th>
-                          <th className="px-3 py-3 text-right">Số lượng</th>
-                          <th className="px-3 py-3 text-right" title="Số dòng đã ghi nhận trong Nhật ký NVL cho LSX này - khác với thông tin trong form LSX.">
-                            Số GD NVL
-                          </th>
-                          <th className="px-3 py-3">Khâu hiện tại</th>
-                          <th className="px-3 py-3">Trạng thái LSX</th>
-                          <th className="px-3 py-3">Trạng thái vận hành</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredOrderSummaries.map((summary) => (
-                          <tr
-                            key={summary.code}
-                            className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
-                              selectedOrderCode === summary.code ? "bg-emerald-50/60" : "bg-white"
-                            }`}
-                            onClick={() => selectProductionOrder(summary.code)}
-                          >
-                            <td className="px-3 py-3 align-top">
-                              <p className="font-semibold text-ink">{summary.code}</p>
-                            </td>
-                            <td className="px-3 py-3 align-top text-zinc-700">{summary.sku || "-"}</td>
-                            <td className="px-3 py-3 align-top">
-                              <p className={`max-w-[240px] truncate font-medium ${hasMeaningfulText(summary.productName) ? "text-zinc-800" : "text-zinc-400"}`}>
-                                {summary.productName || "Chưa cập nhật"}
-                              </p>
-                            </td>
-                            <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.customerName) ? "text-zinc-700" : "text-zinc-400"}`}>
-                              {summary.customerName || "Chưa cập nhật"}
-                            </td>
-                            <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.salesType) ? "text-zinc-700" : "text-zinc-400"}`}>
-                              {summary.salesType || "Chưa cập nhật"}
-                            </td>
-                            <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
-                              {formatDisplayDate(summary.deadlineDate) || "Chưa cập nhật"}
-                            </td>
-                            <td className="px-3 py-3 text-right align-top text-zinc-700">
-                              {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
-                            </td>
-                            <td
-                              className={`px-3 py-3 text-right align-top ${summary.movementCount > 0 ? "text-zinc-700" : "text-zinc-400"}`}
-                              title={
-                                summary.movementCount > 0
-                                  ? `${summary.movementCount} dòng đã ghi trong Nhật ký NVL`
-                                  : "Chưa có giao dịch nào trong Nhật ký NVL cho LSX này"
-                              }
-                            >
-                              {summary.movementCount}
-                            </td>
-                            <td className="px-3 py-3 align-top">
-                              {(() => {
-                                const stageCode = summary.plannedStage ? normalizeProductionStageCode(summary.plannedStage) : "";
-                                const stageIndex = stageCode ? stageOptionsForDropdown.findIndex((item) => item.value === stageCode) : -1;
-                                if (stageIndex < 0) {
-                                  return <span className="text-xs text-zinc-400">Chưa bắt đầu</span>;
-                                }
-                                return (
-                                  <span className="inline-flex flex-col text-xs">
-                                    <span className="font-semibold text-ink">
-                                      Khâu {stageIndex + 1}/{stageOptionsForDropdown.length}
-                                    </span>
-                                    <span className="text-zinc-500">{getStageLabel(stageCode)}</span>
-                                  </span>
-                                );
-                              })()}
-                            </td>
-                            <td className="px-3 py-3 align-top">
-                              <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
-                                {summary.deliveryStatus || "Chưa cập nhật"}
-                              </span>
-                            </td>
-                            <td className="px-3 py-3 align-top">
-                              <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
-                                {summary.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-              </div>
-            </div>
-          </section>
+          <ProductionOrdersView
+            isVisible={isProduction}
+            productionOverview={productionOverview}
+            filteredOrderSummaries={filteredOrderSummaries}
+            selectedOrderCode={selectedOrderCode}
+            stageOptionsForDropdown={stageOptionsForDropdown}
+            productionDeliveryStatus={productionDeliveryStatus}
+            productionSalesType={productionSalesType}
+            productionDeadlineFilter={productionDeadlineFilter}
+            productionCustomerQuery={productionCustomerQuery}
+            onDeliveryStatusChange={setProductionDeliveryStatus}
+            onSalesTypeChange={setProductionSalesType}
+            onDeadlineFilterChange={setProductionDeadlineFilter}
+            onCustomerQueryChange={setProductionCustomerQuery}
+            onCreateOrder={() => {
+              setEditingProductionCode(null);
+              const emptyDraft = createEmptyProductionOrderHeaderDraft();
+              setProductionHeaderDraft({
+                ...emptyDraft,
+                code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), orderSummaries.map((summary) => summary.code))
+              });
+              setIsProductionFormOpen((current) => !current);
+            }}
+            onShowAllOrders={() => {
+              setSelectedOrderCode(null);
+              setIsProductionDetailOpen(false);
+            }}
+            onSelectOrder={selectProductionOrder}
+          />
 
           {isProduction ? (
             <>
@@ -2372,530 +1826,39 @@ export function MaterialDashboard() {
           ) : null}
 
           <div className={`${isMovement || isMovementFormOpen ? "unified-stack" : "hidden"}`}>
-            <section className={`${isMovement ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-ink">Nhật ký xuất/nhập NVL</h3>
-                  <p className="mt-1 text-sm text-zinc-600">Màn này chỉ dùng để tiếp nhận LSX mới và ghi nhận giao dịch NVL phát sinh.</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold uppercase tracking-wide text-white"
-                    type="button"
-                    onClick={() => {
-                      setEditingMovementId(null);
-                      setDraft(createEmptyOrder());
-                      setRemoteError(null);
-                      setMovementFormTab("info");
-    setIsMovementFormOpen(true);
-                    }}
-                  >
-                    <Plus size={16} />
-                    Thêm giao dịch
-                  </button>
-                  <input
-                    className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-                    placeholder="Tìm LSX, mã hàng, thợ..."
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                  />
-                  <select
-                    className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-                    value={status}
-                    onChange={(event) => setStatus(event.target.value as typeof status)}
-                  >
-                    {statusOptions.map((item) => (
-                      <option key={item} value={item}>{item}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+            <MaterialJournalView
+              isVisible={isMovement}
+              orders={filteredOrders}
+              query={query}
+              status={status}
+              recentCreatedOrderCode={recentCreatedOrderCode}
+              onAddMovement={openEmptyMovementForm}
+              onEditMovement={openMovementForEdit}
+              onQueryChange={setQuery}
+              onStatusChange={(nextStatus) => setStatus(nextStatus)}
+              onChangeOrderStatus={changeOrderStatus}
+            />
 
-              <div className="mt-4 overflow-x-auto">
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-ink">Lịch sử giao dịch NVL</h4>
-                    <p className="mt-1 text-xs text-zinc-500">Bấm "Sửa NVL" để chỉnh sửa một dòng đã ghi nhận.</p>
-                  </div>
-                  {filteredOrders.length > 0 ? (
-                    <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
-                      {filteredOrders.length} dòng
-                    </span>
-                  ) : null}
-                </div>
-                {filteredOrders.length > 0 ? (
-                  <table className="w-full min-w-[1320px] border-collapse text-sm">
-                    <thead>
-                    <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
-                        <th className="px-3 py-3">Số CT</th>
-                        <th className="px-3 py-3">Mã hàng</th>
-                        <th className="px-3 py-3">Tên hàng</th>
-                        <th className="px-3 py-3">Mã LSX</th>
-                        <th className="px-3 py-3">Loại NVL</th>
-                        <th className="px-3 py-3">NVL</th>
-                        <th className="px-3 py-3">Thợ / công đoạn</th>
-                        <th className="px-3 py-3 text-right">SL SP</th>
-                        <th className="px-3 py-3 text-right">SL</th>
-                        <th className="px-3 py-3 text-right">Xuất</th>
-                        <th className="px-3 py-3 text-right">Nhập</th>
-                        <th className="px-3 py-3 text-right">Hao hụt</th>
-                        <th className="px-3 py-3">Hao/NXT</th>
-                        <th className="px-3 py-3">Trạng thái</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredOrders.map((order) => (
-                        <tr
-                          key={order.id}
-                          className={`border-b ${isClosedStatus(order.status) ? "" : "cursor-pointer hover:bg-paper"} ${recentCreatedOrderCode === order.code ? "border-emerald-200 bg-emerald-50/40" : "border-line/70"}`}
-                          onClick={() => {
-                            if (isClosedStatus(order.status)) return;
-                            openMovementForEdit(order);
-                          }}
-                          title={isClosedStatus(order.status) ? "Giao dịch đã chốt, không thể sửa" : "Bấm để sửa giao dịch này"}
-                        >
-                          <td className="px-3 py-3">
-                            <div className="font-semibold text-ink">{order.documentNo || order.documentInNo || "-"}</div>
-                            <div className="text-xs text-zinc-500">{formatDisplayDate(order.occurredDate) || "-"}</div>
-                          </td>
-                          <td className="px-3 py-3 font-semibold text-ink">{order.sku}</td>
-                          <td className="px-3 py-3 text-zinc-700">{order.productName || "-"}</td>
-                          <td className="px-3 py-3 font-semibold text-ink">{order.code}</td>
-                          <td className="px-3 py-3 text-zinc-700">{order.materialType || "-"}</td>
-                          <td className="px-3 py-3 text-zinc-700">{order.material}</td>
-                          <td className="px-3 py-3">
-                            <div className="font-medium text-zinc-800">{order.worker}</div>
-                            <div className="text-xs text-zinc-500">{order.stage ? getStageLabel(order.stage) : "-"}</div>
-                          </td>
-                          <td className="px-3 py-3 text-right text-zinc-700">{order.productQty ? order.productQty : "-"}</td>
-                          <td className="px-3 py-3 text-right text-zinc-700">{order.qtyPiece ?? "-"}</td>
-                          <td className={`px-3 py-3 text-right ${order.issued > 0 ? "text-zinc-700" : "text-zinc-400"}`}>{formatGram(order.issued)}</td>
-                          <td className={`px-3 py-3 text-right ${order.returned > 0 ? "text-zinc-700" : "text-zinc-400"}`}>{formatGram(order.returned)}</td>
-                          <td className={`px-3 py-3 text-right font-semibold ${order.loss > 0 ? "text-ink" : "text-zinc-400"}`}>{formatGram(order.loss)}</td>
-                          <td className="px-3 py-3 text-xs text-zinc-600">
-                            <div>{order.lossPeriod || "-"}</div>
-                            <div>{order.nxtPeriod || "-"}</div>
-                          </td>
-                          <td className="px-3 py-3" onClick={(event) => event.stopPropagation()}>
-                            <select
-                              className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 outline-none disabled:cursor-not-allowed disabled:opacity-70 ${statusClass[order.status]}`}
-                              value={order.status}
-                              onChange={(event) => changeOrderStatus(order.id, event.target.value as Status)}
-                              disabled={isClosedStatus(order.status)}
-                            >
-                              {statusOptions.filter((item) => item !== "Tất cả").map((item) => (
-                                <option key={item}>{item}</option>
-                              ))}
-                            </select>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <div className="rounded-md border border-dashed border-line bg-white px-4 py-8 text-sm text-zinc-500">
-                    Chưa có giao dịch NVL phát sinh theo bộ lọc hiện tại.
-                  </div>
-                )}
-              </div>
-            </section>
-
-            <div className={`${isMovementFormOpen ? "block" : "hidden"}`}>
-              {isMovementFormOpen ? (
-                <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-sm" onClick={closeMovementForm} />
-              ) : null}
-              <section
-                className={`fixed inset-y-0 right-0 z-50 w-full max-w-xl overflow-y-auto overflow-x-hidden border-l border-line bg-white p-5 shadow-2xl transition-transform duration-200 ${
-                  isMovementFormOpen ? "translate-x-0" : "pointer-events-none translate-x-full"
-                }`}
-                aria-hidden={!isMovementFormOpen}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-brass">
-                      {editingMovementId ? "Sửa giao dịch NVL" : "Thêm giao dịch NVL"}
-                    </p>
-                    <h3 className="font-display mt-1 text-2xl font-semibold text-ink">
-                      {editingMovementId ? draft.code || "Giao dịch NVL" : "Giao dịch mới"}
-                    </h3>
-                    <p className="mt-1 text-sm text-zinc-600">
-                      {editingMovementId ? "Chỉnh sửa trực tiếp bên dưới, bấm Cập nhật NVL để lưu." : "Nhập thông tin theo mẫu Nhật ký sản xuất tháng."}
-                    </p>
-                  </div>
-                  <button
-                    className="inline-flex size-9 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
-                    type="button"
-                    onClick={closeMovementForm}
-                    title="Đóng form"
-                  >
-                    <X size={17} />
-                  </button>
-                </div>
-                <div className="mt-4 grid gap-3">
-                  <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
-                        {editingMovementId ? "Đang sửa giao dịch" : "Giao dịch mới"}
-                      </span>
-                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                        Mã hàng: {draft.sku || "Chưa chọn"}
-                      </span>
-                      <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                        Công đoạn: {draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}
-                      </span>
-                    </div>
-                    {editingMovementId ? (
-                      <p className="mt-1.5 text-xs leading-5 text-zinc-600">
-                        Thông tin gốc của LSX đã khoá, sửa tại màn Lệnh sản xuất nếu cần.
-                      </p>
-                    ) : (
-                      <p className="mt-1.5 text-xs leading-5 text-zinc-600">
-                        Ưu tiên nhập theo thứ tự từ trên xuống để tránh ghi nhầm giao dịch.
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="inline-flex flex-wrap gap-1 rounded-full border border-line bg-paper p-1">
-                    {([
-                      ["info", "Thông tin"],
-                      ["stage", "Công đoạn"],
-                      ["advanced", "Nâng cao"]
-                    ] as const).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-                          movementFormTab === key ? "bg-ink text-white" : "text-zinc-600 hover:bg-white/70 hover:text-ink"
-                        }`}
-                        onClick={() => setMovementFormTab(key)}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {movementFormTab === "info" ? (
-                    <DrawerSection title="Thông tin LSX" note={editingMovementId ? "Mã LSX đã khoá; các trường còn lại vẫn sửa được và áp dụng cho cả lệnh." : "Nhóm nhận diện đơn và sản phẩm đang thao tác."}>
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        <FieldShell label="Mã LSX" required>
-                          <input
-                            className={fieldControlClass}
-                            placeholder="VD: DHAG-260713"
-                            value={draft.code}
-                            disabled={!!editingMovementId}
-                            onChange={(e) => updateDraft("code", e.target.value)}
-                          />
-                        </FieldShell>
-                        <FieldShell label="Mã hàng" required>
-                          <input
-                            className={fieldControlClass}
-                            placeholder="VD: RG750Y"
-                            value={draft.sku}
-                            onChange={(e) => updateDraft("sku", e.target.value)}
-                          />
-                        </FieldShell>
-                        <FieldShell label="SL sản phẩm" hint="Số lượng sản phẩm của cả lệnh (nhập 1 lần cho LSX).">
-                          <input
-                            className={fieldControlClass}
-                            min="0"
-                            type="number"
-                            placeholder="0"
-                            value={draft.productQty || ""}
-                            onChange={(e) => updateDraft("productQty", Number(e.target.value))}
-                          />
-                        </FieldShell>
-                      </div>
-                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                        <FieldShell label="Loại NVL" hint="Nhóm nguyên liệu/BTP/bột/phụ kiện.">
-                          <SelectControl value={draft.materialType ?? ""} onChange={(value) => updateDraft("materialType", value)}>
-                            <option value="">Chọn loại NVL</option>
-                            {getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions).map((item) => (
-                              <option key={item.value} value={item.value} title={item.label}>{item.label}</option>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                        <FieldShell label="Tên hàng / diễn giải">
-                          <input
-                            className={fieldControlClass}
-                            placeholder="Tên sản phẩm hoặc ghi chú nhận diện"
-                            value={draft.productName ?? ""}
-                            onChange={(e) => updateDraft("productName", e.target.value)}
-                          />
-                        </FieldShell>
-                      </div>
-                    </DrawerSection>
-                  ) : null}
-
-                  {movementFormTab === "info" ? (
-                  <DrawerSection title="Thông tin chứng từ" note="Phục vụ đối chiếu ngày nghiệp vụ và số chứng từ nhập/xuất.">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <FieldShell label="Ngày nghiệp vụ" hint="Ngày phát sinh xuất/nhập NVL." required>
-                        <input className={fieldControlClass} type="date" value={draft.occurredDate ?? ""} onChange={(e) => updateDraft("occurredDate", e.target.value)} />
-                      </FieldShell>
-                      <FieldShell label="Nơi nhận" required>
-                        <SelectControl value={draft.destination ?? ""} onChange={(value) => updateDraft("destination", value)}>
-                          <option value="">Chọn nơi nhận</option>
-                          {getDynamicOptions("nk_nvl_noi_nhan", journalDestinations).map((item) => (
-                            <option key={item.value} value={item.value} title={item.label}>{item.label}</option>
-                          ))}
-                        </SelectControl>
-                      </FieldShell>
-                    </div>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <FieldShell label="Số CT xuất">
-                        <input className={fieldControlClass} placeholder="Tự sinh nếu bỏ trống" value={draft.documentNo ?? ""} onChange={(e) => updateDraft("documentNo", e.target.value)} />
-                      </FieldShell>
-                      <FieldShell label="Số CT nhập">
-                        <input className={fieldControlClass} placeholder="Nếu có" value={draft.documentInNo ?? ""} onChange={(e) => updateDraft("documentInNo", e.target.value)} />
-                      </FieldShell>
-                    </div>
-                  </DrawerSection>
-                  ) : null}
-
-                  {movementFormTab === "stage" ? (
-                  <DrawerSection title="Công đoạn & số lượng" note="Chọn khâu rồi điền Thợ/Xuất/Nhập ngay bên dưới; khâu có dấu ✓ là đã ghi nhận, khâu ○ chưa nhập thì có thể bỏ qua.">
-                    <FieldShell label="Chọn khâu để cập nhật" hint={draft.code ? "Mỗi khâu lưu thành một dòng riêng trong Nhật ký NVL." : "Nhập Mã LSX ở trên trước rồi mới chọn khâu."} required>
-                      <div className="grid grid-cols-3 gap-1.5">
-                        {stageOptionsForDropdown.map((item) => {
-                          const done = draftStageMovements.has(item.value);
-                          const active = normalizeStageCode(draft.stage) === item.value;
-                          return (
-                            <button
-                              key={item.value}
-                              type="button"
-                              disabled={!draft.code.trim()}
-                              onClick={() => selectStageTab(item.value)}
-                              className={`relative flex h-9 items-center justify-center rounded-md border text-xs font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                                active
-                                  ? "border-jade bg-jade text-white"
-                                  : done
-                                    ? "border-jade/40 bg-jade/10 text-ink hover:border-jade/60"
-                                    : "border-dashed border-line/70 text-zinc-400 hover:border-line"
-                              }`}
-                              title={item.label}
-                            >
-                              {item.value}
-                              {done && !active ? (
-                                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-jade text-[10px] text-white">✓</span>
-                              ) : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </FieldShell>
-
-                    <div className={`mt-4 rounded-md border-2 p-3 ${draft.stage ? "border-jade bg-jade/10" : "border-dashed border-line bg-paper/60"}`}>
-                      <p className={`text-sm font-bold ${draft.stage ? "text-jade" : "text-zinc-400"}`}>
-                        {draft.stage ? `● Đang nhập: ${getStageLabel(draft.stage)}` : "Chưa chọn khâu — bấm 1 ô ở trên"}
-                      </p>
-                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                        <FieldShell label="Trạng thái công đoạn" required>
-                          <SelectControl value={draft.stageStatus ?? "Đang thực hiện"} onChange={(value) => updateDraft("stageStatus", value)}>
-                            {movementStageStatusOptions.map((item) => (
-                              <option key={item.value} value={item.value}>{item.label}</option>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                        <FieldShell label="Thợ phụ trách" hint="Danh sách thợ được lọc theo công đoạn nếu có dữ liệu." required>
-                          <SelectControl
-                            value={draft.worker}
-                            onChange={(value) => updateDraft("worker", value)}
-                          >
-                            <option value="">Chọn thợ</option>
-                            {workerOptionsForDraft.map((worker) => (
-                              <option key={worker.id} value={worker.full_name}>{worker.full_name}</option>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                      </div>
-
-                      <div className={`mt-3 grid gap-3 ${normalizeStageCode(draft.stage) === "DKB" ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-                        {normalizeStageCode(draft.stage) === "DKB" ? (
-                          <FieldShell label="Số lượng viên/sợi">
-                            <input className={fieldControlClass} min="0" type="number" placeholder="0" value={draft.qtyPiece || ""} onChange={(e) => updateDraft("qtyPiece", Number(e.target.value))} />
-                          </FieldShell>
-                        ) : null}
-                        <FieldShell label="Xuất gram">
-                          <input className={fieldControlClass} min="0" type="number" placeholder="0.00" value={draft.issued || ""} onChange={(e) => updateDraft("issued", Number(e.target.value))} />
-                        </FieldShell>
-                        <FieldShell label="Nhập gram">
-                          <input className={fieldControlClass} min="0" type="number" placeholder="0.00" value={draft.returned || ""} onChange={(e) => updateDraft("returned", Number(e.target.value))} />
-                        </FieldShell>
-                      </div>
-                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                        <FieldShell label="Trạng thái tính hao" required>
-                          <SelectControl value={draft.status} onChange={(value) => updateDraft("status", value as Status)}>
-                            {movementLossStatusOptions.map((item) => (
-                              <option key={item.value} value={item.value}>{item.label}</option>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                      </div>
-                      <div className="mt-3">
-                        <FieldShell label="Diễn giải giao dịch">
-                          <input
-                            className={fieldControlClass}
-                            placeholder="Nhập diễn giải giao dịch (VD: Xuất cán kéo)"
-                            value={draft.sourceMaterialName ?? ""}
-                            onChange={(e) => updateDraft("sourceMaterialName", e.target.value)}
-                          />
-                        </FieldShell>
-                      </div>
-
-                      {draft.stage && !isSingleWorkerStage(draft.stage) ? (
-                        <div className="mt-3 rounded-md border border-dashed border-line bg-white p-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                            Thợ đã ghi nhận cho khâu này ({currentDrawerStageMovements.length})
-                          </p>
-                          {currentDrawerStageMovements.length > 0 ? (
-                            <div className="mt-2 grid gap-1.5">
-                              {currentDrawerStageMovements.map((movement) => (
-                                <div
-                                  key={movement.id}
-                                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-paper px-3 py-1.5 text-xs"
-                                >
-                                  <span className="font-medium text-zinc-800">{movement.worker || "(chưa có thợ)"}</span>
-                                  <div className="flex flex-wrap items-center gap-3 text-zinc-600">
-                                    <span>Xuất {formatGram(movement.issued)}</span>
-                                    <span>Nhập {formatGram(movement.returned)}</span>
-                                    <button
-                                      className="inline-flex size-6 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                      type="button"
-                                      title="Xóa thợ này khỏi khâu"
-                                      disabled={isClosedStatus(movement.status)}
-                                      onClick={() => removeOrder(movement.id)}
-                                    >
-                                      <Trash2 size={12} />
-                                    </button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="mt-1 text-xs text-zinc-400">Chưa có thợ nào. Điền Thợ/Xuất/Nhập ở trên rồi bấm "+ Thêm thợ vào khâu".</p>
-                          )}
-                          <button
-                            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:border-zinc-200 disabled:text-zinc-400"
-                            type="button"
-                            onClick={() => addOrder("keepStage")}
-                            disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
-                            title="Lưu thợ đang nhập rồi để trống cho thợ tiếp theo của cùng khâu"
-                          >
-                            <Plus size={15} />
-                            Thêm thợ vào khâu
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                  </DrawerSection>
-                  ) : null}
-
-                  {movementFormTab === "advanced" ? (
-                  <DrawerSection title="Thông tin NXT / tính hao" note="Nhóm phục vụ báo cáo nhập xuất tồn và quy đổi hao hụt theo tuổi vàng. Chỉ nhập khi cần NXT, quy đổi KCP hoặc nguồn nhập/xuất.">
-                    <div className="grid gap-3">
-                      <div className="grid grid-cols-2 gap-2">
-                        <FieldShell label="Tháng tính hao" hint="Kỳ dùng để quyết toán hao hụt.">
-                          <input className={fieldControlClass} type="month" value={draft.lossPeriod ?? ""} onChange={(e) => updateDraft("lossPeriod", e.target.value)} />
-                        </FieldShell>
-                        <FieldShell label="Tháng NXT" hint="Kỳ dùng cho báo cáo nhập xuất tồn.">
-                          <input className={fieldControlClass} type="month" value={draft.nxtPeriod ?? ""} onChange={(e) => updateDraft("nxtPeriod", e.target.value)} />
-                        </FieldShell>
-                      </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <FieldShell label="Tuổi vàng" required>
-                          <SelectControl value={String(draft.goldAge ?? "")} onChange={(value) => updateDraft("goldAge", Number(value))}>
-                            <option value="">Chọn tuổi vàng</option>
-                            {getDynamicOptions("tuoi_vang", movementGoldAgeOptions).map((item) => (
-                              <option key={item.value} value={item.value}>{item.label}</option>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                        <FieldShell label="Mã nối NXT" hint="Gõ chữ cái đầu để nhảy nhanh trong danh sách.">
-                          <SelectControl value={draft.nxtLinkCode ?? ""} onChange={(value) => updateDraft("nxtLinkCode", value)}>
-                            <option value="">Chọn mã nối</option>
-                            {groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions)).map((group) => (
-                              <optgroup key={group.label} label={group.label}>
-                                {group.options.map((item) => (
-                                  <option key={item.value} value={item.value}>{item.label}</option>
-                                ))}
-                              </optgroup>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <FieldShell label="Nguồn nhập">
-                          <SelectControl value={draft.importSource ?? ""} onChange={(value) => updateDraft("importSource", value)}>
-                            <option value="">Chọn nguồn nhập</option>
-                            {getDynamicOptions("nguon_nhap", movementImportSourceOptions).map((item) => (
-                              <option key={item.value} value={item.value}>{item.label}</option>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                        <FieldShell label="Nguồn xuất">
-                          <SelectControl value={draft.exportSource ?? ""} onChange={(value) => updateDraft("exportSource", value)}>
-                            <option value="">Chọn nguồn xuất</option>
-                            {getDynamicOptions("nguon_xuat", movementExportSourceOptions).map((item) => (
-                              <option key={item.value} value={item.value}>{item.label}</option>
-                            ))}
-                          </SelectControl>
-                        </FieldShell>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <FieldShell label="TL quy KCP xuất" hint="Trọng lượng xuất đã quy đổi theo tuổi vàng.">
-                          <input className={fieldControlClass} type="number" step="0.0001" placeholder="0.0000" value={draft.convertedIssueWeight || ""} onChange={(e) => updateDraft("convertedIssueWeight", Number(e.target.value))} />
-                        </FieldShell>
-                        <FieldShell label="TL quy KCP nhập" hint="Trọng lượng nhập đã quy đổi theo tuổi vàng.">
-                          <input className={fieldControlClass} type="number" step="0.0001" placeholder="0.0000" value={draft.convertedReturnWeight || ""} onChange={(e) => updateDraft("convertedReturnWeight", Number(e.target.value))} />
-                        </FieldShell>
-                      </div>
-                    </div>
-                  </DrawerSection>
-                  ) : null}
-                  <p className="text-xs leading-5 text-zinc-500">
-                    Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Chuyển tab để nhập từng nhóm; nút lưu luôn ở dưới đáy.
-                  </p>
-                  {isDraftForClosedOrder ? (
-                    <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
-                      LSX này đã chốt. Bạn vẫn có thể cập nhật NK NVL theo luồng xử lý thực tế.
-                    </div>
-                  ) : null}
-                  {remoteError ? (
-                    <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                      {remoteError}
-                    </div>
-                  ) : null}
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
-                      type="button"
-                      onClick={() => addOrder(editingMovementId ? "close" : "clearStage")}
-                      disabled={isDraftDirectChargeInvalid}
-                      title={editingMovementId ? undefined : "Lưu khâu này, drawer vẫn mở để chọn khâu tiếp theo của cùng LSX"}
-                    >
-                      <Plus size={16} />
-                      {editingMovementId ? "Cập nhật NVL" : "Lưu"}
-                    </button>
-                    {editingMovementId ? (
-                      <button
-                        className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400"
-                        type="button"
-                        onClick={() => {
-                          removeOrder(editingMovementId);
-                          closeMovementForm();
-                        }}
-                        disabled={isClosedStatus(draft.status)}
-                        title="Xóa giao dịch"
-                      >
-                        <Trash2 size={16} />
-                        Xóa
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              </section>
-
-            </div>
+            <MaterialMovementDrawer
+              isOpen={isMovementFormOpen}
+              draft={draft}
+              editingMovementId={editingMovementId}
+              movementFormTab={movementFormTab}
+              stageOptions={stageOptionsForDropdown}
+              draftStageMovements={draftStageMovements}
+              currentDrawerStageMovements={currentDrawerStageMovements}
+              workerOptionsForDraft={workerOptionsForDraft}
+              isDraftForClosedOrder={isDraftForClosedOrder}
+              isDraftDirectChargeInvalid={isDraftDirectChargeInvalid}
+              remoteError={remoteError}
+              getDynamicOptions={getDynamicOptions}
+              onClose={closeMovementForm}
+              onTabChange={setMovementFormTab}
+              onDraftChange={updateDraft}
+              onSelectStage={selectStageTab}
+              onSave={addOrder}
+              onRemoveMovement={removeOrder}
+            />
 
             <section className={`${isMovement ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -3005,7 +1968,3 @@ export function MaterialDashboard() {
     </main>
   );
 }
-
-
-
-

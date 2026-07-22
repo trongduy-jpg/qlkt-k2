@@ -70,10 +70,13 @@ project da co chi can chay file con thieu):
     khop file goc. **Chi can chay neu DB cua ban da nhap tho bang ma ten
     truoc do** (0017 ban moi da dung ma so ngay tu dau).
 
-19. `0019_add_product_qty.sql` - them cot `product_qty` (SL san pham cua
-    ca LSX) vao `production_orders`, phuc vu truong "SL san pham" trong
-    form Nhat ky NVL. Khac `quantity_piece` (so vien/soi theo giao dich
-    o khau DKB). **Chay tren DB da co bang production_orders.**
+19. `0019_add_product_qty.sql` - (DA BI DAO LAI o 0020) tung them cot
+    `product_qty` (SL san pham ca LSX) vao `production_orders`. Bo qua
+    neu chay tu dau, chi can chay 0020.
+20. `0020_drop_product_qty.sql` - bo cot `product_qty`, dao lai 0019. He
+    thong chi giu 1 truong SL duy nhat: `quantity_piece` (so vien/soi
+    theo tung giao dich, cot "SL" trong bang Nhat ky NVL). **Chi can
+    chay neu DB da tung chay 0019.**
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 

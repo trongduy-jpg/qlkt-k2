@@ -1,0 +1,257 @@
+"use client";
+
+import { Plus } from "lucide-react";
+import type { OrderSummary } from "@/lib/production-types";
+import type { ProductionOverview } from "@/lib/production-workflow";
+import type { StageOption } from "@/lib/production-summary";
+import { deliveryStatusClass, hasMeaningfulText, statusClass } from "@/lib/production-helpers";
+import { formatDisplayDate, getStageLabel, normalizeStageCode } from "@/lib/production-business-rules";
+import {
+  productionOrderDeliveryStatusOptions,
+  productionOrderSalesTypeOptions
+} from "@/lib/production-journal-options";
+
+type ProductionOrdersViewProps = {
+  isVisible: boolean;
+  productionOverview: ProductionOverview;
+  filteredOrderSummaries: OrderSummary[];
+  selectedOrderCode: string | null;
+  stageOptionsForDropdown: StageOption[];
+  productionDeliveryStatus: string;
+  productionSalesType: string;
+  productionDeadlineFilter: string;
+  productionCustomerQuery: string;
+  onDeliveryStatusChange: (value: string) => void;
+  onSalesTypeChange: (value: string) => void;
+  onDeadlineFilterChange: (value: string) => void;
+  onCustomerQueryChange: (value: string) => void;
+  onCreateOrder: () => void;
+  onShowAllOrders: () => void;
+  onSelectOrder: (code: string) => void;
+};
+
+export function ProductionOrdersView({
+  isVisible,
+  productionOverview,
+  filteredOrderSummaries,
+  selectedOrderCode,
+  stageOptionsForDropdown,
+  productionDeliveryStatus,
+  productionSalesType,
+  productionDeadlineFilter,
+  productionCustomerQuery,
+  onDeliveryStatusChange,
+  onSalesTypeChange,
+  onDeadlineFilterChange,
+  onCustomerQueryChange,
+  onCreateOrder,
+  onShowAllOrders,
+  onSelectOrder
+}: ProductionOrdersViewProps) {
+  return (
+    <section className={`${isVisible ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h3 className="text-base font-bold text-ink">Quản lý lệnh sản xuất</h3>
+            <p className="mt-1 text-sm text-zinc-600">
+              Tạo LSX trước, sau đó mới ghi nhận xuất/nhập nguyên vật liệu trong Nhật ký NVL.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white"
+              type="button"
+              onClick={onCreateOrder}
+            >
+              <Plus size={16} />
+              Tạo LSX
+            </button>
+            <button
+              className="inline-flex items-center justify-center rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
+              type="button"
+              onClick={onShowAllOrders}
+            >
+              Xem tất cả LSX
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          <div className="rounded-md border border-line bg-paper px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tổng LSX</p>
+            <p className="mt-2 text-2xl font-bold text-ink">{productionOverview.total}</p>
+          </div>
+          <div className="rounded-md border border-sky-200 bg-sky-50/70 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Đang xử lý</p>
+            <p className="mt-2 text-2xl font-bold text-sky-900">{productionOverview.inProgressCount}</p>
+          </div>
+          <div className="rounded-md border border-rose-200 bg-rose-50/70 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">Quá hạn deadline</p>
+            <p className="mt-2 text-2xl font-bold text-rose-900">{productionOverview.overdueCount}</p>
+          </div>
+        </div>
+
+        <div className="grid gap-3 rounded-md border border-line bg-paper p-3 lg:grid-cols-4">
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={productionDeliveryStatus}
+            onChange={(event) => onDeliveryStatusChange(event.target.value)}
+          >
+            <option>Tất cả trạng thái LSX</option>
+            {productionOrderDeliveryStatusOptions.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={productionSalesType}
+            onChange={(event) => onSalesTypeChange(event.target.value)}
+          >
+            <option>Tất cả SR/KH</option>
+            {productionOrderSalesTypeOptions.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={productionDeadlineFilter}
+            onChange={(event) => onDeadlineFilterChange(event.target.value)}
+          >
+            <option>Tất cả deadline</option>
+            <option>Quá hạn</option>
+            <option>Hôm nay</option>
+            <option>7 ngày tới</option>
+            <option>Chưa có deadline</option>
+          </select>
+          <input
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            placeholder="Tìm LSX, mã hàng, khách hàng..."
+            value={productionCustomerQuery}
+            onChange={(event) => onCustomerQueryChange(event.target.value)}
+          />
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-sm font-bold text-ink">Danh sách lệnh sản xuất</h4>
+              <p className="mt-1 text-xs text-zinc-500">Bấm vào dòng để mở chi tiết.</p>
+            </div>
+            <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
+              {filteredOrderSummaries.length} LSX
+            </span>
+          </div>
+          <div className="overflow-x-auto rounded-md border border-line bg-white">
+            <table className="w-full min-w-[1360px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
+                  <th className="px-3 py-3">Mã LSX</th>
+                  <th className="px-3 py-3">Mã hàng</th>
+                  <th className="px-3 py-3">Tên hàng</th>
+                  <th className="px-3 py-3">Khách hàng</th>
+                  <th className="px-3 py-3">SR/KH</th>
+                  <th className="px-3 py-3">Deadline đơn hàng</th>
+                  <th className="px-3 py-3 text-right">Số lượng</th>
+                  <th
+                    className="px-3 py-3 text-right"
+                    title="Số dòng đã ghi nhận trong Nhật ký NVL cho LSX này - khác với thông tin trong form LSX."
+                  >
+                    Số GD NVL
+                  </th>
+                  <th className="px-3 py-3">Khâu hiện tại</th>
+                  <th className="px-3 py-3">Trạng thái LSX</th>
+                  <th className="px-3 py-3">Trạng thái vận hành</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOrderSummaries.map((summary) => (
+                  <tr
+                    key={summary.code}
+                    className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
+                      selectedOrderCode === summary.code ? "bg-emerald-50/60" : "bg-white"
+                    }`}
+                    onClick={() => onSelectOrder(summary.code)}
+                  >
+                    <td className="px-3 py-3 align-top">
+                      <p className="font-semibold text-ink">{summary.code}</p>
+                    </td>
+                    <td className="px-3 py-3 align-top text-zinc-700">{summary.sku || "-"}</td>
+                    <td className="px-3 py-3 align-top">
+                      <p className={`max-w-[240px] truncate font-medium ${hasMeaningfulText(summary.productName) ? "text-zinc-800" : "text-zinc-400"}`}>
+                        {summary.productName || "Chưa cập nhật"}
+                      </p>
+                    </td>
+                    <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.customerName) ? "text-zinc-700" : "text-zinc-400"}`}>
+                      {summary.customerName || "Chưa cập nhật"}
+                    </td>
+                    <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.salesType) ? "text-zinc-700" : "text-zinc-400"}`}>
+                      {summary.salesType || "Chưa cập nhật"}
+                    </td>
+                    <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
+                      {formatDisplayDate(summary.deadlineDate) || "Chưa cập nhật"}
+                    </td>
+                    <td className="px-3 py-3 text-right align-top text-zinc-700">
+                      {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
+                    </td>
+                    <td
+                      className={`px-3 py-3 text-right align-top ${summary.movementCount > 0 ? "text-zinc-700" : "text-zinc-400"}`}
+                      title={
+                        summary.movementCount > 0
+                          ? `${summary.movementCount} dòng đã ghi trong Nhật ký NVL`
+                          : "Chưa có giao dịch nào trong Nhật ký NVL cho LSX này"
+                      }
+                    >
+                      {summary.movementCount}
+                    </td>
+                    <td className="px-3 py-3 align-top">
+                      <CurrentStage summary={summary} stageOptionsForDropdown={stageOptionsForDropdown} />
+                    </td>
+                    <td className="px-3 py-3 align-top">
+                      <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
+                        {summary.deliveryStatus || "Chưa cập nhật"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 align-top">
+                      <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
+                        {summary.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CurrentStage({
+  summary,
+  stageOptionsForDropdown
+}: {
+  summary: OrderSummary;
+  stageOptionsForDropdown: StageOption[];
+}) {
+  const stageCode = summary.plannedStage ? normalizeStageCode(summary.plannedStage) : "";
+  const stageIndex = stageCode ? stageOptionsForDropdown.findIndex((item) => item.value === stageCode) : -1;
+
+  if (stageIndex < 0) {
+    return <span className="text-xs text-zinc-400">Chưa bắt đầu</span>;
+  }
+
+  return (
+    <span className="inline-flex flex-col text-xs">
+      <span className="font-semibold text-ink">
+        Khâu {stageIndex + 1}/{stageOptionsForDropdown.length}
+      </span>
+      <span className="text-zinc-500">{getStageLabel(stageCode)}</span>
+    </span>
+  );
+}
