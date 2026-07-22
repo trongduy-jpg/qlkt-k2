@@ -41,6 +41,8 @@ function stageStatusPillClass(status?: string) {
       return "bg-sky-50 text-sky-700 ring-sky-200";
     case "Bỏ qua":
       return "bg-zinc-100 text-zinc-500 ring-zinc-200";
+    case "Chưa thực hiện":
+      return "bg-amber-50 text-amber-700 ring-amber-200";
     default:
       return "bg-white text-zinc-400 ring-line";
   }
@@ -376,6 +378,14 @@ export function MaterialMovementDrawer({
                             </div>
 
                             <div className="mt-3 grid gap-3 md:grid-cols-2">
+                              <FieldShell label="Loại vàng" hint="Loại vàng/NVL đang xử lý ở khâu này.">
+                                <SelectControl value={draft.materialType ?? ""} onChange={(value) => onDraftChange("materialType", value)}>
+                                  <option value="">Chọn loại vàng</option>
+                                  {getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions).map((option) => (
+                                    <option key={option.value} value={option.value} title={option.label}>{option.label}</option>
+                                  ))}
+                                </SelectControl>
+                              </FieldShell>
                               <FieldShell label="Trạng thái tính hao" required>
                                 <SelectControl value={draft.status} onChange={(value) => onDraftChange("status", value as Status)}>
                                   {movementLossStatusOptions.map((option) => (
@@ -383,6 +393,8 @@ export function MaterialMovementDrawer({
                                   ))}
                                 </SelectControl>
                               </FieldShell>
+                            </div>
+                            <div className="mt-3">
                               <FieldShell label="Diễn giải giao dịch">
                                 <input
                                   className={fieldControlClass}
@@ -453,28 +465,16 @@ export function MaterialMovementDrawer({
                                 ) : (
                                   <p className="mt-1 text-xs text-zinc-400">Chưa có thợ nào. Điền Thợ/Xuất/Nhập ở trên rồi bấm &quot;Thêm thợ vào khâu&quot;.</p>
                                 )}
-                                <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                                  <button
-                                    className="inline-flex items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:border-zinc-200 disabled:text-zinc-400"
-                                    type="button"
-                                    onClick={() => onSave("keepStage")}
-                                    disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
-                                    title="Lưu thợ đang nhập rồi để trống cho thợ tiếp theo của cùng khâu"
-                                  >
-                                    <Plus size={15} />
-                                    Thêm thợ vào khâu
-                                  </button>
-                                  <button
-                                    className="inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
-                                    type="button"
-                                    onClick={() => onSave("clearStage")}
-                                    disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
-                                    title="Lưu thợ đang nhập rồi đóng khâu này lại"
-                                  >
-                                    <Check size={15} />
-                                    Xong khâu này
-                                  </button>
-                                </div>
+                                <button
+                                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                                  type="button"
+                                  onClick={() => onSave("keepStage")}
+                                  disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
+                                  title="Lưu thợ đang nhập rồi để trống cho thợ tiếp theo của cùng khâu. Đánh dấu hoàn thành khâu ở ô Trạng thái công đoạn phía trên."
+                                >
+                                  <Plus size={15} />
+                                  Thêm thợ vào khâu
+                                </button>
                               </div>
                             )}
                           </div>
