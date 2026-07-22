@@ -70,8 +70,7 @@ export function ProductionOrdersView({
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h3 className="text-base font-bold text-ink">Quản lý lệnh sản xuất</h3>
-            <p className="mt-1 text-sm text-zinc-600">
+            <p className="text-sm text-zinc-600">
               Tạo LSX trước, sau đó mới ghi nhận xuất/nhập nguyên vật liệu trong Nhật ký NVL.
             </p>
           </div>

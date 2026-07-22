@@ -10,10 +10,7 @@ type LossReportViewProps = {
 export function LossReportView({ isVisible, rows, onExportJson }: LossReportViewProps) {
   return (
     <section className={`${isVisible ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h3 className="text-base font-bold text-ink">Báo cáo hao hụt</h3>
-        </div>
+      <div className="flex justify-end">
         <button className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink" type="button" onClick={onExportJson}>
           Xuất dữ liệu báo cáo
         </button>

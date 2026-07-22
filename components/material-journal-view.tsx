@@ -36,8 +36,7 @@ export function MaterialJournalView({
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h3 className="text-base font-bold text-ink">Nhật ký xuất/nhập NVL</h3>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="text-sm text-zinc-600">
             Màn này chỉ dùng để tiếp nhận LSX mới và ghi nhận giao dịch NVL phát sinh.
           </p>
         </div>

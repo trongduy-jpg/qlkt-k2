@@ -73,6 +73,13 @@ input[type="month"] {
   gap: 20px;
 }
 
+/* Grid item mac dinh min-width:auto (tu phinh theo noi dung con, VD bang
+   NK NVL 1320px) du ban than grid container da min-width:0 - phai ep rieng
+   tung o con thi moi thuc su cho phep co lai, tranh keo ca trang cuon ngang. */
+.unified-stack > * {
+  min-width: 0;
+}
+
 .balanced-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));

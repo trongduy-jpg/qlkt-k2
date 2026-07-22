@@ -67,8 +67,7 @@ export function StageEntryView({
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div>
-        <h3 className="text-base font-bold text-ink">Ghi nhận công đoạn</h3>
-        <p className="mt-1 text-sm text-zinc-600">
+        <p className="text-sm text-zinc-600">
           Chọn 1 LSX rồi ghi nhận Thợ · Xuất · Nhập trực tiếp trên từng dòng khâu. Khâu Cán chỉ/Đan dây/Khắc bi chỉ 1 thợ; các khâu khác thêm được nhiều thợ.
         </p>
       </div>
