@@ -4,6 +4,7 @@ import { Check, Plus, Trash2, X } from "lucide-react";
 import {
   DrawerSection,
   FieldShell,
+  SearchableSelect,
   SelectControl,
   fieldControlClass
 } from "@/components/production-ui";
@@ -174,12 +175,12 @@ export function MaterialMovementDrawer({
                 </div>
                 <div className={`mt-3 ${balancedTwoColumnGrid}`}>
                   <FieldShell label="Loại NVL" hint="Nhóm nguyên liệu/BTP/bột/phụ kiện.">
-                    <SelectControl value={draft.materialType ?? ""} onChange={(value) => onDraftChange("materialType", value)}>
-                      <option value="">Chọn loại NVL</option>
-                      {getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions).map((item) => (
-                        <option key={item.value} value={item.value} title={item.label}>{item.label}</option>
-                      ))}
-                    </SelectControl>
+                    <SearchableSelect
+                      value={draft.materialType ?? ""}
+                      onChange={(value) => onDraftChange("materialType", value)}
+                      groups={[{ options: getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions) }]}
+                      placeholder="Chọn loại NVL"
+                    />
                   </FieldShell>
                   <FieldShell label="Tên hàng / diễn giải">
                     <input
@@ -419,17 +420,13 @@ export function MaterialMovementDrawer({
                       ))}
                     </SelectControl>
                   </FieldShell>
-                  <FieldShell label="Mã nối NXT" hint="Gõ chữ cái đầu để nhảy nhanh trong danh sách.">
-                    <SelectControl value={draft.nxtLinkCode ?? ""} onChange={(value) => onDraftChange("nxtLinkCode", value)}>
-                      <option value="">Chọn mã nối</option>
-                      {groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions)).map((group) => (
-                        <optgroup key={group.label} label={group.label}>
-                          {group.options.map((item) => (
-                            <option key={item.value} value={item.value}>{item.label}</option>
-                          ))}
-                        </optgroup>
-                      ))}
-                    </SelectControl>
+                  <FieldShell label="Mã nối NXT" hint="Gõ để tìm nhanh trong danh sách.">
+                    <SearchableSelect
+                      value={draft.nxtLinkCode ?? ""}
+                      onChange={(value) => onDraftChange("nxtLinkCode", value)}
+                      groups={groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions))}
+                      placeholder="Chọn mã nối"
+                    />
                   </FieldShell>
                 </div>
                 <div className={balancedTwoColumnGrid}>
