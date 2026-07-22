@@ -60,6 +60,14 @@ export const productionOrderSalesTypeOptions: SelectOption[] = [
   { value: "KH", label: "KH" }
 ];
 
+// 12 cong doan chinh dung de cap nhat trong Nhat ky NVL. Cac ma khac
+// (KHO, XMA, HAN...) van ton tai o danh muc tho vi chung la cong doan
+// con cua 12 khau nay, nhung khong hien thi thanh tab rieng o NK NVL.
+export const mainJournalStageCodes = [
+  "NAU", "CKE", "DAN", "KBI", "QBI", "DAP",
+  "NEN", "DKB", "BAO", "GEP", "BAS", "SXK"
+];
+
 export const journalStages: SelectOption[] = [
   { value: "NAU", label: "NAU – Nấu nguyên liệu" },
   { value: "CKE", label: "CKE – Cán chỉ/cán dát" },

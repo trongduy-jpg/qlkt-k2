@@ -84,6 +84,7 @@ import {
   groupNxtLinkOptions,
   journalDestinations,
   journalStages,
+  mainJournalStageCodes,
   movementExportSourceOptions,
   movementGoldAgeOptions,
   movementImportSourceOptions,
@@ -616,10 +617,14 @@ export function MaterialDashboard() {
     return rules;
   }, [stages]);
 
-  const stageOptionsForDropdown = useMemo(
-    () => buildStageOptionsForDropdown(stages, journalStages),
-    [stages]
-  );
+  const stageOptionsForDropdown = useMemo(() => {
+    const all = buildStageOptionsForDropdown(stages, journalStages);
+    const byCode = new Map(all.map((item) => [item.value, item]));
+    // Chi hien thi 12 cong doan chinh, dung dung thu tu quy trinh.
+    return mainJournalStageCodes
+      .map((code) => byCode.get(code) ?? { value: code, label: code })
+      .filter(Boolean);
+  }, [stages]);
 
   const draftStageMovements = useMemo(
     () => buildDraftStageMovements(orders, draft.code),
