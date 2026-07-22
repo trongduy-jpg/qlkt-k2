@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder } from "@/lib/demo-data";
 import { formatDisplayDate, getStageLabel } from "@/lib/production-business-rules";
 import { formatGram, isClosedStatus, statusClass, statusOptions } from "@/lib/production-helpers";
 
@@ -16,7 +16,6 @@ type MaterialJournalViewProps = {
   onEditMovement: (order: ProductionOrder) => void;
   onQueryChange: (value: string) => void;
   onStatusChange: (value: (typeof statusOptions)[number]) => void;
-  onChangeOrderStatus: (id: string, nextStatus: Status) => void;
 };
 
 export function MaterialJournalView({
@@ -29,8 +28,7 @@ export function MaterialJournalView({
   onAddMovement,
   onEditMovement,
   onQueryChange,
-  onStatusChange,
-  onChangeOrderStatus
+  onStatusChange
 }: MaterialJournalViewProps) {
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
@@ -142,17 +140,13 @@ export function MaterialJournalView({
                     <div>{order.lossPeriod || "-"}</div>
                     <div>{order.nxtPeriod || "-"}</div>
                   </td>
-                  <td className="px-3 py-3" onClick={(event) => event.stopPropagation()}>
-                    <select
-                      className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 outline-none disabled:cursor-not-allowed disabled:opacity-70 ${statusClass[order.status]}`}
-                      value={order.status}
-                      onChange={(event) => onChangeOrderStatus(order.id, event.target.value as Status)}
-                      disabled={isClosedStatus(order.status)}
+                  <td className="px-3 py-3">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[order.status]}`}
+                      title="Sửa trạng thái tính hao trong form Sửa giao dịch NVL"
                     >
-                      {statusOptions.filter((item) => item !== "Tất cả").map((item) => (
-                        <option key={item}>{item}</option>
-                      ))}
-                    </select>
+                      {order.status}
+                    </span>
                   </td>
                 </tr>
               ))}

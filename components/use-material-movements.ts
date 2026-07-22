@@ -17,16 +17,9 @@ import {
   type HaoHutRule
 } from "@/lib/production-business-rules";
 import { buildDraftStageMovements } from "@/lib/production-summary";
-import {
-  createAuditLog,
-  createMaterialMovement,
-  deleteMaterialMovement,
-  updateMaterialMovement,
-  updateMaterialMovementStatus,
-  updateProductionOrderStatus
-} from "@/lib/material-service";
+import { createAuditLog, createMaterialMovement, deleteMaterialMovement, updateMaterialMovement } from "@/lib/material-service";
 import { createEmptyOrder } from "@/lib/production-mappers";
-import { getSummaryStatus, isClosedStatus, validateMovementDraft } from "@/lib/production-helpers";
+import { isClosedStatus, validateMovementDraft } from "@/lib/production-helpers";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import type { ReloadOperationalDataOptions } from "@/components/use-operational-data";
 
@@ -256,42 +249,6 @@ export function useMaterialMovements({
     }
   }
 
-  function changeOrderStatus(id: string, nextStatus: Status) {
-    const target = orders.find((order) => order.id === id);
-    if (!target) return;
-
-    if (isClosedStatus(target.status) && !isClosedStatus(nextStatus)) {
-      const detail = `Không thể đổi trạng thái giao dịch ${target.code} vì LSX đã chốt`;
-      pushAudit("blocked_update_status", detail);
-      setRemoteError(detail);
-      return;
-    }
-
-    const nextOrdersSnapshot = orders.map((order) => (order.id === id ? { ...order, status: nextStatus } : order));
-
-    setOrders((current) =>
-      current.map((order) => {
-        if (order.id !== id) return order;
-        if (order.status !== nextStatus) {
-          pushAudit("update_status", `${order.code}: ${order.status} -> ${nextStatus}`);
-        }
-        return { ...order, status: nextStatus };
-      })
-    );
-
-    const nextOrderStatus = getSummaryStatus(
-      nextOrdersSnapshot.filter((order) => order.code === target.code).map((order) => order.status)
-    );
-
-    void updateMaterialMovementStatus(id, nextStatus).catch((error) => {
-      setRemoteError(error instanceof Error ? error.message : "Không cập nhật được trạng thái");
-    });
-    void updateProductionOrderStatus(target.code, nextOrderStatus).catch((error) => {
-      setRemoteError(error instanceof Error ? error.message : "Không đồng bộ được trạng thái LSX");
-    });
-    void createAuditLog("update_status", `${target.code}: ${target.status} -> ${nextStatus}`, id);
-  }
-
   function removeOrder(id: string) {
     const target = orders.find((order) => order.id === id);
     if (target && isClosedStatus(target.status)) {
@@ -394,7 +351,6 @@ export function useMaterialMovements({
     updateDraft,
     addOrder,
     addOrderAsync,
-    changeOrderStatus,
     removeOrder,
     openMovementForEdit,
     closeMovementForm,

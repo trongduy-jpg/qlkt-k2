@@ -435,7 +435,6 @@ export function MaterialDashboard() {
     updateDraft,
     addOrder,
     addOrderAsync,
-    changeOrderStatus,
     removeOrder,
     openMovementForEdit,
     closeMovementForm,
@@ -1836,7 +1835,6 @@ export function MaterialDashboard() {
               onEditMovement={openMovementForEdit}
               onQueryChange={setQuery}
               onStatusChange={(nextStatus) => setStatus(nextStatus)}
-              onChangeOrderStatus={changeOrderStatus}
             />
 
             <MaterialMovementDrawer
