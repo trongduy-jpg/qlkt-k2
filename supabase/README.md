@@ -62,8 +62,13 @@ project da co chi can chay file con thieu):
 17. `0017_restore_stages_and_sync_workers.sql` - khoi phuc lai day du ma
     cong doan (dao lai 0016 - theo yeu cau moi la danh sach tho thuc te
     can dung du cac ma khau nhu KHO/TV/XMA...) va dat lai `stages` cua
-    tung tho khop chinh xac voi danh muc tho thuc te. **Chay file nay la
-    trang thai cuoi cung** (thay cho 0016).
+    tung tho khop chinh xac voi danh muc tho thuc te. worker_code dung
+    "Ma so" (TD001...), rieng On Khi Sinh = KT001B (KT001 da thuoc Nguyen
+    Huu Khoa).
+18. `0018_rename_worker_codes_to_maso.sql` - doi worker_code cua cac tho
+    da nhap bang "Ma ten" (BTDANH...) sang "Ma so" (TD005...) de hien thi
+    khop file goc. **Chi can chay neu DB cua ban da nhap tho bang ma ten
+    truoc do** (0017 ban moi da dung ma so ngay tu dau).
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 

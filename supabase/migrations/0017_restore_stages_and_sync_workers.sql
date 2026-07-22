@@ -38,25 +38,27 @@ values
 on conflict (stage_code) do nothing;
 
 -- 2) Dat lai stages cua tung tho khop chinh xac danh sach thuc te
+-- worker_code = "Ma so" trong file goc. Rieng On Khi Sinh dung KT001B
+-- (file goc ghi trung KT001 voi Nguyen Huu Khoa - ma so bat buoc duy nhat).
 insert into workers (worker_code, full_name, department, stages) values
-  ('HHPHONG', 'Huỳnh Hoài Phong', 'Kho', array['KHO']),
-  ('MTMTRAN', 'Ma Thị Mỹ Trân', 'Sản xuất', array['GSK','QBI','BAO','CKE','CDA','DAP','DKB','DLL']),
-  ('NDTHINH', 'Nguyễn Đức Thịnh', 'Sản xuất', array['KDA','DKB']),
-  ('NHKHOA', 'Nguyễn Hữu Khoa', 'Kỹ thuật sản xuất', array['HAN','GEP','NEN','DAP','DAN','QBI']),
-  ('NDTUYEN', 'Nguyễn Đình Tuyến', 'Sản xuất', array['TV']),
-  ('OKSINH', 'Ôn Khí Sinh', 'Kỹ thuật sản xuất', array['NAU']),
-  ('BVTRUNG', 'Bùi Văn Trung', 'Sản xuất', array['DAN','CVB','BAS','QBI','DAP','GEP','NEN','DKB','HUY','HBT','BHH','SXK']),
-  ('HHHA', 'Hồ Hữu Hà', 'Sản xuất', array['NEN','DAP','BAO','KBI','QBI','CDA']),
-  ('LVTUNG', 'Lê Văn Tùng', 'Sản xuất', array['NAU','CKE','KCH','CCD','HCO','DBI','HBK','BAS','HUY','QBI','BHH','DKB','SXK']),
-  ('DTHUY', 'Đặng Thanh Huy', 'Sản xuất', array['KBI']),
-  ('BTDANH', 'Bùi Thành Danh', 'Sản xuất', array['GEP']),
-  ('HGLAP', 'Heng Gia Lập', 'Sản xuất', array['SXK']),
-  ('LVDUC', 'Lưu Văn Đức', 'Sản xuất', array['KBI']),
-  ('LTHIEN', 'Lương Trí Hiển', 'Sản xuất', array['DKB','NAU','BAS','BAO','XMA','HUY','DLL','NPK']),
-  ('TVTRANG', 'Trần Văn Trang', 'Sản xuất', array['XMA']),
-  ('NTNAM', 'Nguyễn Thành Nam', 'Sản xuất', array['XMA']),
-  ('LQHIEP', 'Lê Quang Hiệp', 'Sản xuất', array['NAUPK']),
-  ('DCTHANH', 'Đinh Công Thành', 'Sản xuất', array['NAU'])
+  ('CP001', 'Huỳnh Hoài Phong', 'Kho', array['KHO']),
+  ('GS001', 'Ma Thị Mỹ Trân', 'Sản xuất', array['GSK','QBI','BAO','CKE','CDA','DAP','DKB','DLL']),
+  ('T001', 'Nguyễn Đức Thịnh', 'Sản xuất', array['KDA','DKB']),
+  ('KT001', 'Nguyễn Hữu Khoa', 'Kỹ thuật sản xuất', array['HAN','GEP','NEN','DAP','DAN','QBI']),
+  ('TV001', 'Nguyễn Đình Tuyến', 'Sản xuất', array['TV']),
+  ('KT001B', 'Ôn Khí Sinh', 'Kỹ thuật sản xuất', array['NAU']),
+  ('TD001', 'Bùi Văn Trung', 'Sản xuất', array['DAN','CVB','BAS','QBI','DAP','GEP','NEN','DKB','HUY','HBT','BHH','SXK']),
+  ('TD002', 'Hồ Hữu Hà', 'Sản xuất', array['NEN','DAP','BAO','KBI','QBI','CDA']),
+  ('TD003', 'Lê Văn Tùng', 'Sản xuất', array['NAU','CKE','KCH','CCD','HCO','DBI','HBK','BAS','HUY','QBI','BHH','DKB','SXK']),
+  ('TD004', 'Đặng Thanh Huy', 'Sản xuất', array['KBI']),
+  ('TD005', 'Bùi Thành Danh', 'Sản xuất', array['GEP']),
+  ('TD006', 'Heng Gia Lập', 'Sản xuất', array['SXK']),
+  ('TD007', 'Lưu Văn Đức', 'Sản xuất', array['KBI']),
+  ('KTL02', 'Lương Trí Hiển', 'Sản xuất', array['DKB','NAU','BAS','BAO','XMA','HUY','DLL','NPK']),
+  ('TXL02', 'Trần Văn Trang', 'Sản xuất', array['XMA']),
+  ('TXL01', 'Nguyễn Thành Nam', 'Sản xuất', array['XMA']),
+  ('TN001', 'Lê Quang Hiệp', 'Sản xuất', array['NAUPK']),
+  ('TN002', 'Đinh Công Thành', 'Sản xuất', array['NAU'])
 on conflict (worker_code) do update set
   full_name = excluded.full_name,
   department = excluded.department,
