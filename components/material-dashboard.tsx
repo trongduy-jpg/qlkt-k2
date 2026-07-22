@@ -3214,14 +3214,15 @@ export function MaterialDashboard() {
                     ))}
                   </div>
 
-                  {movementFormTab === "info" && !editingMovementId ? (
-                    <DrawerSection title="Thông tin LSX" note="Nhóm nhận diện đơn và sản phẩm đang thao tác.">
+                  {movementFormTab === "info" ? (
+                    <DrawerSection title="Thông tin LSX" note={editingMovementId ? "Mã LSX đã khoá; các trường còn lại vẫn sửa được và áp dụng cho cả lệnh." : "Nhóm nhận diện đơn và sản phẩm đang thao tác."}>
                       <div className="grid gap-3 sm:grid-cols-3">
                         <FieldShell label="Mã LSX" required>
                           <input
                             className={fieldControlClass}
                             placeholder="VD: DHAG-260713"
                             value={draft.code}
+                            disabled={!!editingMovementId}
                             onChange={(e) => updateDraft("code", e.target.value)}
                           />
                         </FieldShell>
