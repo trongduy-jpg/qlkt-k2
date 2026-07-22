@@ -3322,10 +3322,12 @@ export function MaterialDashboard() {
                         </FieldShell>
                       </div>
 
-                      <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                        <FieldShell label="Số lượng viên/sợi">
-                          <input className={fieldControlClass} min="0" type="number" placeholder="0" value={draft.qtyPiece || ""} onChange={(e) => updateDraft("qtyPiece", Number(e.target.value))} />
-                        </FieldShell>
+                      <div className={`mt-3 grid gap-3 ${normalizeStageCode(draft.stage) === "DKB" ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+                        {normalizeStageCode(draft.stage) === "DKB" ? (
+                          <FieldShell label="Số lượng viên/sợi">
+                            <input className={fieldControlClass} min="0" type="number" placeholder="0" value={draft.qtyPiece || ""} onChange={(e) => updateDraft("qtyPiece", Number(e.target.value))} />
+                          </FieldShell>
+                        ) : null}
                         <FieldShell label="Xuất gram">
                           <input className={fieldControlClass} min="0" type="number" placeholder="0.00" value={draft.issued || ""} onChange={(e) => updateDraft("issued", Number(e.target.value))} />
                         </FieldShell>
