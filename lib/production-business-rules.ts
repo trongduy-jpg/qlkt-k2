@@ -163,7 +163,26 @@ export function getStageLabel(stageCode: string) {
     BAO: "Bào dây",
     GEP: "Ghép dây",
     BAS: "Dập bass, bông khoen",
-    SXK: "Sản xuất khóa"
+    SXK: "Sản xuất khóa",
+    KHO: "Kho cấp phát",
+    GSK: "GSK",
+    CDA: "Cắt ra dây",
+    DLL: "Dập lưỡi lam",
+    KDA: "Khắc dấu",
+    HAN: "Hàn băng tải",
+    TV: "Tư vấn",
+    CVB: "Cắt/vo bi",
+    XMA: "Xi mạ",
+    NAUPK: "Nấu phân kim",
+    KCH: "Kéo chi",
+    CCD: "Cán/cắt dát",
+    HCO: "Hàn cuốn ống",
+    DBI: "Dập trái châu",
+    HBK: "Hàn khóa bass",
+    HUY: "Hủy sản phẩm",
+    HBT: "Hàn băng tải",
+    BHH: "Bảo hành sản phẩm",
+    NPK: "Nấu phân kim"
   };
 
   return labels[stageCode] ?? stageCode;

@@ -59,6 +59,11 @@ project da co chi can chay file con thieu):
     tro/cong viec khac nhu KHO=thu kho, TV=tu van, khong phai khau xu ly
     NVL). Loc lai `stages` cua tung tho, chi giu ma nam trong 12 khau.
     **Phai chay sau 0015**.
+17. `0017_restore_stages_and_sync_workers.sql` - khoi phuc lai day du ma
+    cong doan (dao lai 0016 - theo yeu cau moi la danh sach tho thuc te
+    can dung du cac ma khau nhu KHO/TV/XMA...) va dat lai `stages` cua
+    tung tho khop chinh xac voi danh muc tho thuc te. **Chay file nay la
+    trang thai cuoi cung** (thay cho 0016).
 
 Sau MOI lan chay migration them cot/bang moi, chay them:
 
