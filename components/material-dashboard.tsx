@@ -85,6 +85,7 @@ import {
   journalDestinations,
   journalStages,
   mainJournalStageCodes,
+  materialTypeOptions,
   movementExportSourceOptions,
   movementGoldAgeOptions,
   movementImportSourceOptions,
@@ -3231,7 +3232,15 @@ export function MaterialDashboard() {
                           />
                         </FieldShell>
                       </div>
-                      <div className="mt-3">
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <FieldShell label="Loại NVL" hint="Nhóm nguyên liệu/BTP/bột/phụ kiện.">
+                          <SelectControl value={draft.materialType ?? ""} onChange={(value) => updateDraft("materialType", value)}>
+                            <option value="">Chọn loại NVL</option>
+                            {getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions).map((item) => (
+                              <option key={item.value} value={item.value} title={item.label}>{item.label}</option>
+                            ))}
+                          </SelectControl>
+                        </FieldShell>
                         <FieldShell label="Tên hàng / diễn giải">
                           <input
                             className={fieldControlClass}
