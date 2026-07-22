@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Trash2, X } from "lucide-react";
+import { Check, Plus, Trash2, X } from "lucide-react";
 import {
   DrawerSection,
   FieldShell,
@@ -112,19 +112,16 @@ export function MaterialMovementDrawer({
 
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4">
           <div className="grid gap-3">
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
-                {isEditing ? "Đang sửa giao dịch" : "Giao dịch mới"}
+          <div className="rounded-lg border border-line bg-paper/60 px-3 py-2.5">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+              <span className="text-zinc-500">
+                Mã hàng <span className="font-semibold text-ink">{draft.sku || "Chưa chọn"}</span>
               </span>
-              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                Mã hàng: {draft.sku || "Chưa chọn"}
-              </span>
-              <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-700 ring-1 ring-line">
-                Công đoạn: {draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}
+              <span className="text-zinc-500">
+                Công đoạn <span className="font-semibold text-ink">{draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}</span>
               </span>
             </div>
-            <p className="mt-1.5 text-xs leading-5 text-zinc-600">
+            <p className="mt-1.5 text-xs leading-5 text-zinc-500">
               {isEditing
                 ? "Thông tin gốc của LSX đã khoá, sửa tại màn Lệnh sản xuất nếu cần."
                 : "Ưu tiên nhập theo thứ tự từ trên xuống để tránh ghi nhầm giao dịch."}
@@ -504,7 +501,7 @@ export function MaterialMovementDrawer({
               disabled={isDraftDirectChargeInvalid}
               title={isEditing ? undefined : "Lưu khâu này, drawer vẫn mở để chọn khâu tiếp theo của cùng LSX"}
             >
-              <Plus size={16} />
+              {isEditing ? <Check size={16} /> : <Plus size={16} />}
               {isEditing ? "Cập nhật NVL" : "Lưu"}
             </button>
             {editingMovementId ? (
