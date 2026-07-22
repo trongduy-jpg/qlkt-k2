@@ -240,14 +240,14 @@ export function groupNxtLinkOptions(options: SelectOption[]): Array<{ label: str
 }
 
 export const materialTypeOptions: SelectOption[] = [
-  { value: "NL18K", label: "NL18K – Nguyên liệu vàng 18K" },
-  { value: "NL24K", label: "NL24K – Nguyên liệu vàng 24K" },
-  { value: "NL23K", label: "NL23K – Nguyên liệu vàng 23K" },
-  { value: "NLBAC92.5", label: "NLBAC92.5 – Nguyên liệu bạc 92.5" },
+  { value: "NL18K", label: "NL18K – Vàng 18K" },
+  { value: "NL24K", label: "NL24K – Vàng 24K" },
+  { value: "NL23K", label: "NL23K – Vàng 23K" },
+  { value: "NLBAC92.5", label: "NLBAC92.5 – Bạc 92.5" },
   { value: "NLBAC9999", label: "NLBAC9999 – Bạc 99.99" },
-  { value: "BOT18K", label: "BOT18K – Bột vàng 18K" },
-  { value: "BOT23K", label: "BOT23K – Bột vàng 23K" },
-  { value: "BOT24K", label: "BOT24K – Bột vàng 24K" },
+  { value: "BOT18K", label: "BOT18K – Bột 18K" },
+  { value: "BOT23K", label: "BOT23K – Bột 23K" },
+  { value: "BOT24K", label: "BOT24K – Bột 24K" },
   { value: "PK18K", label: "PK18K – Phụ kiện 18K" },
   { value: "BTPDAY18K", label: "BTPDAY18K – BTP dây 18K" },
   { value: "BTPDAYBAC92.5", label: "BTPDAYBAC92.5 – BTP dây bạc" }

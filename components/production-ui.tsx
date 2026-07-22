@@ -43,7 +43,7 @@ export function SelectControl({
   return (
     <div className="relative">
       <select
-        className={`${fieldControlClass} appearance-none pr-10`}
+        className={`${fieldControlClass} appearance-none truncate pr-10`}
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
