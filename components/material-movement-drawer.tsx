@@ -180,6 +180,7 @@ export function MaterialMovementDrawer({
                       onChange={(value) => onDraftChange("materialType", value)}
                       groups={[{ options: getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions) }]}
                       placeholder="Chọn loại NVL"
+                      clearLabel="Chọn loại NVL"
                     />
                   </FieldShell>
                   <FieldShell label="Tên hàng / diễn giải">
@@ -426,6 +427,7 @@ export function MaterialMovementDrawer({
                       onChange={(value) => onDraftChange("nxtLinkCode", value)}
                       groups={groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions))}
                       placeholder="Chọn mã nối"
+                      clearLabel="Chọn mã nối"
                     />
                   </FieldShell>
                 </div>

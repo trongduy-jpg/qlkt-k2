@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Children, isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, Search } from "lucide-react";
 import { hasMeaningfulDisplayValue } from "@/lib/production-helpers";
@@ -35,6 +35,21 @@ export function FieldShell({
   );
 }
 
+// Doc danh sach <option> tu children de giu nguyen API cu (JSX <option>
+// nhu <select> goc), cho phep SelectControl dung chung 1 dropdown tuy bien
+// voi SearchableSelect ma khong phai sua ~25 noi dang goi no trong app.
+function extractOptionsFromChildren(children: ReactNode): SelectOption[] {
+  const options: SelectOption[] = [];
+  Children.forEach(children, (child) => {
+    if (!isValidElement(child) || child.type !== "option") return;
+    const props = child.props as { value?: unknown; children?: ReactNode; title?: string };
+    const value = String(props.value ?? "");
+    const label = typeof props.children === "string" ? props.children : String(props.children ?? value);
+    options.push({ value, label, hint: props.title });
+  });
+  return options;
+}
+
 export function SelectControl({
   value,
   onChange,
@@ -44,18 +59,8 @@ export function SelectControl({
   onChange: (value: string) => void;
   children: ReactNode;
 }) {
-  return (
-    <div className="relative">
-      <select
-        className={`${fieldControlClass} appearance-none truncate pr-10`}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-    </div>
-  );
+  const options = useMemo(() => extractOptionsFromChildren(children), [children]);
+  return <SearchableSelect value={value} onChange={onChange} groups={[{ options }]} />;
 }
 
 export type SearchableSelectGroup = { label?: string; options: SelectOption[] };
@@ -80,12 +85,18 @@ export function SearchableSelect({
   value,
   onChange,
   groups,
-  placeholder = "Chọn..."
+  placeholder = "Chọn...",
+  clearLabel
 }: {
   value: string;
   onChange: (value: string) => void;
   groups: SearchableSelectGroup[];
   placeholder?: string;
+  // Chi hien dong "bo chon" o dau panel khi truyen prop nay - danh cho cac
+  // danh sach KHONG tu co san 1 option value="" (VD Loai NVL, Ma noi NXT).
+  // Cac dropdown da co san option value="" trong chinh danh sach (VD "Chon
+  // noi nhan") thi khong can, tranh hien thi trung 2 dong bo chon.
+  clearLabel?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -194,15 +205,17 @@ export function SearchableSelect({
               ) : null}
 
               <div className="max-h-64 overflow-y-auto py-1">
-                <button
-                  type="button"
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-jade/10 ${
-                    !value ? "font-semibold text-jade" : "text-zinc-500"
-                  }`}
-                  onClick={() => selectValue("")}
-                >
-                  {placeholder}
-                </button>
+                {clearLabel ? (
+                  <button
+                    type="button"
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-jade/10 ${
+                      !value ? "font-semibold text-jade" : "text-zinc-500"
+                    }`}
+                    onClick={() => selectValue("")}
+                  >
+                    {clearLabel}
+                  </button>
+                ) : null}
 
                 {filteredGroups.length === 0 ? (
                   <p className="px-3 py-3 text-sm text-zinc-400">Không tìm thấy lựa chọn phù hợp.</p>
