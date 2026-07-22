@@ -626,6 +626,17 @@ export function MaterialDashboard() {
     [orders, draft.code]
   );
 
+  // Tat ca giao dich da ghi nhan cho DUNG (LSX + khau) dang chon trong
+  // drawer - dung de hien danh sach tho da them cho khau nhieu tho.
+  const currentDrawerStageMovements = useMemo(() => {
+    const code = draft.code.trim();
+    const stageCode = normalizeProductionStageCode(draft.stage);
+    if (!code || !stageCode) return [];
+    return orders
+      .filter((order) => order.code === code && normalizeProductionStageCode(order.stage) === stageCode)
+      .sort((left, right) => String(right.id).localeCompare(String(left.id)));
+  }, [orders, draft.code, draft.stage]);
+
   const selectedOrderStageProgress = useMemo(
     () => buildStageProgress(stageOptionsForDropdown, selectedOrderMovements),
     [stageOptionsForDropdown, selectedOrderMovements]
@@ -3341,6 +3352,51 @@ export function MaterialDashboard() {
                           />
                         </FieldShell>
                       </div>
+
+                      {draft.stage && !isSingleWorkerStage(draft.stage) ? (
+                        <div className="mt-3 rounded-md border border-dashed border-line bg-white p-3">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                            Thợ đã ghi nhận cho khâu này ({currentDrawerStageMovements.length})
+                          </p>
+                          {currentDrawerStageMovements.length > 0 ? (
+                            <div className="mt-2 grid gap-1.5">
+                              {currentDrawerStageMovements.map((movement) => (
+                                <div
+                                  key={movement.id}
+                                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-paper px-3 py-1.5 text-xs"
+                                >
+                                  <span className="font-medium text-zinc-800">{movement.worker || "(chưa có thợ)"}</span>
+                                  <div className="flex flex-wrap items-center gap-3 text-zinc-600">
+                                    <span>Xuất {formatGram(movement.issued)}</span>
+                                    <span>Nhập {formatGram(movement.returned)}</span>
+                                    <button
+                                      className="inline-flex size-6 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                      type="button"
+                                      title="Xóa thợ này khỏi khâu"
+                                      disabled={isClosedStatus(movement.status)}
+                                      onClick={() => removeOrder(movement.id)}
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="mt-1 text-xs text-zinc-400">Chưa có thợ nào. Điền Thợ/Xuất/Nhập ở trên rồi bấm "+ Thêm thợ vào khâu".</p>
+                          )}
+                          <button
+                            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:border-zinc-200 disabled:text-zinc-400"
+                            type="button"
+                            onClick={() => addOrder("keepStage")}
+                            disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
+                            title="Lưu thợ đang nhập rồi để trống cho thợ tiếp theo của cùng khâu"
+                          >
+                            <Plus size={15} />
+                            Thêm thợ vào khâu
+                          </button>
+                        </div>
+                      ) : null}
                     </div>
                   </DrawerSection>
                   ) : null}
@@ -3431,18 +3487,6 @@ export function MaterialDashboard() {
                       <Plus size={16} />
                       {editingMovementId ? "Cập nhật NVL" : "Lưu"}
                     </button>
-                    {!editingMovementId && draft.stage && !isSingleWorkerStage(draft.stage) ? (
-                      <button
-                        className="inline-flex items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:border-zinc-200 disabled:text-zinc-400"
-                        type="button"
-                        onClick={() => addOrder("keepStage")}
-                        disabled={isDraftDirectChargeInvalid}
-                        title="Lưu thợ này và nhập tiếp thợ khác cho cùng khâu"
-                      >
-                        <Plus size={16} />
-                        Thêm thợ khác
-                      </button>
-                    ) : null}
                     {editingMovementId ? (
                       <button
                         className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400"
