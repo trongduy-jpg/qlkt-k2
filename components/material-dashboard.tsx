@@ -104,6 +104,7 @@ import {
   getCarryOverLossPeriod,
   getStageLabel,
   isLargeWeightMovement,
+  isSingleWorkerStage,
   normalizeStageCode as normalizeProductionStageCode,
   shouldForceDirectCharge,
   toIsoDate,
@@ -1800,7 +1801,11 @@ export function MaterialDashboard() {
 
   function selectStageTab(stageCode: string) {
     const existing = draftStageMovements.get(stageCode);
-    if (existing) {
+    // Khau chi 1 tho (CKE/DAN/KBI): bam lai khau da co giao dich se sua
+    // dung dong do (khong tao them dong thu 2). Khau nhieu tho: luon tao
+    // giao dich moi de them tho khac, sua dong cu thi bam vao dong trong
+    // bang lich su NK NVL.
+    if (existing && isSingleWorkerStage(stageCode)) {
       setEditingMovementId(existing.id);
       setDraft((current) => ({ ...current, ...existing }));
     } else {
