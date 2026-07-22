@@ -6,6 +6,16 @@
 --
 -- Chi can chay tren DB da tung nhap tho bang ma ten (0015/0017 ban cu).
 
+-- Don 2 tho demo cu (TD003 Le Van Tung, TD004 Nguyen Van An) dang chiem
+-- ma TD003/TD004 ma tho that can dung: xoa neu khong con giao dich, con
+-- neu con giao dich thi doi ma de nhuong cho tho that.
+delete from workers w
+where w.worker_code in ('TD003','TD004')
+  and not exists (select 1 from material_movements m where m.worker_id = w.id);
+
+update workers set worker_code = 'OLD-' || worker_code
+where worker_code in ('TD003','TD004');
+
 update workers set worker_code = 'CP001'  where worker_code = 'HHPHONG';
 update workers set worker_code = 'GS001'  where worker_code = 'MTMTRAN';
 update workers set worker_code = 'T001'   where worker_code = 'NDTHINH';
