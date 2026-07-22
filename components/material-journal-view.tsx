@@ -11,6 +11,7 @@ type MaterialJournalViewProps = {
   query: string;
   status: (typeof statusOptions)[number];
   recentCreatedOrderCode: string | null;
+  recentlySavedMovementId: string | null;
   onAddMovement: () => void;
   onEditMovement: (order: ProductionOrder) => void;
   onQueryChange: (value: string) => void;
@@ -24,6 +25,7 @@ export function MaterialJournalView({
   query,
   status,
   recentCreatedOrderCode,
+  recentlySavedMovementId,
   onAddMovement,
   onEditMovement,
   onQueryChange,
@@ -104,7 +106,9 @@ export function MaterialJournalView({
                 <tr
                   key={order.id}
                   className={`border-b ${isClosedStatus(order.status) ? "" : "cursor-pointer hover:bg-paper"} ${
-                    recentCreatedOrderCode === order.code ? "border-emerald-200 bg-emerald-50/40" : "border-line/70"
+                    recentlySavedMovementId === order.id || recentCreatedOrderCode === order.code
+                      ? "border-emerald-200 bg-emerald-50/40"
+                      : "border-line/70"
                   }`}
                   onClick={() => {
                     if (isClosedStatus(order.status)) return;

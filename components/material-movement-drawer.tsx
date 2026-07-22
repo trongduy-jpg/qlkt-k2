@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Plus, Trash2, X } from "lucide-react";
+import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   DrawerSection,
   FieldShell,
@@ -51,6 +51,7 @@ type MaterialMovementDrawerProps = {
   onSelectStage: (stageCode: string) => void;
   onSave: (resetMode?: "close" | "clearStage" | "keepStage") => void;
   onRemoveMovement: (id: string) => void;
+  onEditStageMovement: (order: ProductionOrder) => void;
 };
 
 export function MaterialMovementDrawer({
@@ -71,7 +72,8 @@ export function MaterialMovementDrawer({
   onDraftChange,
   onSelectStage,
   onSave,
-  onRemoveMovement
+  onRemoveMovement,
+  onEditStageMovement
 }: MaterialMovementDrawerProps) {
   if (!isOpen) return null;
 
@@ -113,14 +115,24 @@ export function MaterialMovementDrawer({
 
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4">
           <div className="grid gap-3">
-          <div className="rounded-lg border border-line bg-paper/60 px-3 py-2.5">
+          <div className={`rounded-lg border px-3 py-2.5 ${isEditing ? "border-jade/30 bg-jade/10" : "border-line bg-paper/60"}`}>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+              {isEditing ? (
+                <span className="rounded-full bg-jade px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                  Đang sửa dòng này
+                </span>
+              ) : null}
               <span className="text-zinc-500">
                 Mã hàng <span className="font-semibold text-ink">{draft.sku || "Chưa chọn"}</span>
               </span>
               <span className="text-zinc-500">
                 Công đoạn <span className="font-semibold text-ink">{draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}</span>
               </span>
+              {isEditing ? (
+                <span className="text-zinc-500">
+                  Thợ <span className="font-semibold text-ink">{draft.worker || "(chưa có thợ)"}</span>
+                </span>
+              ) : null}
             </div>
             <p className="mt-1.5 text-xs leading-5 text-zinc-500">
               {isEditing
@@ -350,27 +362,44 @@ export function MaterialMovementDrawer({
                     </p>
                     {currentDrawerStageMovements.length > 0 ? (
                       <div className="mt-2 grid gap-1.5">
-                        {currentDrawerStageMovements.map((movement) => (
-                          <div
-                            key={movement.id}
-                            className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-paper px-3 py-1.5 text-xs"
-                          >
-                            <span className="font-medium text-zinc-800">{movement.worker || "(chưa có thợ)"}</span>
-                            <div className="flex flex-wrap items-center gap-3 text-zinc-600">
-                              <span>Xuất {formatGram(movement.issued)}</span>
-                              <span>Nhập {formatGram(movement.returned)}</span>
-                              <button
-                                className="inline-flex size-6 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                type="button"
-                                title="Xóa thợ này khỏi khâu"
-                                disabled={isClosedStatus(movement.status)}
-                                onClick={() => onRemoveMovement(movement.id)}
-                              >
-                                <Trash2 size={12} />
-                              </button>
+                        {currentDrawerStageMovements.map((movement) => {
+                          const isBeingEdited = movement.id === editingMovementId;
+                          return (
+                            <div
+                              key={movement.id}
+                              className={`flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-xs ${
+                                isBeingEdited ? "border-jade bg-jade/10" : "border-line bg-paper"
+                              }`}
+                            >
+                              <span className="font-medium text-zinc-800">
+                                {movement.worker || "(chưa có thợ)"}
+                                {isBeingEdited ? <span className="ml-1.5 text-[10px] font-semibold uppercase text-jade">Đang sửa</span> : null}
+                              </span>
+                              <div className="flex flex-wrap items-center gap-3 text-zinc-600">
+                                <span>Xuất {formatGram(movement.issued)}</span>
+                                <span>Nhập {formatGram(movement.returned)}</span>
+                                <button
+                                  className="inline-flex size-6 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50"
+                                  type="button"
+                                  title="Sửa thông tin thợ này"
+                                  disabled={isBeingEdited}
+                                  onClick={() => onEditStageMovement(movement)}
+                                >
+                                  <Pencil size={12} />
+                                </button>
+                                <button
+                                  className="inline-flex size-6 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                  type="button"
+                                  title="Xóa thợ này khỏi khâu"
+                                  disabled={isClosedStatus(movement.status)}
+                                  onClick={() => onRemoveMovement(movement.id)}
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className="mt-1 text-xs text-zinc-400">Chưa có thợ nào. Điền Thợ/Xuất/Nhập ở trên rồi bấm "+ Thêm thợ vào khâu".</p>

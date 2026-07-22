@@ -3,6 +3,7 @@
 import {
   AlertTriangle,
   Boxes,
+  CheckCircle2,
   CircleDollarSign,
   ClipboardList,
   Database,
@@ -438,9 +439,14 @@ export function MaterialDashboard() {
     removeOrder,
     openMovementForEdit,
     closeMovementForm,
-    openEmptyMovementForm
+    openEmptyMovementForm,
+    selectStageTab,
+    switchToMovement,
+    savedMovementNotice,
+    dismissSavedMovementNotice
   } = useMaterialMovements({
     orders,
+    workers,
     stageRules,
     movementDraftCache,
     setOrders,
@@ -1135,34 +1141,6 @@ export function MaterialDashboard() {
     }
   }
 
-  function selectStageTab(stageCode: string) {
-    const existing = draftStageMovements.get(stageCode);
-    // Khau chi 1 tho (CKE/DAN/KBI): bam lai khau da co giao dich se sua
-    // dung dong do (khong tao them dong thu 2). Khau nhieu tho: luon tao
-    // giao dich moi de them tho khac, sua dong cu thi bam vao dong trong
-    // bang lich su NK NVL.
-    if (existing && isSingleWorkerStage(stageCode)) {
-      setEditingMovementId(existing.id);
-      setDraft((current) => ({ ...current, ...existing }));
-    } else {
-      const suggestedWorker = workers.find((item) => item.stages.includes(stageCode));
-      setEditingMovementId(null);
-      setDraft((current) => ({
-        ...current,
-        id: "",
-        stage: stageCode,
-        worker: suggestedWorker?.full_name ?? "",
-        qtyPiece: 0,
-        issued: 0,
-        returned: 0,
-        transferred: 0,
-        loss: 0,
-        sourceMaterialName: ""
-      }));
-    }
-    setRemoteError(null);
-  }
-
   function viewSelectedOrderMovements() {
     if (!selectedOrderSummary) return;
     setQuery(selectedOrderSummary.code);
@@ -1854,6 +1832,7 @@ export function MaterialDashboard() {
               query={query}
               status={status}
               recentCreatedOrderCode={recentCreatedOrderCode}
+              recentlySavedMovementId={savedMovementNotice?.id ?? null}
               onAddMovement={openEmptyMovementForm}
               onEditMovement={openMovementForEdit}
               onQueryChange={setQuery}
@@ -1880,7 +1859,23 @@ export function MaterialDashboard() {
               onSelectStage={selectStageTab}
               onSave={addOrder}
               onRemoveMovement={removeOrder}
+              onEditStageMovement={switchToMovement}
             />
+
+            {savedMovementNotice ? (
+              <div className="fixed bottom-6 right-6 z-[60] flex max-w-sm items-start gap-3 rounded-lg border border-jade/30 bg-white px-4 py-3 shadow-xl">
+                <CheckCircle2 className="mt-0.5 shrink-0 text-jade" size={18} />
+                <p className="text-sm leading-5 text-ink">{savedMovementNotice.message}</p>
+                <button
+                  type="button"
+                  className="ml-1 shrink-0 text-zinc-400 hover:text-zinc-600"
+                  onClick={dismissSavedMovementNotice}
+                  title="Đóng thông báo"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            ) : null}
 
             <section className={`${isMovement ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">

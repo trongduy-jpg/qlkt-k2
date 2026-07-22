@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { WorkerMaster } from "@/lib/material-service";
 import {
   applyProductionBusinessRules,
   buildProductionOrderCode,
   getCarryOverLossPeriod,
+  getStageLabel,
   isLargeWeightMovement,
   isSingleWorkerStage,
   normalizeStageCode,
@@ -14,6 +16,7 @@ import {
   toMonthCode,
   type HaoHutRule
 } from "@/lib/production-business-rules";
+import { buildDraftStageMovements } from "@/lib/production-summary";
 import {
   createAuditLog,
   createMaterialMovement,
@@ -29,8 +32,15 @@ import type { ReloadOperationalDataOptions } from "@/components/use-operational-
 
 type MovementDraftCache = Record<string, ProductionOrder>;
 
+export type SavedMovementNotice = { id: string; message: string };
+
+const SAVED_NOTICE_DURATION_MS = 4500;
+const DISCARD_UNSAVED_EDIT_WARNING =
+  "Bạn có thay đổi chưa lưu ở khâu đang sửa. Chuyển sang khâu khác sẽ bỏ các thay đổi này. Tiếp tục?";
+
 type UseMaterialMovementsParams = {
   orders: ProductionOrder[];
+  workers: WorkerMaster[];
   stageRules: Record<string, HaoHutRule>;
   movementDraftCache: MovementDraftCache;
   setOrders: Dispatch<SetStateAction<ProductionOrder[]>>;
@@ -44,6 +54,7 @@ type UseMaterialMovementsParams = {
 
 export function useMaterialMovements({
   orders,
+  workers,
   stageRules,
   movementDraftCache,
   setOrders,
@@ -58,6 +69,32 @@ export function useMaterialMovements({
   const [editingMovementId, setEditingMovementId] = useState<string | null>(null);
   const [isMovementFormOpen, setIsMovementFormOpen] = useState(false);
   const [movementFormTab, setMovementFormTab] = useState<"info" | "stage" | "advanced">("info");
+  const [savedMovementNotice, setSavedMovementNotice] = useState<SavedMovementNotice | null>(null);
+
+  // Luu lai "anh chup" cua dong dang sua ngay khi gan editingMovementId, de
+  // phat hien co thay doi chua luu truoc khi cho phep chuyen sang khau/dong
+  // khac (tranh mat du lieu am tham). Chi la ref noi bo, khong can render lai.
+  const editingSnapshotRef = useRef<string | null>(null);
+
+  function isCurrentEditDirty(currentDraft: ProductionOrder) {
+    return editingMovementId !== null && editingSnapshotRef.current !== null && JSON.stringify(currentDraft) !== editingSnapshotRef.current;
+  }
+
+  function confirmDiscardIfDirty(): boolean {
+    if (!isCurrentEditDirty(draft)) return true;
+    if (typeof window === "undefined") return true;
+    return window.confirm(DISCARD_UNSAVED_EDIT_WARNING);
+  }
+
+  function attachToExistingMovement(order: ProductionOrder) {
+    setEditingMovementId(order.id);
+    setDraft((current) => ({ ...current, ...order }));
+    editingSnapshotRef.current = JSON.stringify(order);
+  }
+
+  function dismissSavedMovementNotice() {
+    setSavedMovementNotice(null);
+  }
 
   useEffect(() => {
     if (!isMovementFormOpen) return;
@@ -72,6 +109,12 @@ export function useMaterialMovements({
       return { ...current, [code]: draft };
     });
   }, [draft, isMovementFormOpen, setMovementDraftCache]);
+
+  useEffect(() => {
+    if (!savedMovementNotice) return;
+    const timer = setTimeout(() => setSavedMovementNotice(null), SAVED_NOTICE_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, [savedMovementNotice]);
 
   function updateDraft<K extends keyof ProductionOrder>(key: K, value: ProductionOrder[K]) {
     setDraft((current) => {
@@ -156,13 +199,24 @@ export function useMaterialMovements({
       }
 
       setSelectedOrderCode(savedOrder.code);
+      const stageLabel = getStageLabel(savedOrder.stage);
+      const workerLabel = savedOrder.worker || "(chưa có thợ)";
       if (effectiveEditingId) {
         pushAudit("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`);
         await createAuditLog("update_movement", `Cập nhật giao dịch NVL ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
+        setSavedMovementNotice({
+          id: savedOrder.id,
+          message: `Đã cập nhật: ${savedOrder.code} · Khâu ${stageLabel} · Thợ ${workerLabel}`
+        });
       } else {
         pushAudit("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`);
         await createAuditLog("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
+        setSavedMovementNotice({
+          id: savedOrder.id,
+          message: `Đã thêm: ${savedOrder.code} · Khâu ${stageLabel} · Thợ ${workerLabel}`
+        });
       }
+      editingSnapshotRef.current = null;
 
       if (resetMode === "close") {
         setDraft(createEmptyOrder());
@@ -256,13 +310,17 @@ export function useMaterialMovements({
     if (target) void createAuditLog("delete_movement", `Xóa giao dịch ${target.code} - ${target.worker}`, id);
   }
 
+  // Mo 1 dong da co san de sua (bam tu bang NK NVL hoac tu danh sach tho
+  // trong khau nhieu tho) - luon mo thang vao tab "Cong doan" de user thay
+  // ngay khau/tho dang sua, tranh nham lan voi tao moi.
   function openMovementForEdit(order: ProductionOrder) {
-    setEditingMovementId(order.id);
-    setDraft({ ...order });
+    if (isMovementFormOpen && !confirmDiscardIfDirty()) return;
+    attachToExistingMovement(order);
     setSelectedOrderCode(order.code);
-    setMovementFormTab("info");
+    setMovementFormTab("stage");
     setIsMovementFormOpen(true);
     setActiveModule("Nhật ký NVL");
+    setRemoteError(null);
   }
 
   function closeMovementForm() {
@@ -270,14 +328,58 @@ export function useMaterialMovements({
     setEditingMovementId(null);
     setDraft(createEmptyOrder());
     setRemoteError(null);
+    editingSnapshotRef.current = null;
   }
 
   function openEmptyMovementForm() {
+    if (isMovementFormOpen && !confirmDiscardIfDirty()) return;
     setEditingMovementId(null);
     setDraft(createEmptyOrder());
+    editingSnapshotRef.current = null;
     setRemoteError(null);
     setMovementFormTab("info");
     setIsMovementFormOpen(true);
+  }
+
+  // Chuyen tab khau trong drawer. Khau 1 tho da co dong: gan lai dung dong
+  // do de sua (khong tao dong moi). Khau chua co dong hoac khau nhieu tho:
+  // bat dau 1 draft moi cho khau ay. Neu dang sua dong khac ma co thay doi
+  // chua luu, hoi xac nhan truoc khi chuyen de tranh mat du lieu am tham.
+  function selectStageTab(stageCode: string) {
+    if (!confirmDiscardIfDirty()) return;
+
+    const draftStageMovements = buildDraftStageMovements(orders, draft.code);
+    const existing = draftStageMovements.get(stageCode);
+
+    if (existing && isSingleWorkerStage(stageCode)) {
+      attachToExistingMovement(existing);
+    } else {
+      const suggestedWorker = workers.find((item) => item.stages.includes(stageCode));
+      editingSnapshotRef.current = null;
+      setEditingMovementId(null);
+      setDraft((current) => ({
+        ...current,
+        id: "",
+        stage: stageCode,
+        worker: suggestedWorker?.full_name ?? "",
+        qtyPiece: 0,
+        issued: 0,
+        returned: 0,
+        transferred: 0,
+        loss: 0,
+        sourceMaterialName: ""
+      }));
+    }
+    setRemoteError(null);
+  }
+
+  // Sua 1 dong cu the trong danh sach "Tho da ghi nhan cho khau nay" (khau
+  // nhieu tho) - thay vi luon tao dong moi khi bam lai tab khau, cho phep
+  // gan dung vao dong da chon de cap nhat, dam bao khong tao trung dong.
+  function switchToMovement(order: ProductionOrder) {
+    if (!confirmDiscardIfDirty()) return;
+    attachToExistingMovement(order);
+    setRemoteError(null);
   }
 
   return {
@@ -296,6 +398,10 @@ export function useMaterialMovements({
     removeOrder,
     openMovementForEdit,
     closeMovementForm,
-    openEmptyMovementForm
+    openEmptyMovementForm,
+    selectStageTab,
+    switchToMovement,
+    savedMovementNotice,
+    dismissSavedMovementNotice
   };
 }
