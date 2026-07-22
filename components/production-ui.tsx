@@ -141,7 +141,14 @@ export function SearchableSelect({
       close();
     }
 
-    function handleScrollOrResize() {
+    // "scroll" khong bubble nhung listener capture tren window van bat duoc
+    // moi scroll xay ra ben trong trang, ke ca cuon chinh danh sach lua chon
+    // cua panel (max-h-64 overflow-y-auto) - phai bo qua truong hop nay,
+    // chi dong panel khi scroll xay ra BEN NGOAI no (VD drawer cuon lam
+    // lech vi tri trigger), neu khong panel se tu dong bi vua cuon vua dong.
+    function handleScrollOrResize(event: Event) {
+      const target = event.target as Node;
+      if (panelRef.current?.contains(target)) return;
       close();
     }
 
