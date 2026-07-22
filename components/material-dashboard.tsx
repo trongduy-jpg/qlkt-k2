@@ -60,7 +60,8 @@ import {
   buildProductionOverview,
   buildSelectedOrderDetail,
   filterJournalOrders,
-  filterProductionSummaries
+  filterProductionSummaries,
+  pickCurrentStagePerOrder
 } from "@/lib/production-workflow";
 import { LossReportView } from "@/components/loss-report-view";
 import { StageEntryView } from "@/components/stage-entry-view";
@@ -313,7 +314,13 @@ export function MaterialDashboard() {
     window.localStorage.setItem(productionHeaderDraftCacheKey, JSON.stringify(productionHeaderDraftCache));
   }, [hasLoadedStorage, productionHeaderDraftCache]);
 
-  const filteredOrders = useMemo(() => filterJournalOrders(orders, { query, status }), [orders, query, status]);
+  // Bang NK NVL chi hien 1 dong/LSX (cong doan hien tai = khau xa nhat da
+  // ghi nhan). Xem lich su cac khau truoc thi mo drawer. Gom nhom truoc,
+  // roi moi loc theo tu khoa/trang thai tren dong dai dien.
+  const filteredOrders = useMemo(() => {
+    const currentStageRows = pickCurrentStagePerOrder(orders, mainJournalStageCodes);
+    return filterJournalOrders(currentStageRows, { query, status });
+  }, [orders, query, status]);
 
   const orderSummaries = useMemo(() => buildOrderSummaries(orders, productionHeaders), [orders, productionHeaders]);
 

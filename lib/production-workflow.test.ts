@@ -5,8 +5,11 @@ import {
   buildProductionOverview,
   buildSelectedOrderDetail,
   filterJournalOrders,
-  filterProductionSummaries
+  filterProductionSummaries,
+  pickCurrentStagePerOrder
 } from "./production-workflow";
+
+const STAGE_ORDER = ["NAU", "CKE", "DAN", "KBI", "QBI", "DAP", "NEN", "DKB", "BAO", "GEP", "BAS", "SXK"];
 
 function makeMovement(overrides: Partial<ProductionOrder>): ProductionOrder {
   return {
@@ -152,6 +155,31 @@ describe("filterProductionSummaries", () => {
       query: ""
     });
     expect(byMonth.map((item) => item.code)).toEqual(["DHAG-26071", "DHAG-26072"]);
+  });
+});
+
+describe("pickCurrentStagePerOrder", () => {
+  it("gom moi LSX ve 1 dong, lay khau xa nhat trong quy trinh lam dai dien", () => {
+    const rows = [
+      makeMovement({ id: "m1", code: "DHAG-1", stage: "NAU", occurredDate: "2026-07-20" }),
+      makeMovement({ id: "m2", code: "DHAG-1", stage: "DKB", occurredDate: "2026-07-19" }),
+      makeMovement({ id: "m3", code: "DHAG-2", stage: "CKE", occurredDate: "2026-07-21" })
+    ];
+
+    const result = pickCurrentStagePerOrder(rows, STAGE_ORDER);
+    expect(result).toHaveLength(2);
+    const byCode = Object.fromEntries(result.map((item) => [item.code, item.id]));
+    // DHAG-1: DKB (index 7) xa hon NAU (index 0) du NAU co ngay moi hon
+    expect(byCode["DHAG-1"]).toBe("m2");
+    expect(byCode["DHAG-2"]).toBe("m3");
+  });
+
+  it("cung 1 khau nhieu tho: lay ban ghi occurredDate moi nhat lam dai dien", () => {
+    const rows = [
+      makeMovement({ id: "a", code: "DHAG-1", stage: "GEP", occurredDate: "2026-07-18" }),
+      makeMovement({ id: "b", code: "DHAG-1", stage: "GEP", occurredDate: "2026-07-20" })
+    ];
+    expect(pickCurrentStagePerOrder(rows, STAGE_ORDER).map((item) => item.id)).toEqual(["b"]);
   });
 });
 

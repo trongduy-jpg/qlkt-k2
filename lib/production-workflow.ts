@@ -1,6 +1,6 @@
 import type { ProductionOrder, Status } from "@/lib/demo-data";
 import { pickNumber, pickText } from "@/lib/production-helpers";
-import { extractOrderCodeMonth, toIsoDate } from "@/lib/production-business-rules";
+import { extractOrderCodeMonth, normalizeStageCode, toIsoDate } from "@/lib/production-business-rules";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
 
 export const ALL_DESTINATIONS_FILTER = "Tất cả cửa hàng";
@@ -99,6 +99,46 @@ export function buildOrderCodeMonthOptions(summaries: OrderSummary[]): string[] 
     if (month) months.add(month);
   }
   return Array.from(months).sort((a, b) => b.localeCompare(a));
+}
+
+// Gom cac giao dich (moi khau = 1 dong) ve DUNG 1 dong/LSX, dai dien la
+// "cong doan hien tai" = khau xa nhat trong quy trinh (stageOrder) da co
+// ghi nhan. Bang NK NVL chi hien dong dai dien nay, xem lich su cac khau
+// truoc thi mo drawer (accordion da liet ke day du). Neu cung 1 khau co
+// nhieu tho / cung index quy trinh thi lay ban ghi occurredDate moi nhat,
+// hoa nua thi giu ban ghi xuat hien truoc trong mang (thuong da sort moi->cu).
+export function pickCurrentStagePerOrder(orders: ProductionOrder[], stageOrder: string[]): ProductionOrder[] {
+  const orderIndexByStage = new Map(stageOrder.map((code, index) => [code, index]));
+  const stageRank = (order: ProductionOrder) => orderIndexByStage.get(normalizeStageCode(order.stage)) ?? -1;
+
+  const representativeByCode = new Map<string, { order: ProductionOrder; position: number }>();
+  orders.forEach((order, position) => {
+    const current = representativeByCode.get(order.code);
+    if (!current) {
+      representativeByCode.set(order.code, { order, position });
+      return;
+    }
+
+    const rankDiff = stageRank(order) - stageRank(current.order);
+    if (rankDiff > 0) {
+      representativeByCode.set(order.code, { order, position });
+      return;
+    }
+    if (rankDiff === 0) {
+      const dateDiff = (order.occurredDate || "").localeCompare(current.order.occurredDate || "");
+      if (dateDiff > 0 || (dateDiff === 0 && position < current.position)) {
+        representativeByCode.set(order.code, { order, position });
+      }
+    }
+  });
+
+  return Array.from(representativeByCode.values())
+    .sort((left, right) => {
+      const dateDiff = (right.order.occurredDate || "").localeCompare(left.order.occurredDate || "");
+      if (dateDiff !== 0) return dateDiff;
+      return left.position - right.position;
+    })
+    .map((entry) => entry.order);
 }
 
 export function filterJournalOrders(orders: ProductionOrder[], filters: JournalOrderFilters): ProductionOrder[] {
