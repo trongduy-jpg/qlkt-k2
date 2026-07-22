@@ -3074,6 +3074,7 @@ export function MaterialDashboard() {
                         <th className="px-3 py-3">Loại NVL</th>
                         <th className="px-3 py-3">NVL</th>
                         <th className="px-3 py-3">Thợ / công đoạn</th>
+                        <th className="px-3 py-3 text-right">SL SP</th>
                         <th className="px-3 py-3 text-right">SL</th>
                         <th className="px-3 py-3 text-right">Xuất</th>
                         <th className="px-3 py-3 text-right">Nhập</th>
@@ -3106,6 +3107,7 @@ export function MaterialDashboard() {
                             <div className="font-medium text-zinc-800">{order.worker}</div>
                             <div className="text-xs text-zinc-500">{order.stage ? getStageLabel(order.stage) : "-"}</div>
                           </td>
+                          <td className="px-3 py-3 text-right text-zinc-700">{order.productQty ? order.productQty : "-"}</td>
                           <td className="px-3 py-3 text-right text-zinc-700">{order.qtyPiece ?? "-"}</td>
                           <td className={`px-3 py-3 text-right ${order.issued > 0 ? "text-zinc-700" : "text-zinc-400"}`}>{formatGram(order.issued)}</td>
                           <td className={`px-3 py-3 text-right ${order.returned > 0 ? "text-zinc-700" : "text-zinc-400"}`}>{formatGram(order.returned)}</td>
