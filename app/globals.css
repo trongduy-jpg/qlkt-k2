@@ -36,6 +36,25 @@ select {
   font: inherit;
 }
 
+/* Bo mui ten tang/giam cua input number cho giao dien gon gang */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  text-align: right;
+}
+
+/* Input ngay/thang co ben rong noi tai lon; cho phep co lai trong grid
+   de khong lam tran layout (thanh cuon ngang) trong drawer/form. */
+input[type="date"],
+input[type="month"] {
+  min-width: 0;
+}
+
 .shell-grid {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);

@@ -3145,7 +3145,7 @@ export function MaterialDashboard() {
                 <div className="fixed inset-0 z-50 bg-ink/30 backdrop-blur-sm" onClick={closeMovementForm} />
               ) : null}
               <section
-                className={`fixed inset-y-0 right-0 z-50 w-full max-w-xl overflow-y-auto border-l border-line bg-white p-5 shadow-2xl transition-transform duration-200 ${
+                className={`fixed inset-y-0 right-0 z-50 w-full max-w-xl overflow-y-auto overflow-x-hidden border-l border-line bg-white p-5 shadow-2xl transition-transform duration-200 ${
                   isMovementFormOpen ? "translate-x-0" : "pointer-events-none translate-x-full"
                 }`}
                 aria-hidden={!isMovementFormOpen}

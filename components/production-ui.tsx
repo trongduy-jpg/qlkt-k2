@@ -6,7 +6,7 @@ import { hasMeaningfulDisplayValue } from "@/lib/production-helpers";
 // Tach ra khoi material-dashboard.tsx de tai su dung va giam do dai file.
 
 export const fieldControlClass =
-  "h-10 w-full rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
+  "h-10 w-full min-w-0 rounded-md border border-line bg-white px-3 text-sm outline-none transition-colors focus:border-jade focus:ring-2 focus:ring-jade/20 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
 
 export function FieldShell({
   label,
@@ -20,7 +20,7 @@ export function FieldShell({
   children: ReactNode;
 }) {
   return (
-    <label className="grid gap-1 text-sm">
+    <label className="grid min-w-0 gap-1 text-sm">
       <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
         {label}
         {required ? <span className="ml-1 text-rose-500">*</span> : null}
