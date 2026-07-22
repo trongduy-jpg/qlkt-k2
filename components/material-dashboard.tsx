@@ -701,11 +701,11 @@ export function MaterialDashboard() {
     setRemoteError(null);
   }
 
-  function addOrder(keepOpen = false) {
-    void addOrderAsync(keepOpen);
+  function addOrder(resetMode: "close" | "clearStage" | "keepStage" = "close") {
+    void addOrderAsync(resetMode);
   }
 
-  async function addOrderAsync(keepOpen = false) {
+  async function addOrderAsync(resetMode: "close" | "clearStage" | "keepStage" = "close") {
     const missingFields = validateMovementDraft(draft);
     if (missingFields.length > 0) {
       setRemoteError(`Chưa thể lưu giao dịch. Vui lòng bổ sung: ${missingFields.join(", ")}.`);
@@ -725,14 +725,18 @@ export function MaterialDashboard() {
       pushAudit("large_weight_warning", `Giao dịch ${normalizedDraft.code} có trọng lượng trên 2000g, cần kiểm tra trước khi chốt.`);
     }
 
-    // Moi (LSX + khau) chi giu 1 dong: neu khau nay cua LSX da co dong roi
-    // thi cap nhat de len chinh dong do, khong tao them dong moi.
+    // Khau chi 1 tho (CKE/DAN/KBI): moi (LSX + khau) chi giu 1 dong - neu
+    // khau nay cua LSX da co dong roi thi cap nhat len chinh dong do,
+    // khong tao them dong moi. Khau nhieu tho: moi lan luu la 1 dong rieng
+    // (them tho khac), tru khi dang sua 1 dong co san (editingMovementId).
     const normalizedStageCode = normalizeStageCode(normalizedDraft.stage);
-    const existingStageMovement = orders.find(
-      (order) =>
-        order.code === normalizedDraft.code.trim() &&
-        normalizeStageCode(order.stage) === normalizedStageCode
-    );
+    const existingStageMovement = isSingleWorkerStage(normalizedStageCode)
+      ? orders.find(
+          (order) =>
+            order.code === normalizedDraft.code.trim() &&
+            normalizeStageCode(order.stage) === normalizedStageCode
+        )
+      : undefined;
     const effectiveEditingId = editingMovementId || existingStageMovement?.id || null;
 
     const nextOrder = {
@@ -771,11 +775,33 @@ export function MaterialDashboard() {
         pushAudit("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`);
         await createAuditLog("create_movement", `Thêm giao dịch ${savedOrder.code} cho ${savedOrder.worker}`, savedOrder.id);
       }
-      if (keepOpen) {
-        // Giu drawer mo de nhap tiep khau khac cua cung LSX. Xoa ca khau
-        // dang chon (khong chi xoa so lieu) de "Dang nhap: ..." quay ve
-        // trang thai "Chua chon khau" - tranh cam giac du lieu vua luu bi
-        // mat khi form van hien khau vua xong nhung trong trơn.
+      if (resetMode === "close") {
+        setDraft(createEmptyOrder());
+        setEditingMovementId(null);
+        setIsMovementFormOpen(false);
+        setActiveModule("Nhật ký NVL");
+      } else if (resetMode === "keepStage") {
+        // "+ Them tho khac": giu nguyen khau dang chon, chi xoa Tho/So
+        // lieu de nhap tiep 1 tho khac cho DUNG khau nay (danh cho khau
+        // nhieu tho).
+        setEditingMovementId(null);
+        setDraft((current) => ({
+          ...current,
+          id: "",
+          worker: "",
+          qtyPiece: 0,
+          issued: 0,
+          returned: 0,
+          transferred: 0,
+          loss: 0,
+          sourceMaterialName: ""
+        }));
+      } else {
+        // "clearStage": giu drawer mo de chuyen sang khau khac cua cung
+        // LSX. Xoa ca khau dang chon (khong chi xoa so lieu) de "Dang
+        // nhap: ..." quay ve trang thai "Chua chon khau" - tranh cam giac
+        // du lieu vua luu bi mat khi form van hien khau vua xong nhung
+        // trong tron.
         setEditingMovementId(null);
         setDraft((current) => ({
           ...current,
@@ -789,11 +815,6 @@ export function MaterialDashboard() {
           loss: 0,
           sourceMaterialName: ""
         }));
-      } else {
-        setDraft(createEmptyOrder());
-        setEditingMovementId(null);
-        setIsMovementFormOpen(false);
-        setActiveModule("Nhật ký NVL");
       }
     } catch (error) {
       setRemoteError(error instanceof Error ? error.message : editingMovementId ? "Không cập nhật được giao dịch" : "Không thêm được giao dịch");
@@ -3403,13 +3424,25 @@ export function MaterialDashboard() {
                     <button
                       className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
                       type="button"
-                      onClick={() => addOrder(!editingMovementId)}
+                      onClick={() => addOrder(editingMovementId ? "close" : "clearStage")}
                       disabled={isDraftDirectChargeInvalid}
                       title={editingMovementId ? undefined : "Lưu khâu này, drawer vẫn mở để chọn khâu tiếp theo của cùng LSX"}
                     >
                       <Plus size={16} />
                       {editingMovementId ? "Cập nhật NVL" : "Lưu"}
                     </button>
+                    {!editingMovementId && draft.stage && !isSingleWorkerStage(draft.stage) ? (
+                      <button
+                        className="inline-flex items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:border-zinc-200 disabled:text-zinc-400"
+                        type="button"
+                        onClick={() => addOrder("keepStage")}
+                        disabled={isDraftDirectChargeInvalid}
+                        title="Lưu thợ này và nhập tiếp thợ khác cho cùng khâu"
+                      >
+                        <Plus size={16} />
+                        Thêm thợ khác
+                      </button>
+                    ) : null}
                     {editingMovementId ? (
                       <button
                         className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-400"
