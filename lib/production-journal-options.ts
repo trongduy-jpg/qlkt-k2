@@ -307,5 +307,6 @@ export const movementExportSourceOptions: SelectOption[] = [
 
 export const movementStageStatusOptions: SelectOption[] = [
   { value: "Đang thực hiện", label: "Đang thực hiện" },
-  { value: "Hoàn thành", label: "Hoàn thành" }
+  { value: "Hoàn thành", label: "Hoàn thành" },
+  { value: "Bỏ qua", label: "Bỏ qua" }
 ];
