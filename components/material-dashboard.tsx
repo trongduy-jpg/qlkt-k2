@@ -3321,7 +3321,7 @@ export function MaterialDashboard() {
                           >
                             <option value="">Chọn thợ</option>
                             {workerOptionsForDraft.map((worker) => (
-                              <option key={worker.id} value={worker.full_name}>{worker.worker_code} - {worker.full_name}</option>
+                              <option key={worker.id} value={worker.full_name}>{worker.full_name}</option>
                             ))}
                           </SelectControl>
                         </FieldShell>
