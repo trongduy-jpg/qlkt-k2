@@ -1,12 +1,17 @@
 import type { ProductionOrder, Status } from "@/lib/demo-data";
 import { pickNumber, pickText } from "@/lib/production-helpers";
-import { toIsoDate } from "@/lib/production-business-rules";
+import { extractOrderCodeMonth, toIsoDate } from "@/lib/production-business-rules";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
+
+export const ALL_DESTINATIONS_FILTER = "Tất cả cửa hàng";
+export const ALL_CODE_MONTHS_FILTER = "Tất cả tháng";
 
 export type ProductionSummaryFilters = {
   deliveryStatus: string;
   salesType: string;
   deadlineFilter: string;
+  destination: string;
+  codeMonth: string;
   query: string;
   today?: string;
 };
@@ -62,6 +67,8 @@ export function filterProductionSummaries(summaries: OrderSummary[], filters: Pr
   return summaries.filter((summary) => {
     const matchDeliveryStatus = filters.deliveryStatus === "Tất cả trạng thái LSX" || summary.deliveryStatus === filters.deliveryStatus;
     const matchSalesType = filters.salesType === "Tất cả SR/KH" || summary.salesType === filters.salesType;
+    const matchDestination = filters.destination === ALL_DESTINATIONS_FILTER || summary.destination === filters.destination;
+    const matchCodeMonth = filters.codeMonth === ALL_CODE_MONTHS_FILTER || extractOrderCodeMonth(summary.code) === filters.codeMonth;
     const matchQuery =
       !normalizedQuery ||
       `${summary.customerName || ""} ${summary.sku || ""} ${summary.productName || ""} ${summary.code || ""}`
@@ -79,8 +86,19 @@ export function filterProductionSummaries(summaries: OrderSummary[], filters: Pr
       matchDeadline = !summary.deadlineDate;
     }
 
-    return matchDeliveryStatus && matchSalesType && matchQuery && matchDeadline;
+    return matchDeliveryStatus && matchSalesType && matchDestination && matchCodeMonth && matchQuery && matchDeadline;
   });
+}
+
+// Danh sach thang xuat hien trong Ma LSX cua toan bo LSX hien co, moi nhat
+// truoc, dung de dien dropdown loc "Thang" ma khong can luu cot rieng.
+export function buildOrderCodeMonthOptions(summaries: OrderSummary[]): string[] {
+  const months = new Set<string>();
+  for (const summary of summaries) {
+    const month = extractOrderCodeMonth(summary.code);
+    if (month) months.add(month);
+  }
+  return Array.from(months).sort((a, b) => b.localeCompare(a));
 }
 
 export function filterJournalOrders(orders: ProductionOrder[], filters: JournalOrderFilters): ProductionOrder[] {

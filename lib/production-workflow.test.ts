@@ -117,11 +117,41 @@ describe("filterProductionSummaries", () => {
       deliveryStatus: "Tất cả trạng thái LSX",
       salesType: "Tất cả SR/KH",
       deadlineFilter: "Quá hạn",
+      destination: "Tất cả cửa hàng",
+      codeMonth: "Tất cả tháng",
       query: "alpha",
       today: "2026-07-22"
     });
 
     expect(result.map((item) => item.code)).toEqual(["DHAG-1"]);
+  });
+
+  it("loc LSX theo cua hang va thang doc tu Ma LSX", () => {
+    const rows = [
+      makeSummary({ code: "DHAG-26071", sku: "A", destination: "CH1" }),
+      makeSummary({ code: "DHAG-26072", sku: "B", destination: "CH2" }),
+      makeSummary({ code: "DHAG-26081", sku: "C", destination: "CH1" })
+    ];
+
+    const byDestination = filterProductionSummaries(rows, {
+      deliveryStatus: "Tất cả trạng thái LSX",
+      salesType: "Tất cả SR/KH",
+      deadlineFilter: "Tất cả deadline",
+      destination: "CH1",
+      codeMonth: "Tất cả tháng",
+      query: ""
+    });
+    expect(byDestination.map((item) => item.code)).toEqual(["DHAG-26071", "DHAG-26081"]);
+
+    const byMonth = filterProductionSummaries(rows, {
+      deliveryStatus: "Tất cả trạng thái LSX",
+      salesType: "Tất cả SR/KH",
+      deadlineFilter: "Tất cả deadline",
+      destination: "Tất cả cửa hàng",
+      codeMonth: "2026-07",
+      query: ""
+    });
+    expect(byMonth.map((item) => item.code)).toEqual(["DHAG-26071", "DHAG-26072"]);
   });
 });
 

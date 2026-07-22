@@ -8,8 +8,10 @@ import { deliveryStatusClass, hasMeaningfulText, statusClass } from "@/lib/produ
 import { formatDisplayDate, getStageLabel, normalizeStageCode } from "@/lib/production-business-rules";
 import {
   productionOrderDeliveryStatusOptions,
+  productionOrderDestinations,
   productionOrderSalesTypeOptions
 } from "@/lib/production-journal-options";
+import { ALL_CODE_MONTHS_FILTER, ALL_DESTINATIONS_FILTER } from "@/lib/production-workflow";
 
 type ProductionOrdersViewProps = {
   isVisible: boolean;
@@ -20,15 +22,25 @@ type ProductionOrdersViewProps = {
   productionDeliveryStatus: string;
   productionSalesType: string;
   productionDeadlineFilter: string;
+  productionDestinationFilter: string;
+  productionCodeMonthFilter: string;
+  productionCodeMonthOptions: string[];
   productionCustomerQuery: string;
   onDeliveryStatusChange: (value: string) => void;
   onSalesTypeChange: (value: string) => void;
   onDeadlineFilterChange: (value: string) => void;
+  onDestinationFilterChange: (value: string) => void;
+  onCodeMonthFilterChange: (value: string) => void;
   onCustomerQueryChange: (value: string) => void;
   onCreateOrder: () => void;
   onShowAllOrders: () => void;
   onSelectOrder: (code: string) => void;
 };
+
+function formatCodeMonthLabel(codeMonth: string) {
+  const [year, month] = codeMonth.split("-");
+  return `Tháng ${month}/${year}`;
+}
 
 export function ProductionOrdersView({
   isVisible,
@@ -39,10 +51,15 @@ export function ProductionOrdersView({
   productionDeliveryStatus,
   productionSalesType,
   productionDeadlineFilter,
+  productionDestinationFilter,
+  productionCodeMonthFilter,
+  productionCodeMonthOptions,
   productionCustomerQuery,
   onDeliveryStatusChange,
   onSalesTypeChange,
   onDeadlineFilterChange,
+  onDestinationFilterChange,
+  onCodeMonthFilterChange,
   onCustomerQueryChange,
   onCreateOrder,
   onShowAllOrders,
@@ -92,16 +109,43 @@ export function ProductionOrdersView({
           </div>
         </div>
 
-        <div className="grid gap-3 rounded-md border border-line bg-paper p-3 lg:grid-cols-4">
+        <div className="grid gap-3 rounded-md border border-line bg-paper p-3 lg:grid-cols-3 xl:grid-cols-6">
           <select
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={productionDeliveryStatus}
             onChange={(event) => onDeliveryStatusChange(event.target.value)}
+            title="Lọc theo trạng thái LSX"
           >
             <option>Tất cả trạng thái LSX</option>
             {productionOrderDeliveryStatusOptions.map((item) => (
               <option key={item.value} value={item.value}>
                 {item.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={productionDestinationFilter}
+            onChange={(event) => onDestinationFilterChange(event.target.value)}
+            title="Lọc theo cửa hàng"
+          >
+            <option value={ALL_DESTINATIONS_FILTER}>{ALL_DESTINATIONS_FILTER}</option>
+            {productionOrderDestinations.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={productionCodeMonthFilter}
+            onChange={(event) => onCodeMonthFilterChange(event.target.value)}
+            title="Lọc theo tháng (dựa vào Mã LSX)"
+          >
+            <option value={ALL_CODE_MONTHS_FILTER}>{ALL_CODE_MONTHS_FILTER}</option>
+            {productionCodeMonthOptions.map((codeMonth) => (
+              <option key={codeMonth} value={codeMonth}>
+                {formatCodeMonthLabel(codeMonth)}
               </option>
             ))}
           </select>

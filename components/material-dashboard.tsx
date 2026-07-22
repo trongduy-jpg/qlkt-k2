@@ -53,6 +53,9 @@ import {
   selectMovementsForOrder
 } from "@/lib/production-summary";
 import {
+  ALL_CODE_MONTHS_FILTER,
+  ALL_DESTINATIONS_FILTER,
+  buildOrderCodeMonthOptions,
   buildProductionOverview,
   buildSelectedOrderDetail,
   filterJournalOrders,
@@ -155,6 +158,8 @@ export function MaterialDashboard() {
   const [productionSalesType, setProductionSalesType] = useState("Tất cả SR/KH");
   const [productionCustomerQuery, setProductionCustomerQuery] = useState("");
   const [productionDeadlineFilter, setProductionDeadlineFilter] = useState("Tất cả deadline");
+  const [productionDestinationFilter, setProductionDestinationFilter] = useState(ALL_DESTINATIONS_FILTER);
+  const [productionCodeMonthFilter, setProductionCodeMonthFilter] = useState(ALL_CODE_MONTHS_FILTER);
   const [selectedOrderCode, setSelectedOrderCode] = useState<string | null>(null);
   const [isProductionDetailOpen, setIsProductionDetailOpen] = useState(false);
   const [stageEntryQuery, setStageEntryQuery] = useState("");
@@ -337,15 +342,27 @@ export function MaterialDashboard() {
     setRemoteError
   });
 
+  const productionCodeMonthOptions = useMemo(() => buildOrderCodeMonthOptions(orderSummaries), [orderSummaries]);
+
   const filteredOrderSummaries = useMemo(
     () =>
       filterProductionSummaries(orderSummaries, {
         deliveryStatus: productionDeliveryStatus,
         salesType: productionSalesType,
         deadlineFilter: productionDeadlineFilter,
+        destination: productionDestinationFilter,
+        codeMonth: productionCodeMonthFilter,
         query: productionCustomerQuery
       }),
-    [orderSummaries, productionCustomerQuery, productionDeadlineFilter, productionDeliveryStatus, productionSalesType]
+    [
+      orderSummaries,
+      productionCustomerQuery,
+      productionDeadlineFilter,
+      productionDeliveryStatus,
+      productionSalesType,
+      productionDestinationFilter,
+      productionCodeMonthFilter
+    ]
   );
 
   const selectedOrderSummary = useMemo(() => {
@@ -1544,10 +1561,15 @@ export function MaterialDashboard() {
             productionDeliveryStatus={productionDeliveryStatus}
             productionSalesType={productionSalesType}
             productionDeadlineFilter={productionDeadlineFilter}
+            productionDestinationFilter={productionDestinationFilter}
+            productionCodeMonthFilter={productionCodeMonthFilter}
+            productionCodeMonthOptions={productionCodeMonthOptions}
             productionCustomerQuery={productionCustomerQuery}
             onDeliveryStatusChange={setProductionDeliveryStatus}
             onSalesTypeChange={setProductionSalesType}
             onDeadlineFilterChange={setProductionDeadlineFilter}
+            onDestinationFilterChange={setProductionDestinationFilter}
+            onCodeMonthFilterChange={setProductionCodeMonthFilter}
             onCustomerQueryChange={setProductionCustomerQuery}
             onCreateOrder={() => {
               setEditingProductionCode(null);

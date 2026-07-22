@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildProductionOrderCode,
   buildUniqueProductionOrderCode,
+  extractOrderCodeMonth,
   formatDisplayDate,
   formatDisplayDateTime,
   getCarryOverLossPeriod,
@@ -34,6 +35,25 @@ describe("buildProductionOrderCode", () => {
 
   it("buildUniqueProductionOrderCode la alias tuong duong", () => {
     expect(buildUniqueProductionOrderCode("DHAG", "2026-07-20", ["DHAG-26071"])).toBe("DHAG-26072");
+  });
+});
+
+describe("extractOrderCodeMonth", () => {
+  it("doc dung thang/nam tu Ma LSX STT 1 chu so", () => {
+    expect(extractOrderCodeMonth("DHAG-26071")).toBe("2026-07");
+  });
+
+  it("doc dung thang/nam tu Ma LSX STT 2 chu so", () => {
+    expect(extractOrderCodeMonth("DHAG-260716")).toBe("2026-07");
+  });
+
+  it("tra ve null voi ma khong dung dinh dang", () => {
+    expect(extractOrderCodeMonth("DHAG-26/03/02")).toBeNull();
+    expect(extractOrderCodeMonth("KHONGHOPLE")).toBeNull();
+  });
+
+  it("tra ve null neu thang khong hop le", () => {
+    expect(extractOrderCodeMonth("DHAG-26131")).toBeNull();
   });
 });
 

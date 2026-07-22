@@ -70,6 +70,18 @@ export function buildUniqueProductionOrderCode(prefix: string, dateString: strin
   return buildProductionOrderCode(prefix, dateString, existingCodes);
 }
 
+// Doc lai thang/nam tu Ma LSX (nguoc voi buildOrderMonthKey o tren), dung
+// de loc danh sach LSX theo thang ma khong can them cot rieng trong DB.
+// Tra ve "YYYY-MM" (gia dinh the ky 20xx) hoac null neu ma khong dung dinh dang.
+export function extractOrderCodeMonth(code: string): string | null {
+  const match = code.match(/-(\d{2})(\d{2})\d*$/);
+  if (!match) return null;
+  const [, yy, mm] = match;
+  const monthNumber = Number(mm);
+  if (monthNumber < 1 || monthNumber > 12) return null;
+  return `20${yy}-${mm}`;
+}
+
 export function buildDocumentNo(dateString: string, sequence: number) {
   const compactDate = dateString.replaceAll("-", "");
   return `${compactDate}-${String(sequence).padStart(3, "0")}`;
