@@ -3214,7 +3214,7 @@ export function MaterialDashboard() {
 
                   {movementFormTab === "info" && !editingMovementId ? (
                     <DrawerSection title="Thông tin LSX" note="Nhóm nhận diện đơn và sản phẩm đang thao tác.">
-                      <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="grid gap-3 sm:grid-cols-3">
                         <FieldShell label="Mã LSX" required>
                           <input
                             className={fieldControlClass}
@@ -3229,6 +3229,16 @@ export function MaterialDashboard() {
                             placeholder="VD: RG750Y"
                             value={draft.sku}
                             onChange={(e) => updateDraft("sku", e.target.value)}
+                          />
+                        </FieldShell>
+                        <FieldShell label="SL sản phẩm" hint="Số lượng sản phẩm của cả lệnh (nhập 1 lần cho LSX).">
+                          <input
+                            className={fieldControlClass}
+                            min="0"
+                            type="number"
+                            placeholder="0"
+                            value={draft.productQty || ""}
+                            onChange={(e) => updateDraft("productQty", Number(e.target.value))}
                           />
                         </FieldShell>
                       </div>

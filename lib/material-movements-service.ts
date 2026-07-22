@@ -47,7 +47,7 @@ export async function loadProductionOrders(): Promise<ProductionOrder[]> {
       converted_return_weight,
       status,
       order_id,
-      production_orders(order_code, sku, product_name),
+      production_orders(order_code, sku, product_name, product_qty),
       materials(name),
       workers(full_name)
     `)
@@ -130,7 +130,7 @@ async function upsertProductionOrder(order: ProductionOrder) {
   const { data: existingOrder } = await supabase
     .from("production_orders")
     .select(
-      "order_code, sku, product_name, destination, occurred_date, document_no, document_in_no, document_line_no, movement_type, quantity_piece, planned_date, planned_stage, planned_worker, planned_material, planned_gold_age, planned_material_type, issued_gram, returned_gram, powder_gram, transferred_weight_gram, loss_period, nxt_period, source_material_name, source_name, import_source, export_source, nxt_link_code, converted_issue_weight, converted_return_weight, status"
+      "order_code, sku, product_name, product_qty, destination, occurred_date, document_no, document_in_no, document_line_no, movement_type, quantity_piece, planned_date, planned_stage, planned_worker, planned_material, planned_gold_age, planned_material_type, issued_gram, returned_gram, powder_gram, transferred_weight_gram, loss_period, nxt_period, source_material_name, source_name, import_source, export_source, nxt_link_code, converted_issue_weight, converted_return_weight, status"
     )
     .eq("order_code", order.code)
     .maybeSingle();
@@ -139,6 +139,7 @@ async function upsertProductionOrder(order: ProductionOrder) {
     order_code: order.code,
     sku: order.sku || existingOrder?.sku || null,
     product_name: order.productName || existingOrder?.product_name || null,
+    product_qty: order.productQty && order.productQty > 0 ? order.productQty : existingOrder?.product_qty || null,
     destination: order.destination || existingOrder?.destination || null,
     occurred_date: order.occurredDate || existingOrder?.occurred_date || null,
     document_no: order.documentNo || existingOrder?.document_no || null,
@@ -263,7 +264,7 @@ export async function createMaterialMovement(order: ProductionOrder): Promise<Pr
       converted_return_weight,
       status,
       order_id,
-      production_orders(order_code, sku, product_name),
+      production_orders(order_code, sku, product_name, product_qty),
       materials(name),
       workers(full_name)
     `)
@@ -305,6 +306,7 @@ export async function createMaterialMovement(order: ProductionOrder): Promise<Pr
     documentLineNo: order.documentLineNo,
     movementType: order.movementType,
     qtyPiece: order.qtyPiece,
+    productQty: order.productQty,
     transferred: order.transferred,
     lossPeriod: order.lossPeriod,
     nxtPeriod: order.nxtPeriod,
@@ -395,7 +397,7 @@ export async function updateMaterialMovement(order: ProductionOrder): Promise<Pr
       converted_issue_weight,
       converted_return_weight,
       status,
-      production_orders(order_code, sku, product_name),
+      production_orders(order_code, sku, product_name, product_qty),
       materials(name),
       workers(full_name)
     `)
@@ -416,6 +418,7 @@ export async function updateMaterialMovement(order: ProductionOrder): Promise<Pr
     documentLineNo: order.documentLineNo,
     movementType: order.movementType,
     qtyPiece: order.qtyPiece,
+    productQty: order.productQty,
     transferred: order.transferred,
     lossPeriod: order.lossPeriod,
     nxtPeriod: order.nxtPeriod,

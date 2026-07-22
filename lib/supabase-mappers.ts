@@ -55,6 +55,7 @@ export type MovementRow = {
     order_code: string;
     sku: string;
     product_name?: string | null;
+    product_qty?: number | null;
   } | null;
   materials: {
     name: string;
@@ -71,6 +72,7 @@ export function movementRowToProductionOrder(row: MovementRow): ProductionOrder 
     code: row.production_orders?.order_code ?? "",
     sku: row.production_orders?.sku ?? "",
     productName: row.production_orders?.product_name ?? "",
+    productQty: row.production_orders?.product_qty ?? 0,
     material: row.materials?.name ?? "",
     worker: row.workers?.full_name ?? "",
     stage: row.process_name,

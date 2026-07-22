@@ -17,6 +17,7 @@ export type ProductionOrder = {
   documentLineNo?: string;
   movementType?: "issue" | "return" | "transfer" | "adjustment";
   qtyPiece?: number;
+  productQty?: number;
   issued: number;
   returned: number;
   powder: number;
