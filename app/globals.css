@@ -62,12 +62,14 @@ input[type="month"] {
 
 .content-shell {
   width: 100%;
+  min-width: 0;
   max-width: 1720px;
   margin: 0 auto;
 }
 
 .unified-stack {
   display: grid;
+  min-width: 0;
   gap: 20px;
 }
 

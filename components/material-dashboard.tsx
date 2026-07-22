@@ -1371,14 +1371,13 @@ export function MaterialDashboard() {
           ) : null}
         </aside>
 
-        <section className="px-5 py-5 md:px-8">
+        <section className="min-w-0 px-5 py-5 md:px-8">
           <div className="content-shell">
-          <header className="border-b border-line pb-5">
+          <header className="border-b border-line pb-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Quản trị sản xuất</p>
-            <h2 className="font-display mt-1 text-3xl font-semibold text-ink">Theo dõi tiến độ NVL và quản trị hao hụt</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-600">
-              Quản lý lệnh sản xuất, xuất/nhập nguyên vật liệu, treo nợ/xác định, quy đổi hao hụt và quyết toán theo kỳ.
-            </p>
+            <h2 className="font-display mt-1 text-2xl font-semibold text-ink">
+              {activeModule === "Dashboard" ? "Tổng quan" : activeModule}
+            </h2>
           </header>
 
           <div className={`${isDashboard ? "grid" : "hidden"} gap-4 py-5 sm:grid-cols-2 xl:grid-cols-4`}>
