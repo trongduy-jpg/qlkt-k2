@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 
 const statusToDb: Record<Status, string> = {
   "Đang xử lý": "dang_xu_ly",

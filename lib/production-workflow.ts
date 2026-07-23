@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import { pickNumber, pickText } from "@/lib/production-helpers";
 import { extractOrderCodeMonth, normalizeStageCode, toIsoDate } from "@/lib/production-business-rules";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
@@ -152,13 +152,22 @@ export function filterJournalOrders(orders: ProductionOrder[], filters: JournalO
   });
 }
 
+// summaries gio co the co nhieu dong cung 1 Ma LSX (moi Ma hang 1 dong).
+// Tong/qua han/dang xu ly la khai niem cap LSX (deadline, trang thai LSX
+// giong nhau giua cac Ma hang cung LSX) nen chi dem 1 lan/ma LSX, tranh
+// nhan 3 lan neu LSX co 3 Ma hang. Rieng "chua co giao dich" van dem theo
+// tung dong vi moi Ma hang co the phat sinh giao dich rieng.
 export function buildProductionOverview(summaries: OrderSummary[], today = toIsoDate()): ProductionOverview {
+  const seenCodes = new Set<string>();
   return summaries.reduce(
     (acc, summary) => {
-      acc.total += 1;
+      if (!seenCodes.has(summary.code)) {
+        seenCodes.add(summary.code);
+        acc.total += 1;
+        if (summary.deadlineDate && summary.deadlineDate < today && summary.deliveryStatus !== "Hoàn tất") acc.overdueCount += 1;
+        if (summary.status === "Đang xử lý") acc.inProgressCount += 1;
+      }
       if (summary.movementCount === 0) acc.noMovementCount += 1;
-      if (summary.deadlineDate && summary.deadlineDate < today && summary.deliveryStatus !== "Hoàn tất") acc.overdueCount += 1;
-      if (summary.status === "Đang xử lý") acc.inProgressCount += 1;
       return acc;
     },
     { total: 0, noMovementCount: 0, overdueCount: 0, inProgressCount: 0 }

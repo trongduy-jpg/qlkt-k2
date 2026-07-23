@@ -1,4 +1,4 @@
-import type { ProductionOrder } from "@/lib/demo-data";
+import type { ProductionOrder } from "@/lib/domain/production";
 import { pickNumber, pickText } from "@/lib/production-helpers";
 import {
   buildProductionOrderCode,

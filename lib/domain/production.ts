@@ -1,0 +1,40 @@
+export type MovementType = "issue" | "return" | "transfer" | "adjustment";
+
+export type Status = string;
+
+export type ProductionOrder = {
+  id: string;
+  orderId?: string;
+  code: string;
+  sku: string;
+  itemSku?: string;
+  productName?: string;
+  material: string;
+  worker: string;
+  stage: string;
+  stageStatus?: string;
+  destination?: string;
+  occurredDate?: string;
+  documentNo?: string;
+  documentInNo?: string;
+  documentLineNo?: string;
+  movementType?: MovementType;
+  qtyPiece?: number;
+  issued: number;
+  returned: number;
+  powder: number;
+  transferred?: number;
+  lossPeriod?: string;
+  nxtPeriod?: string;
+  goldAge?: number;
+  sourceMaterialName?: string;
+  nxtLinkCode?: string;
+  sourceName?: string;
+  importSource?: string;
+  exportSource?: string;
+  materialType?: string;
+  convertedIssueWeight?: number;
+  convertedReturnWeight?: number;
+  loss: number;
+  status: Status;
+};

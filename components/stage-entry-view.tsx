@@ -5,7 +5,7 @@ import { isSingleWorkerStage } from "@/lib/production-business-rules";
 import { fieldControlClass } from "@/components/production-ui";
 import type { StageOption } from "@/lib/production-summary";
 import type { OrderSummary } from "@/lib/production-types";
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { WorkerMaster } from "@/lib/material-service";
 
 type StageEntryDraft = { worker: string; issued: number; returned: number; status: Status };

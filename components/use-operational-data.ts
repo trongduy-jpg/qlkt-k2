@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { AppUser } from "@/lib/auth-service";
-import { productionOrders, type ProductionOrder } from "@/lib/demo-data";
+import { productionOrders } from "@/lib/demo-data";
+import type { ProductionOrder } from "@/lib/domain/production";
 import {
   loadDatabaseHealth,
   loadMaterials,

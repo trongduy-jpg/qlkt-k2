@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ProductionOrder } from "./demo-data";
+import type { ProductionOrder } from "./domain/production";
+import type { ProductionOrderHeader } from "./production-types";
 import {
   buildDraftStageMovements,
   buildLossReportRows,
@@ -7,6 +8,7 @@ import {
   buildStageOptionsForDropdown,
   buildStageProgress,
   computeMovementTotals,
+  orderRowKey,
   selectMovementsForOrder
 } from "./production-summary";
 
@@ -60,8 +62,61 @@ describe("computeMovementTotals", () => {
   });
 });
 
+function makeHeader(overrides: Partial<ProductionOrderHeader> = {}): ProductionOrderHeader {
+  return {
+    id: "h1",
+    code: "DHAG-26073",
+    sku: "RG750Y",
+    productName: "",
+    destination: "CH1",
+    orderDate: "2026-07-20",
+    occurredDate: "2026-07-20",
+    documentNo: "",
+    documentInNo: "",
+    documentLineNo: "",
+    movementType: "issue",
+    qtyPiece: 0,
+    plannedDate: "2026-07-20",
+    plannedStage: "CKE",
+    plannedWorker: "",
+    plannedMaterial: "Vàng 18K",
+    materialSpec: "18KY",
+    plannedGoldAge: 0.75,
+    plannedMaterialType: "NL18K",
+    deliveryStatus: "Chưa Hoàn Tất",
+    orderMonth: "2026-07",
+    salesType: "SR",
+    customerName: "",
+    specification: "",
+    deadlineDate: "",
+    completedDate: "",
+    deliveredQty: 0,
+    actualProgressNote: "",
+    completedWeightGram: 0,
+    issued: 0,
+    returned: 0,
+    powder: 0,
+    transferred: 0,
+    lossPeriod: "",
+    nxtPeriod: "",
+    sourceMaterialName: "",
+    sourceName: "",
+    importSource: "",
+    exportSource: "",
+    nxtLinkCode: "",
+    convertedIssueWeight: 0,
+    convertedReturnWeight: 0,
+    note: "",
+    status: "Đang xử lý",
+    createdAt: "20/07/26 10:00:00",
+    parentOrderCode: "",
+    items: [],
+    ...overrides
+  };
+}
+
 describe("buildOrderSummaries", () => {
-  it("gop nhieu giao dich cung ma LSX thanh 1 dong tong hop", () => {
+  it("gop nhieu giao dich cung ma LSX + cung Ma hang thanh 1 dong tong hop", () => {
     const orders = [
       makeOrder({ id: "a", code: "DHAG-26071", stage: "CKE", worker: "An", issued: 10, returned: 8, loss: 2, status: "Treo nợ" }),
       makeOrder({ id: "b", code: "DHAG-26071", stage: "CDT", worker: "Binh", issued: 5, returned: 4, loss: 1, status: "Đang xử lý" })
@@ -79,60 +134,38 @@ describe("buildOrderSummaries", () => {
   });
 
   it("LSX chua co giao dich nao van xuat hien tu header voi movementCount = 0", () => {
-    const header = {
-      id: "h1",
-      code: "DHAG-26073",
-      sku: "RG750Y",
-      productName: "",
-      destination: "CH1",
-      orderDate: "2026-07-20",
-      occurredDate: "2026-07-20",
-      documentNo: "",
-      documentInNo: "",
-      documentLineNo: "",
-      movementType: "issue" as const,
-      qtyPiece: 0,
-      plannedDate: "2026-07-20",
-      plannedStage: "CKE",
-      plannedWorker: "",
-      plannedMaterial: "Vàng 18K",
-      materialSpec: "18KY",
-      plannedGoldAge: 0.75,
-      plannedMaterialType: "NL18K",
-      deliveryStatus: "Chưa Hoàn Tất",
-      orderMonth: "2026-07",
-      salesType: "SR",
-      customerName: "",
-      specification: "",
-      deadlineDate: "",
-      completedDate: "",
-      deliveredQty: 0,
-      actualProgressNote: "",
-      completedWeightGram: 0,
-      issued: 0,
-      returned: 0,
-      powder: 0,
-      transferred: 0,
-      lossPeriod: "",
-      nxtPeriod: "",
-      sourceMaterialName: "",
-      sourceName: "",
-      importSource: "",
-      exportSource: "",
-      nxtLinkCode: "",
-      convertedIssueWeight: 0,
-      convertedReturnWeight: 0,
-      note: "",
-      status: "Đang xử lý",
-      createdAt: "20/07/26 10:00:00",
-      parentOrderCode: "",
-      items: []
-    };
-
-    const summaries = buildOrderSummaries([], [header]);
+    const summaries = buildOrderSummaries([], [makeHeader()]);
     expect(summaries).toHaveLength(1);
     expect(summaries[0].movementCount).toBe(0);
     expect(summaries[0].status).toBe("Đang xử lý");
+  });
+
+  it("LSX co nhieu Ma hang: moi Ma hang la 1 dong rieng, giao dich khong lan sang Ma hang khac", () => {
+    const header = makeHeader({
+      code: "DHAG-26080",
+      items: [
+        { sku: "RG001", productName: "Nhẫn A", quantityPiece: 10 },
+        { sku: "RG002", productName: "Nhẫn B", quantityPiece: 20 }
+      ]
+    });
+    const orders = [
+      makeOrder({ id: "a", code: "DHAG-26080", sku: "RG001", itemSku: "RG001", issued: 10, returned: 8 }),
+      makeOrder({ id: "b", code: "DHAG-26080", sku: "RG002", itemSku: "RG002", issued: 3, returned: 2 })
+    ];
+
+    const summaries = buildOrderSummaries(orders, [header]);
+    expect(summaries).toHaveLength(2);
+
+    const rowA = summaries.find((item) => item.sku === "RG001")!;
+    const rowB = summaries.find((item) => item.sku === "RG002")!;
+    expect(rowA.code).toBe("DHAG-26080");
+    expect(rowA.movementCount).toBe(1);
+    expect(rowA.issued).toBe(10);
+    expect(rowA.qtyPiece).toBe(10);
+    expect(rowB.movementCount).toBe(1);
+    expect(rowB.issued).toBe(3);
+    expect(rowB.qtyPiece).toBe(20);
+    expect(orderRowKey(rowA)).not.toBe(orderRowKey(rowB));
   });
 });
 

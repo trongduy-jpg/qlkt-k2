@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { ProductionOrderItem } from "@/lib/material-service-types";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
 import {

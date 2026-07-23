@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 
 export type HaoHutRule = "truc_tiep" | "kiem_soat_rui_ro" | "binh_thuong";
 

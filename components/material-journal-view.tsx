@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { ProductionOrder } from "@/lib/demo-data";
+import type { ProductionOrder } from "@/lib/domain/production";
 import { formatDisplayDate, getStageLabel } from "@/lib/production-business-rules";
 import { formatGram, isClosedStatus, statusClass, statusOptions } from "@/lib/production-helpers";
 

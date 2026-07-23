@@ -1,4 +1,5 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { ProductionOrderItem } from "@/lib/material-service-types";
 import { getSummaryStatus, pickNumber, pickText } from "@/lib/production-helpers";
 import { normalizeStageCode } from "@/lib/production-business-rules";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
@@ -7,225 +8,218 @@ import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types
 // Tach ra khoi material-dashboard.tsx (cac useMemo lon nhat) de de doc,
 // de test doc lap va giam do dai file component.
 
-export function buildOrderSummaries(orders: ProductionOrder[], productionHeaders: ProductionOrderHeader[]): OrderSummary[] {
-  const map = new Map<string, OrderSummary & { statuses: Status[] }>();
-
-  for (const header of productionHeaders) {
-    map.set(header.code, {
-      code: header.code,
-      sku: header.sku,
-      productName: header.productName,
-      destination: header.destination,
-      orderDate: header.orderDate,
-      occurredDate: header.occurredDate,
-      documentNo: header.documentNo,
-      documentInNo: header.documentInNo,
-      documentLineNo: header.documentLineNo,
-      movementType: header.movementType,
-      qtyPiece: header.qtyPiece,
-      plannedDate: header.plannedDate,
-      plannedStage: header.plannedStage,
-      plannedWorker: header.plannedWorker,
-      plannedMaterial: header.plannedMaterial,
-      materialSpec: header.materialSpec,
-      plannedGoldAge: header.plannedGoldAge,
-      plannedMaterialType: header.plannedMaterialType,
-      deliveryStatus: header.deliveryStatus,
-      orderMonth: header.orderMonth,
-      salesType: header.salesType,
-      customerName: header.customerName,
-      specification: header.specification,
-      deadlineDate: header.deadlineDate,
-      completedDate: header.completedDate,
-      deliveredQty: header.deliveredQty,
-      actualProgressNote: header.actualProgressNote,
-      completedWeightGram: header.completedWeightGram,
-      issuedDefault: header.issued,
-      returnedDefault: header.returned,
-      powderDefault: header.powder,
-      transferred: header.transferred,
-      lossPeriod: header.lossPeriod,
-      nxtPeriod: header.nxtPeriod,
-      sourceMaterialName: header.sourceMaterialName,
-      sourceName: header.sourceName,
-      importSource: header.importSource,
-      exportSource: header.exportSource,
-      nxtLinkCode: header.nxtLinkCode,
-      convertedIssueWeight: header.convertedIssueWeight,
-      convertedReturnWeight: header.convertedReturnWeight,
-      note: header.note,
-      createdAt: header.createdAt,
-      headerStatus: header.status,
-      parentOrderCode: header.parentOrderCode,
-      movementCount: 0,
-      issued: 0,
-      returned: 0,
-      powder: 0,
-      loss: 0,
-      status: header.status,
-      workers: [],
-      materials: [],
-      statuses: [header.status]
-    });
-  }
-
-  for (const order of orders) {
-    const current = map.get(order.code) ?? {
-      code: order.code,
-      sku: order.sku,
-      productName: order.productName,
-      destination: order.destination,
-      orderDate: order.occurredDate,
-      occurredDate: order.occurredDate,
-      documentNo: order.documentNo,
-      documentInNo: order.documentInNo,
-      documentLineNo: order.documentLineNo,
-      movementType: order.movementType,
-      qtyPiece: order.qtyPiece,
-      plannedDate: order.occurredDate,
-      plannedStage: order.stage,
-      plannedWorker: order.worker,
-      plannedMaterial: order.material,
-      materialSpec: "",
-      plannedGoldAge: order.goldAge,
-      plannedMaterialType: order.materialType,
-      deliveryStatus: "",
-      orderMonth: order.nxtPeriod,
-      salesType: "",
-      customerName: "",
-      specification: "",
-      deadlineDate: "",
-      completedDate: "",
-      deliveredQty: 0,
-      actualProgressNote: "",
-      completedWeightGram: 0,
-      issuedDefault: order.issued,
-      returnedDefault: order.returned,
-      powderDefault: order.powder,
-      transferred: order.transferred,
-      lossPeriod: order.lossPeriod,
-      nxtPeriod: order.nxtPeriod,
-      sourceMaterialName: order.sourceMaterialName,
-      sourceName: order.sourceName,
-      importSource: order.importSource,
-      exportSource: order.exportSource,
-      nxtLinkCode: order.nxtLinkCode,
-      convertedIssueWeight: order.convertedIssueWeight,
-      convertedReturnWeight: order.convertedReturnWeight,
-      note: "",
-      headerStatus: undefined,
-      movementCount: 0,
-      issued: 0,
-      returned: 0,
-      powder: 0,
-      loss: 0,
-      status: order.status,
-      workers: [],
-      materials: [],
-      statuses: []
-    };
-
-    current.movementCount += 1;
-    const isLatestMovementForSummary = current.movementCount === 1;
-
-    current.productName = isLatestMovementForSummary
-      ? pickText(order.productName, current.productName)
-      : pickText(current.productName, order.productName);
-    current.destination = isLatestMovementForSummary
-      ? pickText(order.destination, current.destination)
-      : pickText(current.destination, order.destination);
-    current.orderDate = pickText(current.orderDate, order.occurredDate);
-    current.occurredDate = isLatestMovementForSummary
-      ? pickText(order.occurredDate, current.occurredDate)
-      : pickText(current.occurredDate, order.occurredDate);
-    current.documentNo = isLatestMovementForSummary
-      ? pickText(order.documentNo, current.documentNo)
-      : pickText(current.documentNo, order.documentNo);
-    current.documentInNo = isLatestMovementForSummary
-      ? pickText(order.documentInNo, current.documentInNo)
-      : pickText(current.documentInNo, order.documentInNo);
-    current.documentLineNo = isLatestMovementForSummary
-      ? pickText(order.documentLineNo, current.documentLineNo)
-      : pickText(current.documentLineNo, order.documentLineNo);
-    current.movementType = isLatestMovementForSummary ? order.movementType || current.movementType : current.movementType || order.movementType;
-    current.qtyPiece =
-      isLatestMovementForSummary && pickNumber(order.qtyPiece) > 0
-        ? pickNumber(order.qtyPiece)
-        : pickNumber(current.qtyPiece, order.qtyPiece);
-    current.plannedDate = pickText(current.plannedDate, order.occurredDate);
-    current.plannedStage = isLatestMovementForSummary
-      ? pickText(order.stage, current.plannedStage)
-      : pickText(current.plannedStage, order.stage);
-    current.plannedWorker = isLatestMovementForSummary
-      ? pickText(order.worker, current.plannedWorker)
-      : pickText(current.plannedWorker, order.worker);
-    current.plannedMaterial = isLatestMovementForSummary
-      ? pickText(order.material, current.plannedMaterial)
-      : pickText(current.plannedMaterial, order.material);
-    current.plannedGoldAge =
-      isLatestMovementForSummary && pickNumber(order.goldAge) > 0
-        ? pickNumber(order.goldAge)
-        : pickNumber(current.plannedGoldAge, order.goldAge);
-    current.plannedMaterialType = isLatestMovementForSummary
-      ? pickText(order.materialType, current.plannedMaterialType)
-      : pickText(current.plannedMaterialType, order.materialType);
-    current.issuedDefault = isLatestMovementForSummary ? pickNumber(order.issued, current.issuedDefault) : pickNumber(current.issuedDefault, order.issued);
-    current.returnedDefault = isLatestMovementForSummary ? pickNumber(order.returned, current.returnedDefault) : pickNumber(current.returnedDefault, order.returned);
-    current.powderDefault = isLatestMovementForSummary ? pickNumber(order.powder, current.powderDefault) : pickNumber(current.powderDefault, order.powder);
-    current.transferred = isLatestMovementForSummary ? pickNumber(order.transferred, current.transferred) : pickNumber(current.transferred, order.transferred);
-    current.lossPeriod = isLatestMovementForSummary
-      ? pickText(order.lossPeriod, current.lossPeriod)
-      : pickText(current.lossPeriod, order.lossPeriod);
-    current.nxtPeriod = isLatestMovementForSummary
-      ? pickText(order.nxtPeriod, current.nxtPeriod)
-      : pickText(current.nxtPeriod, order.nxtPeriod);
-    current.sourceMaterialName = isLatestMovementForSummary
-      ? pickText(order.sourceMaterialName, current.sourceMaterialName)
-      : pickText(current.sourceMaterialName, order.sourceMaterialName);
-    current.sourceName = isLatestMovementForSummary
-      ? pickText(order.sourceName, current.sourceName)
-      : pickText(current.sourceName, order.sourceName);
-    current.importSource = isLatestMovementForSummary
-      ? pickText(order.importSource, current.importSource)
-      : pickText(current.importSource, order.importSource);
-    current.exportSource = isLatestMovementForSummary
-      ? pickText(order.exportSource, current.exportSource)
-      : pickText(current.exportSource, order.exportSource);
-    current.nxtLinkCode = isLatestMovementForSummary
-      ? pickText(order.nxtLinkCode, current.nxtLinkCode)
-      : pickText(current.nxtLinkCode, order.nxtLinkCode);
-    current.convertedIssueWeight =
-      isLatestMovementForSummary && pickNumber(order.convertedIssueWeight) > 0
-        ? pickNumber(order.convertedIssueWeight)
-        : pickNumber(current.convertedIssueWeight, order.convertedIssueWeight);
-    current.convertedReturnWeight =
-      isLatestMovementForSummary && pickNumber(order.convertedReturnWeight) > 0
-        ? pickNumber(order.convertedReturnWeight)
-        : pickNumber(current.convertedReturnWeight, order.convertedReturnWeight);
-    current.issued += order.issued;
-    current.returned += order.returned;
-    current.powder += order.powder;
-    current.loss += order.loss;
-    current.statuses.push(order.status);
-    if (!current.workers.includes(order.worker)) current.workers.push(order.worker);
-    if (!current.materials.includes(order.material)) current.materials.push(order.material);
-    current.status = current.headerStatus ?? getSummaryStatus(current.statuses);
-    map.set(order.code, current);
-  }
-
-  return Array.from(map.values()).map(({ statuses: _statuses, headerStatus: _headerStatus, ...summary }) => summary);
+// Khoa nhan dien 1 dong trong bang LSX/NK NVL: 1 LSX co the co nhieu Ma
+// hang (line item), moi Ma hang la 1 dong rieng - khong con dung Ma LSX
+// (code) don le lam khoa nua vi code co the lap lai giua cac dong.
+export function orderRowKey(summary: { code: string; sku: string }): string {
+  return `${summary.code}::${summary.sku}`;
 }
 
-export function selectMovementsForOrder(orders: ProductionOrder[], code: string | undefined | null): ProductionOrder[] {
+function sortMovementsLatestFirst(movements: ProductionOrder[]): ProductionOrder[] {
+  return [...movements].sort((left, right) => {
+    const leftDate = left.occurredDate || "";
+    const rightDate = right.occurredDate || "";
+    if (leftDate !== rightDate) return rightDate.localeCompare(leftDate);
+    return String(right.id).localeCompare(String(left.id));
+  });
+}
+
+// Gop 1 danh sach giao dich (da thuoc dung 1 dong Ma hang) thanh cac
+// truong tong hop dung chung cho ca nhanh co header lan nhanh chi co
+// giao dich roi (chua tao LSX chinh thuc).
+function summarizeMovements(movements: ProductionOrder[]) {
+  const sorted = sortMovementsLatestFirst(movements);
+  const latest = sorted[0];
+  const workers: string[] = [];
+  const materials: string[] = [];
+  const statuses: Status[] = [];
+  let issued = 0;
+  let returned = 0;
+  let powder = 0;
+  let loss = 0;
+
+  for (const order of sorted) {
+    issued += order.issued;
+    returned += order.returned;
+    powder += order.powder;
+    loss += order.loss;
+    statuses.push(order.status);
+    if (order.worker && !workers.includes(order.worker)) workers.push(order.worker);
+    if (order.material && !materials.includes(order.material)) materials.push(order.material);
+  }
+
+  return { sorted, latest, workers, materials, statuses, issued, returned, powder, loss };
+}
+
+function buildRowFromHeaderItem(
+  header: ProductionOrderHeader,
+  item: ProductionOrderItem,
+  movements: ProductionOrder[]
+): OrderSummary {
+  const { latest, workers, materials, statuses, issued, returned, powder, loss } = summarizeMovements(movements);
+
+  return {
+    code: header.code,
+    sku: item.sku,
+    productName: pickText(item.productName, header.productName),
+    destination: header.destination,
+    orderDate: header.orderDate,
+    occurredDate: pickText(latest?.occurredDate, header.occurredDate),
+    documentNo: pickText(latest?.documentNo, header.documentNo),
+    documentInNo: pickText(latest?.documentInNo, header.documentInNo),
+    documentLineNo: pickText(latest?.documentLineNo, header.documentLineNo),
+    movementType: latest?.movementType || header.movementType,
+    qtyPiece: pickNumber(item.quantityPiece, header.qtyPiece),
+    plannedDate: header.plannedDate,
+    plannedStage: pickText(latest?.stage, header.plannedStage),
+    plannedWorker: pickText(latest?.worker, header.plannedWorker),
+    plannedMaterial: pickText(item.plannedMaterial, header.plannedMaterial),
+    materialSpec: pickText(item.materialSpec, header.materialSpec),
+    plannedGoldAge: item.plannedGoldAge || header.plannedGoldAge,
+    plannedMaterialType: pickText(item.plannedMaterialType, header.plannedMaterialType),
+    deliveryStatus: header.deliveryStatus,
+    orderMonth: header.orderMonth,
+    salesType: header.salesType,
+    customerName: header.customerName,
+    specification: header.specification,
+    deadlineDate: header.deadlineDate,
+    completedDate: header.completedDate,
+    deliveredQty: pickNumber(item.deliveredQty, header.deliveredQty),
+    actualProgressNote: header.actualProgressNote,
+    completedWeightGram: pickNumber(item.completedWeightGram, header.completedWeightGram),
+    issuedDefault: header.issued,
+    returnedDefault: header.returned,
+    powderDefault: header.powder,
+    transferred: header.transferred,
+    lossPeriod: pickText(latest?.lossPeriod, header.lossPeriod),
+    nxtPeriod: pickText(latest?.nxtPeriod, header.nxtPeriod),
+    sourceMaterialName: pickText(latest?.sourceMaterialName, header.sourceMaterialName),
+    sourceName: pickText(latest?.sourceName, header.sourceName),
+    importSource: pickText(latest?.importSource, header.importSource),
+    exportSource: pickText(latest?.exportSource, header.exportSource),
+    nxtLinkCode: pickText(latest?.nxtLinkCode, header.nxtLinkCode),
+    convertedIssueWeight: pickNumber(latest?.convertedIssueWeight, header.convertedIssueWeight),
+    convertedReturnWeight: pickNumber(latest?.convertedReturnWeight, header.convertedReturnWeight),
+    note: header.note,
+    createdAt: header.createdAt,
+    parentOrderCode: header.parentOrderCode,
+    movementCount: movements.length,
+    issued,
+    returned,
+    powder,
+    loss,
+    status: header.status,
+    workers,
+    materials
+  };
+}
+
+// Dong cho giao dich chua gan voi LSX chinh thuc nao (VD user ghi Nhat ky
+// NVL truoc khi tao LSX o man Lenh san xuat) - suy ra toan bo thong tin tu
+// chinh cac giao dich, giu nguyen hanh vi cu truoc khi tach tang Ma hang.
+function buildRowFromLooseMovements(code: string, sku: string, movements: ProductionOrder[]): OrderSummary {
+  const { sorted, workers, materials, statuses, issued, returned, powder, loss } = summarizeMovements(movements);
+  const latest = sorted[0];
+  const oldest = sorted[sorted.length - 1];
+
+  return {
+    code,
+    sku,
+    productName: latest?.productName ?? "",
+    destination: latest?.destination ?? "",
+    orderDate: oldest?.occurredDate ?? "",
+    occurredDate: latest?.occurredDate ?? "",
+    documentNo: latest?.documentNo ?? "",
+    documentInNo: latest?.documentInNo ?? "",
+    documentLineNo: latest?.documentLineNo ?? "",
+    movementType: latest?.movementType,
+    qtyPiece: latest?.qtyPiece ?? 0,
+    plannedDate: oldest?.occurredDate ?? "",
+    plannedStage: latest?.stage ?? "",
+    plannedWorker: latest?.worker ?? "",
+    plannedMaterial: latest?.material ?? "",
+    materialSpec: "",
+    plannedGoldAge: latest?.goldAge ?? 0,
+    plannedMaterialType: latest?.materialType ?? "",
+    deliveryStatus: "",
+    orderMonth: latest?.nxtPeriod ?? "",
+    salesType: "",
+    customerName: "",
+    specification: "",
+    deadlineDate: "",
+    completedDate: "",
+    deliveredQty: 0,
+    actualProgressNote: "",
+    completedWeightGram: 0,
+    issuedDefault: latest?.issued ?? 0,
+    returnedDefault: latest?.returned ?? 0,
+    powderDefault: latest?.powder ?? 0,
+    transferred: latest?.transferred ?? 0,
+    lossPeriod: latest?.lossPeriod ?? "",
+    nxtPeriod: latest?.nxtPeriod ?? "",
+    sourceMaterialName: latest?.sourceMaterialName ?? "",
+    sourceName: latest?.sourceName ?? "",
+    importSource: latest?.importSource ?? "",
+    exportSource: latest?.exportSource ?? "",
+    nxtLinkCode: latest?.nxtLinkCode ?? "",
+    convertedIssueWeight: latest?.convertedIssueWeight ?? 0,
+    convertedReturnWeight: latest?.convertedReturnWeight ?? 0,
+    note: "",
+    parentOrderCode: "",
+    movementCount: movements.length,
+    issued,
+    returned,
+    powder,
+    loss,
+    status: getSummaryStatus(statuses),
+    workers,
+    materials
+  };
+}
+
+// 1 dong = 1 Ma hang (khong con gop nhieu Ma hang cua cung 1 LSX vao 1
+// dong nua). Neu LSX co danh sach Ma hang chinh thuc (Phase 2, man Lenh
+// san xuat), moi Ma hang la 1 dong voi giao dich NK NVL rieng cua no.
+// LSX chua co danh sach Ma hang (header.items rong) hoac giao dich ghi
+// truoc khi tao LSX chinh thuc van fallback ve 1 dong duy nhat nhu truoc.
+export function buildOrderSummaries(orders: ProductionOrder[], productionHeaders: ProductionOrderHeader[]): OrderSummary[] {
+  const rows: OrderSummary[] = [];
+  const consumedMovementIds = new Set<string>();
+
+  for (const header of productionHeaders) {
+    const items: ProductionOrderItem[] = header.items.length > 0 ? header.items : [{ sku: header.sku, productName: header.productName }];
+
+    for (const item of items) {
+      const sku = item.sku.trim();
+      if (!sku) continue;
+      const movements = orders.filter((order) => order.code === header.code && (order.itemSku || order.sku) === sku);
+      movements.forEach((order) => consumedMovementIds.add(order.id));
+      rows.push(buildRowFromHeaderItem(header, item, movements));
+    }
+  }
+
+  const looseGroups = new Map<string, ProductionOrder[]>();
+  for (const order of orders) {
+    if (consumedMovementIds.has(order.id)) continue;
+    const key = `${order.code}::${order.itemSku || order.sku}`;
+    const list = looseGroups.get(key) ?? [];
+    list.push(order);
+    looseGroups.set(key, list);
+  }
+  for (const [key, movements] of looseGroups) {
+    const [code, sku] = key.split("::");
+    rows.push(buildRowFromLooseMovements(code, sku, movements));
+  }
+
+  return rows;
+}
+
+export function selectMovementsForOrder(orders: ProductionOrder[], code: string | undefined | null, itemSku?: string | null): ProductionOrder[] {
   if (!code) return [];
-  return orders
-    .filter((order) => order.code === code)
-    .sort((left, right) => {
-      const leftDate = left.occurredDate || "";
-      const rightDate = right.occurredDate || "";
-      if (leftDate !== rightDate) return rightDate.localeCompare(leftDate);
-      return String(right.id).localeCompare(String(left.id));
-    });
+  const trimmedItemSku = itemSku?.trim();
+  return sortMovementsLatestFirst(
+    orders.filter((order) => order.code === code && (!trimmedItemSku || (order.itemSku || order.sku) === trimmedItemSku))
+  );
 }
 
 export function computeMovementTotals(movements: ProductionOrder[]) {

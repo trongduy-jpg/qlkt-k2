@@ -1,4 +1,5 @@
-import { productionOrders, type ProductionOrder, type Status } from "@/lib/demo-data";
+import { productionOrders } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import { movementRowToProductionOrder, toDbStatus, type MovementRow } from "@/lib/supabase-mappers";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { buildWorkerCode } from "@/lib/workers-service";

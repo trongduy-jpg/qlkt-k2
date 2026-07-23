@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { ProductionOrderItem } from "@/lib/material-service-types";
 
 // Cac kieu du lieu dung chung cho man Lenh san xuat / Nhat ky NVL.

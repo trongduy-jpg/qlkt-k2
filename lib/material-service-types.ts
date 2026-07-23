@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 
 // Kieu du lieu dung chung cho toan bo lop service (materials, workers,
 // stages, reference options, production orders, movements...).

@@ -1,43 +1,4 @@
-export type Status = string;
-
-export type ProductionOrder = {
-  id: string;
-  orderId?: string;
-  code: string;
-  sku: string;
-  // Ma hang cu the trong LSX ma giao dich nay thuoc ve (1 LSX co the co
-  // nhieu Ma hang). Rong = giao dich cu truoc khi tach tang Ma hang.
-  itemSku?: string;
-  productName?: string;
-  material: string;
-  worker: string;
-  stage: string;
-  stageStatus?: string;
-  destination?: string;
-  occurredDate?: string;
-  documentNo?: string;
-  documentInNo?: string;
-  documentLineNo?: string;
-  movementType?: "issue" | "return" | "transfer" | "adjustment";
-  qtyPiece?: number;
-  issued: number;
-  returned: number;
-  powder: number;
-  transferred?: number;
-  lossPeriod?: string;
-  nxtPeriod?: string;
-  goldAge?: number;
-  sourceMaterialName?: string;
-  nxtLinkCode?: string;
-  sourceName?: string;
-  importSource?: string;
-  exportSource?: string;
-  materialType?: string;
-  convertedIssueWeight?: number;
-  convertedReturnWeight?: number;
-  loss: number;
-  status: Status;
-};
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 
 export const kpis = [
   { label: "Giá 24K đã duyệt", value: "15.407.000", unit: "VND/chỉ", trend: "Kỳ 05/2026" },

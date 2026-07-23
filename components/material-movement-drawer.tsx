@@ -9,7 +9,7 @@ import {
   SelectControl,
   fieldControlClass
 } from "@/components/production-ui";
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { ProductionOrderItem, WorkerMaster } from "@/lib/material-service";
 import { formatGram, isClosedStatus } from "@/lib/production-helpers";
 import {

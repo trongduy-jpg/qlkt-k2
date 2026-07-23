@@ -1,4 +1,4 @@
-import type { ProductionOrder } from "@/lib/demo-data";
+import type { ProductionOrder } from "@/lib/domain/production";
 import type { WorkerMaster } from "@/lib/material-service";
 import { journalStages, movementGoldAgeOptions } from "@/lib/production-journal-options";
 import {

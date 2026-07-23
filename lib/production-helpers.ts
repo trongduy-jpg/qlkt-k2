@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 
 // Hang so va ham thuan (khong phu thuoc React) dung chung cho man
 // Lenh san xuat / Nhat ky NVL. Tach ra khoi material-dashboard.tsx.

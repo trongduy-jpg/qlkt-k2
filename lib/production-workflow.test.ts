@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ProductionOrder } from "./demo-data";
+import type { ProductionOrder } from "./domain/production";
 import type { OrderSummary, ProductionOrderHeader } from "./production-types";
 import {
   buildProductionOverview,
@@ -206,6 +206,20 @@ describe("buildProductionOverview", () => {
 
     expect(buildProductionOverview(rows, "2026-07-22")).toEqual({
       total: 2,
+      noMovementCount: 1,
+      overdueCount: 1,
+      inProgressCount: 1
+    });
+  });
+
+  it("1 LSX co nhieu Ma hang (nhieu dong cung code) chi dem 1 lan cho total/qua han/dang xu ly", () => {
+    const rows = [
+      makeSummary({ code: "DHAG-1", sku: "A", movementCount: 0, status: "Đang xử lý", deadlineDate: "2026-07-10" }),
+      makeSummary({ code: "DHAG-1", sku: "B", movementCount: 2, status: "Đang xử lý", deadlineDate: "2026-07-10" })
+    ];
+
+    expect(buildProductionOverview(rows, "2026-07-22")).toEqual({
+      total: 1,
       noMovementCount: 1,
       overdueCount: 1,
       inProgressCount: 1

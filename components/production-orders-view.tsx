@@ -3,7 +3,7 @@
 import { Link2, Plus } from "lucide-react";
 import type { OrderSummary } from "@/lib/production-types";
 import type { ProductionOverview } from "@/lib/production-workflow";
-import type { StageOption } from "@/lib/production-summary";
+import { orderRowKey, type StageOption } from "@/lib/production-summary";
 import { deliveryStatusClass, hasMeaningfulText, statusClass } from "@/lib/production-helpers";
 import { formatDisplayDate, getStageLabel, normalizeStageCode } from "@/lib/production-business-rules";
 import {
@@ -18,6 +18,7 @@ type ProductionOrdersViewProps = {
   productionOverview: ProductionOverview;
   filteredOrderSummaries: OrderSummary[];
   selectedOrderCode: string | null;
+  selectedItemSku: string | null;
   stageOptionsForDropdown: StageOption[];
   productionDeliveryStatus: string;
   productionSalesType: string;
@@ -34,7 +35,7 @@ type ProductionOrdersViewProps = {
   onCustomerQueryChange: (value: string) => void;
   onCreateOrder: () => void;
   onShowAllOrders: () => void;
-  onSelectOrder: (code: string) => void;
+  onSelectOrder: (code: string, itemSku?: string) => void;
 };
 
 function formatCodeMonthLabel(codeMonth: string) {
@@ -47,6 +48,7 @@ export function ProductionOrdersView({
   productionOverview,
   filteredOrderSummaries,
   selectedOrderCode,
+  selectedItemSku,
   stageOptionsForDropdown,
   productionDeliveryStatus,
   productionSalesType,
@@ -183,10 +185,10 @@ export function ProductionOrdersView({
           <div className="flex items-center justify-between">
             <div>
               <h4 className="text-sm font-bold text-ink">Danh sách lệnh sản xuất</h4>
-              <p className="mt-1 text-xs text-zinc-500">Bấm vào dòng để mở chi tiết.</p>
+              <p className="mt-1 text-xs text-zinc-500">Mỗi Mã hàng là 1 dòng riêng. Bấm vào dòng để mở chi tiết.</p>
             </div>
             <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
-              {filteredOrderSummaries.length} LSX
+              {filteredOrderSummaries.length} Mã hàng
             </span>
           </div>
           <div className="overflow-x-auto rounded-md border border-line bg-white">
@@ -214,11 +216,11 @@ export function ProductionOrdersView({
               <tbody>
                 {filteredOrderSummaries.map((summary) => (
                   <tr
-                    key={summary.code}
+                    key={orderRowKey(summary)}
                     className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
-                      selectedOrderCode === summary.code ? "bg-emerald-50/60" : "bg-white"
+                      selectedOrderCode === summary.code && selectedItemSku === summary.sku ? "bg-emerald-50/60" : "bg-white"
                     }`}
-                    onClick={() => onSelectOrder(summary.code)}
+                    onClick={() => onSelectOrder(summary.code, summary.sku)}
                   >
                     <td className="px-3 py-3 align-top">
                       <p className="flex items-center gap-1.5 font-semibold text-ink">

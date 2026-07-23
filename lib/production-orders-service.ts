@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import { fromDbStatus, toDbStatus } from "@/lib/supabase-mappers";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { ProductionOrderHeaderInput, ProductionOrderHeaderRecord } from "@/lib/material-service-types";
