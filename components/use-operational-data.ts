@@ -7,12 +7,14 @@ import {
   loadDatabaseHealth,
   loadMaterials,
   loadProductionOrderHeaders,
+  loadProductionOrderItems,
   loadProductionOrders,
   loadReferenceOptions,
   loadStages,
   loadWorkers,
   type DatabaseHealth,
   type MaterialMaster,
+  type ProductionOrderItem,
   type ReferenceOption,
   type StageMaster,
   type WorkerMaster
@@ -88,6 +90,7 @@ export function useOperationalData({
     const [
       remoteOrders,
       remoteHeaders,
+      remoteItems,
       remoteMaterials,
       remoteWorkers,
       remoteStages,
@@ -96,6 +99,7 @@ export function useOperationalData({
     ] = await Promise.all([
       loadProductionOrders(),
       loadProductionOrderHeaders(),
+      loadProductionOrderItems(),
       loadMaterials(),
       loadWorkers(),
       loadStages(),
@@ -103,12 +107,21 @@ export function useOperationalData({
       loadDatabaseHealth()
     ]);
 
+    // Gom Ma hang theo Ma LSX de gan vao tung header.
+    const itemsByCode = new Map<string, ProductionOrderItem[]>();
+    for (const item of remoteItems) {
+      const list = itemsByCode.get(item.orderCode) ?? [];
+      list.push(item);
+      itemsByCode.set(item.orderCode, list);
+    }
+
     const mergedHeaderDrafts = {
       ...productionHeaderDraftCache,
       ...(options?.productionHeaderDraftOverrides ?? {})
     };
     const mappedHeaders = remoteHeaders
       .map(mapRemoteHeaderToProductionHeader)
+      .map((header) => ({ ...header, items: itemsByCode.get(header.code) ?? [] }))
       .map((header) => mergeProductionHeaderWithDraft(header, mergedHeaderDrafts[header.code]));
     const headerByCode = new Map(mappedHeaders.map((header) => [header.code, header]));
     const headerById = new Map(mappedHeaders.map((header) => [header.id, header]));

@@ -1,4 +1,5 @@
 import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrderItem } from "@/lib/material-service-types";
 
 // Cac kieu du lieu dung chung cho man Lenh san xuat / Nhat ky NVL.
 // Tach ra khoi material-dashboard.tsx de de tai su dung va bao tri.
@@ -113,6 +114,10 @@ export type ProductionOrderHeader = {
   status: Status;
   createdAt: string;
   parentOrderCode: string;
+  // Danh sach Ma hang cua LSX. 1 LSX co the co nhieu Ma hang, moi Ma hang
+  // mot bo thong tin rieng. Cac truong sku/productName/... o tren van giu
+  // = Ma hang dau tien (primary) de tuong thich cac logic hien co.
+  items: ProductionOrderItem[];
 };
 
 export type PendingJournalRow = {

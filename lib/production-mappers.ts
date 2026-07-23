@@ -7,7 +7,52 @@ import {
   toMonthCode
 } from "@/lib/production-business-rules";
 import type { loadProductionOrderHeaders } from "@/lib/material-service";
+import type { ProductionOrderItem } from "@/lib/material-service-types";
 import type { ProductionOrderHeader } from "@/lib/production-types";
+
+// 1 Ma hang rong cho danh sach Ma hang trong form LSX.
+export function createEmptyProductionOrderItem(): ProductionOrderItem {
+  return {
+    sku: "",
+    productName: "",
+    quantityPiece: 0,
+    materialSpec: "18KY",
+    plannedMaterial: "Vàng 18K",
+    plannedGoldAge: 0.75,
+    plannedMaterialType: "NL18K",
+    plannedWeightGram: 0,
+    deliveredQty: 0,
+    completedWeightGram: 0,
+    note: ""
+  };
+}
+
+// Dung header (cac truong sku/... primary cu) tao 1 Ma hang - fallback khi
+// LSX chua co dong nao trong production_order_items.
+export function itemFromHeaderPrimary(header: {
+  sku?: string;
+  productName?: string;
+  qtyPiece?: number;
+  materialSpec?: string;
+  plannedMaterial?: string;
+  plannedGoldAge?: number;
+  plannedMaterialType?: string;
+  completedWeightGram?: number;
+  deliveredQty?: number;
+}): ProductionOrderItem {
+  return {
+    ...createEmptyProductionOrderItem(),
+    sku: header.sku ?? "",
+    productName: header.productName ?? "",
+    quantityPiece: header.qtyPiece ?? 0,
+    materialSpec: header.materialSpec || "18KY",
+    plannedMaterial: header.plannedMaterial || "Vàng 18K",
+    plannedGoldAge: header.plannedGoldAge || 0.75,
+    plannedMaterialType: header.plannedMaterialType || "NL18K",
+    deliveredQty: header.deliveredQty ?? 0,
+    completedWeightGram: header.completedWeightGram ?? 0
+  };
+}
 
 // Factory va ham merge/mapping cho LSX (header) va giao dich (movement).
 // Tach ra khoi material-dashboard.tsx de tai su dung va de test doc lap.
@@ -94,7 +139,8 @@ export function createEmptyProductionOrderHeaderDraft(): Omit<ProductionOrderHea
     convertedReturnWeight: 0,
     note: "",
     status: "Đang xử lý",
-    parentOrderCode: ""
+    parentOrderCode: "",
+    items: [createEmptyProductionOrderItem()]
   };
 }
 
@@ -147,7 +193,10 @@ export function mapRemoteHeaderToProductionHeader(
     note: header.note ?? "",
     status: header.status,
     createdAt: header.createdAt,
-    parentOrderCode: header.parentOrderCode ?? ""
+    parentOrderCode: header.parentOrderCode ?? "",
+    // items duoc gan sau tu production_order_items (xem use-operational-data);
+    // mac dinh rong o day.
+    items: []
   };
 }
 
@@ -202,7 +251,10 @@ export function mergeProductionHeaderWithDraft(
     convertedReturnWeight: pickNumber(header.convertedReturnWeight, cachedDraft.convertedReturnWeight),
     note: pickText(header.note, cachedDraft.note),
     status: header.status || cachedDraft.status,
-    parentOrderCode: pickText(header.parentOrderCode, cachedDraft.parentOrderCode)
+    parentOrderCode: pickText(header.parentOrderCode, cachedDraft.parentOrderCode),
+    // Uu tien danh sach Ma hang tu draft (dang sua) neu co, khong thi lay
+    // tu du lieu remote da gan.
+    items: cachedDraft.items && cachedDraft.items.length > 0 ? cachedDraft.items : header.items
   };
 }
 

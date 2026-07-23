@@ -115,6 +115,7 @@ export type ProductionOrderItem = {
   plannedMaterial?: string;
   plannedGoldAge?: number;
   plannedMaterialType?: string;
+  plannedWeightGram?: number;
   deliveredQty?: number;
   completedWeightGram?: number;
   note?: string;

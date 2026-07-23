@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import type { ProductionOrder, Status } from "@/lib/demo-data";
+import type { ProductionOrderItem } from "@/lib/material-service-types";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
 import {
   formatDisplayDateTime,
@@ -9,8 +10,17 @@ import {
   toIsoDate,
   toMonthCode
 } from "@/lib/production-business-rules";
-import { createEmptyProductionOrderHeaderDraft } from "@/lib/production-mappers";
-import { createAuditLog, createProductionOrderHeader, updateProductionOrderHeader } from "@/lib/material-service";
+import {
+  createEmptyProductionOrderHeaderDraft,
+  createEmptyProductionOrderItem,
+  itemFromHeaderPrimary
+} from "@/lib/production-mappers";
+import {
+  createAuditLog,
+  createProductionOrderHeader,
+  replaceProductionOrderItems,
+  updateProductionOrderHeader
+} from "@/lib/material-service";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
 type HeaderDraft = Omit<ProductionOrderHeader, "id" | "createdAt">;
@@ -91,6 +101,41 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       next.convertedReturnWeight = Number((Number(returned || 0) * goldAge).toFixed(4));
       return next;
     });
+  }
+
+  // Cap nhat danh sach Ma hang cua LSX dang soan.
+  function updateProductionHeaderItems(items: ProductionOrderItem[]) {
+    setProductionHeaderDraft((current) => ({ ...current, items }));
+  }
+
+  // Danh sach Ma hang hop le de luu: bo dong khong co Ma hang; neu rong thi
+  // fallback = 1 Ma hang lay tu cac truong primary cu (tuong thich du lieu
+  // cu truoc khi tach tang Ma hang).
+  function resolveDraftItems(header: ProductionOrderHeader): ProductionOrderItem[] {
+    const valid = (header.items ?? []).filter((item) => item.sku.trim().length > 0);
+    if (valid.length > 0) return valid;
+    return [itemFromHeaderPrimary(header)];
+  }
+
+  // Dong bo cac truong primary tren production_orders = Ma hang dau tien, de
+  // cac logic hien co (bang danh sach, gom nhom...) van chay khi chua chuyen
+  // sang hien "N ma hang" (Phase 4).
+  function applyPrimaryItem(header: ProductionOrderHeader, items: ProductionOrderItem[]): ProductionOrderHeader {
+    const primary = items[0];
+    if (!primary) return header;
+    return {
+      ...header,
+      sku: primary.sku.trim() || header.sku,
+      productName: (primary.productName ?? "").trim() || header.productName,
+      qtyPiece: Number(primary.quantityPiece || 0),
+      materialSpec: primary.materialSpec || header.materialSpec,
+      plannedMaterial: primary.plannedMaterial || header.plannedMaterial,
+      plannedGoldAge: primary.plannedGoldAge || header.plannedGoldAge,
+      plannedMaterialType: primary.plannedMaterialType || header.plannedMaterialType,
+      deliveredQty: Number(primary.deliveredQty || 0),
+      completedWeightGram: Number(primary.completedWeightGram || 0),
+      items
+    };
   }
 
   function normalizeProductionHeaderDraft(createdAt?: string): ProductionOrderHeader {
@@ -200,12 +245,33 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
   }
 
   function buildProductionHeaderDraftFromSummary(summary: OrderSummary): HeaderDraft {
+    const matchingHeader = productionHeaders.find((header) => header.code === summary.code);
+    // Danh sach Ma hang: uu tien tu header remote da gan; neu chua co thi
+    // fallback = 1 Ma hang lay tu thong tin primary cua summary/header cu.
+    const resolvedItems =
+      matchingHeader && matchingHeader.items.length > 0
+        ? matchingHeader.items.map((item) => ({ ...item }))
+        : [
+            itemFromHeaderPrimary({
+              sku: summary.sku,
+              productName: summary.productName,
+              qtyPiece: summary.qtyPiece,
+              materialSpec: summary.materialSpec,
+              plannedMaterial: summary.plannedMaterial,
+              plannedGoldAge: summary.plannedGoldAge,
+              plannedMaterialType: summary.plannedMaterialType,
+              deliveredQty: summary.deliveredQty,
+              completedWeightGram: summary.completedWeightGram
+            })
+          ];
+
     const cachedDraft = productionHeaderDraftCache[summary.code];
     if (cachedDraft) {
       return {
         ...cachedDraft,
         code: cachedDraft.code || summary.code,
-        sku: cachedDraft.sku || summary.sku
+        sku: cachedDraft.sku || summary.sku,
+        items: cachedDraft.items && cachedDraft.items.length > 0 ? cachedDraft.items : resolvedItems
       };
     }
 
@@ -215,6 +281,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     return {
       code: summary.code,
       sku: summary.sku,
+      items: resolvedItems,
       productName: summary.productName ?? "",
       destination: summary.destination || "CH1",
       orderDate: summary.orderDate || occurredDate,
@@ -262,10 +329,13 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
 
   async function createProductionOrderFromHeader() {
     const code = productionHeaderDraft.code.trim();
-    const sku = productionHeaderDraft.sku.trim();
 
-    if (!code || !sku) {
-      setRemoteError("Cần nhập Mã LSX và Mã hàng trước khi tạo lệnh sản xuất.");
+    if (!code) {
+      setRemoteError("Cần nhập Mã LSX trước khi tạo lệnh sản xuất.");
+      return;
+    }
+    if (!(productionHeaderDraft.items ?? []).some((item) => item.sku.trim().length > 0)) {
+      setRemoteError("Cần nhập ít nhất 1 Mã hàng trước khi tạo lệnh sản xuất.");
       return;
     }
 
@@ -274,10 +344,13 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       return;
     }
 
-    const nextHeader = normalizeProductionHeaderDraft();
+    const normalizedHeader = normalizeProductionHeaderDraft();
+    const items = resolveDraftItems(normalizedHeader);
+    const nextHeader = applyPrimaryItem(normalizedHeader, items);
 
     try {
       const saved = await createProductionOrderHeader(toProductionHeaderInput(nextHeader));
+      await replaceProductionOrderItems(nextHeader.code, items);
       const nextHeaderDraftCache = { ...productionHeaderDraftCache, [nextHeader.code]: { ...nextHeader } };
 
       if (isSupabaseConfigured) {
@@ -318,10 +391,13 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     if (!editingProductionCode) return;
 
     const code = productionHeaderDraft.code.trim();
-    const sku = productionHeaderDraft.sku.trim();
 
-    if (!code || !sku) {
-      setRemoteError("Cần nhập Mã LSX và Mã hàng trước khi cập nhật lệnh sản xuất.");
+    if (!code) {
+      setRemoteError("Cần nhập Mã LSX trước khi cập nhật lệnh sản xuất.");
+      return;
+    }
+    if (!(productionHeaderDraft.items ?? []).some((item) => item.sku.trim().length > 0)) {
+      setRemoteError("Cần nhập ít nhất 1 Mã hàng trước khi cập nhật lệnh sản xuất.");
       return;
     }
 
@@ -331,13 +407,16 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     }
 
     const existingHeader = productionHeaders.find((header) => header.code === editingProductionCode);
-    const nextHeader = {
+    const normalizedHeader = {
       ...normalizeProductionHeaderDraft(existingHeader?.createdAt),
       id: existingHeader?.id ?? crypto.randomUUID()
     };
+    const items = resolveDraftItems(normalizedHeader);
+    const nextHeader = applyPrimaryItem(normalizedHeader, items);
 
     try {
       const saved = await updateProductionOrderHeader(editingProductionCode, toProductionHeaderInput(nextHeader));
+      await replaceProductionOrderItems(nextHeader.code, items);
       const nextHeaderDraftCache = { ...productionHeaderDraftCache, [nextHeader.code]: { ...nextHeader } };
       if (editingProductionCode !== nextHeader.code) {
         delete nextHeaderDraftCache[editingProductionCode];
@@ -412,6 +491,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     editingProductionCode,
     setEditingProductionCode,
     updateProductionHeaderDraft,
+    updateProductionHeaderItems,
     buildProductionHeaderDraftFromSummary,
     createProductionOrderFromHeader,
     cancelProductionHeaderEdit,

@@ -106,6 +106,7 @@ function makeHeader(overrides: Partial<ProductionOrderHeader>): ProductionOrderH
     status: overrides.status ?? "Đang xử lý",
     createdAt: overrides.createdAt ?? "17/07/26 10:00:00",
     parentOrderCode: overrides.parentOrderCode ?? "",
+    items: overrides.items ?? [],
     ...overrides
   };
 }

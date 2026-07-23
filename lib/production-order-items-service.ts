@@ -19,7 +19,7 @@ export async function loadProductionOrderItems(): Promise<ProductionOrderItemRec
   const { data, error } = await supabase
     .from("production_order_items")
     .select(
-      "id, order_code, sku, product_name, quantity_piece, material_spec, planned_material, planned_gold_age, planned_material_type, delivered_qty, completed_weight_gram, note, sort_order, created_at"
+      "id, order_code, sku, product_name, quantity_piece, material_spec, planned_material, planned_gold_age, planned_material_type, planned_weight_gram, delivered_qty, completed_weight_gram, note, sort_order, created_at"
     )
     .order("order_code", { ascending: true })
     .order("sort_order", { ascending: true });
@@ -42,6 +42,7 @@ export async function loadProductionOrderItems(): Promise<ProductionOrderItemRec
     plannedMaterial: String(row.planned_material ?? ""),
     plannedGoldAge: Number(row.planned_gold_age ?? 0),
     plannedMaterialType: String(row.planned_material_type ?? ""),
+    plannedWeightGram: Number(row.planned_weight_gram ?? 0),
     deliveredQty: Number(row.delivered_qty ?? 0),
     completedWeightGram: Number(row.completed_weight_gram ?? 0),
     note: String(row.note ?? ""),
@@ -76,6 +77,7 @@ export async function replaceProductionOrderItems(orderCode: string, items: Prod
     planned_material: item.plannedMaterial?.trim() || null,
     planned_gold_age: item.plannedGoldAge || null,
     planned_material_type: item.plannedMaterialType?.trim() || null,
+    planned_weight_gram: item.plannedWeightGram || 0,
     delivered_qty: item.deliveredQty || 0,
     completed_weight_gram: item.completedWeightGram || 0,
     note: item.note?.trim() || null,

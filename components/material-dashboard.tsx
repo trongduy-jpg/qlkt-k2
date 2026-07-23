@@ -73,6 +73,7 @@ import { MasterDataProvider } from "@/components/master-data-context";
 import { MaterialJournalView } from "@/components/material-journal-view";
 import { MaterialMovementDrawer } from "@/components/material-movement-drawer";
 import { ProductionOrdersView } from "@/components/production-orders-view";
+import { ProductionItemsEditor } from "@/components/production-items-editor";
 import { useMasterDataCrud } from "@/components/use-master-data-crud";
 import { useMaterialMovements } from "@/components/use-material-movements";
 import { useOperationalData } from "@/components/use-operational-data";
@@ -94,7 +95,6 @@ import {
   movementLossStatusOptions,
   productionOrderDeliveryStatusOptions,
   productionOrderDestinations,
-  productionOrderMaterialSpecOptions,
   productionOrderSalesTypeOptions,
 } from "@/lib/production-journal-options";
 import {
@@ -333,6 +333,7 @@ export function MaterialDashboard() {
     editingProductionCode,
     setEditingProductionCode,
     updateProductionHeaderDraft,
+    updateProductionHeaderItems,
     buildProductionHeaderDraftFromSummary,
     cancelProductionHeaderEdit,
     saveProductionHeader
@@ -673,45 +674,13 @@ export function MaterialDashboard() {
                   />
                     </FieldShell>
                   </div>
-                  <div className="col-span-12 xl:col-span-3">
-                    <FieldShell label="Mã hàng" hint="Mã sản phẩm/chủng loại cần sản xuất.">
-                  <input
-                    className={fieldControlClass}
-                    placeholder="VD: RG750Y"
-                    value={productionHeaderDraft.sku}
-                    onChange={(event) => updateProductionHeaderDraft("sku", event.target.value)}
-                  />
-                    </FieldShell>
-                  </div>
-                  <div className="col-span-12 xl:col-span-3">
-                    <FieldShell label="Tên hàng / diễn giải">
-                  <input
-                    className={fieldControlClass}
-                    placeholder="VD: Nhẫn vàng 18K"
-                    value={productionHeaderDraft.productName}
-                    onChange={(event) => updateProductionHeaderDraft("productName", event.target.value)}
-                  />
-                    </FieldShell>
-                  </div>
-                  <div className="col-span-12 md:col-span-6 xl:col-span-2">
+                  <div className="col-span-12 md:col-span-6 xl:col-span-3">
                     <FieldShell label="Nơi nhận" hint="Bộ phận hoặc nơi tiếp nhận lệnh.">
                       <SelectControl value={productionHeaderDraft.destination} onChange={(value) => updateProductionHeaderDraft("destination", value)}>
                         {getDynamicOptions("lsx_noi_nhan", productionOrderDestinations).map((item) => (
                           <option key={item.value} value={item.value}>{item.label}</option>
                         ))}
                       </SelectControl>
-                    </FieldShell>
-                  </div>
-                  <div className="col-span-12 md:col-span-6 xl:col-span-1">
-                    <FieldShell label="Số lượng" hint="Số viên/sợi/sản phẩm theo đơn hàng.">
-                  <input
-                    className={fieldControlClass}
-                    min="0"
-                    type="number"
-                    placeholder="0"
-                    value={productionHeaderDraft.qtyPiece || ""}
-                    onChange={(event) => updateProductionHeaderDraft("qtyPiece", Number(event.target.value))}
-                  />
                     </FieldShell>
                   </div>
                 </div>
@@ -755,19 +724,16 @@ export function MaterialDashboard() {
                       </SelectControl>
                     </FieldShell>
                   </div>
-                  <div className="col-span-12 md:col-span-6 xl:col-span-2">
-                    <FieldShell label="SL đã giao">
-                  <input
-                    className={fieldControlClass}
-                    min="0"
-                    type="number"
-                    placeholder="0"
-                    value={productionHeaderDraft.deliveredQty || ""}
-                    onChange={(event) => updateProductionHeaderDraft("deliveredQty", Number(event.target.value))}
-                  />
-                    </FieldShell>
-                  </div>
                 </div>
+              </div>
+
+              <div className="mt-4">
+                <ProductionItemsEditor
+                  items={productionHeaderDraft.items}
+                  onChange={updateProductionHeaderItems}
+                  materials={materials}
+                  getDynamicOptions={getDynamicOptions}
+                />
               </div>
 
               <div className="mt-4 rounded-md border border-line bg-white/85 p-4">
@@ -790,27 +756,6 @@ export function MaterialDashboard() {
                     </FieldShell>
                   </div>
                   <div className="col-span-12 md:col-span-6 xl:col-span-3">
-                    <FieldShell label="NVL dự kiến">
-                      <SelectControl value={productionHeaderDraft.plannedMaterial} onChange={(value) => updateProductionHeaderDraft("plannedMaterial", value)}>
-                        {materials.map((material) => (
-                          <option key={material.id} value={material.name}>{material.code} - {material.name}</option>
-                        ))}
-                      </SelectControl>
-                    </FieldShell>
-                  </div>
-                  <div className="col-span-12 md:col-span-6 xl:col-span-3">
-                    <FieldShell label="Loại nguyên liệu">
-                      <SelectControl value={productionHeaderDraft.materialSpec} onChange={(value) => updateProductionHeaderDraft("materialSpec", value)}>
-                        {getDynamicOptions("loai_nguyen_lieu", productionOrderMaterialSpecOptions).map((item) => (
-                          <option key={item.value} value={item.value}>{item.label}</option>
-                        ))}
-                      </SelectControl>
-                    </FieldShell>
-                  </div>
-                </div>
-
-                <div className="mt-3 grid grid-cols-12 gap-3">
-                  <div className="col-span-12 md:col-span-6 xl:col-span-3">
                     <FieldShell label="Deadline đơn hàng">
                     <DateInput
                       value={productionHeaderDraft.deadlineDate}
@@ -826,25 +771,13 @@ export function MaterialDashboard() {
                     />
                     </FieldShell>
                   </div>
-                  <div className="col-span-12 xl:col-span-4">
-                    <FieldShell label="Quy cách (Độ dài/Đường kính)">
+                  <div className="col-span-12 xl:col-span-6">
+                    <FieldShell label="Quy cách chung (Độ dài/Đường kính)">
                     <input
                       className={fieldControlClass}
                       placeholder="VD: 1.2mm / 16cm"
                       value={productionHeaderDraft.specification}
                       onChange={(event) => updateProductionHeaderDraft("specification", event.target.value)}
-                    />
-                    </FieldShell>
-                  </div>
-                  <div className="col-span-12 xl:col-span-2">
-                    <FieldShell label="TL hoàn tất (GR)">
-                    <input
-                      className={fieldControlClass}
-                      min="0"
-                      type="number"
-                      placeholder="0.00"
-                      value={productionHeaderDraft.completedWeightGram || ""}
-                      onChange={(event) => updateProductionHeaderDraft("completedWeightGram", Number(event.target.value))}
                     />
                     </FieldShell>
                   </div>
@@ -899,40 +832,16 @@ export function MaterialDashboard() {
               <input
                 className={fieldControlClass}
                 value={productionHeaderDraft.code}
+                disabled
                 onChange={(event) => updateProductionHeaderDraft("code", event.target.value)}
               />
             </FieldShell>
-            <FieldShell label="Mã hàng">
-              <input
-                className={fieldControlClass}
-                value={productionHeaderDraft.sku}
-                onChange={(event) => updateProductionHeaderDraft("sku", event.target.value)}
-              />
-            </FieldShell>
-            <div className="col-span-2">
-              <FieldShell label="Tên hàng / diễn giải">
-                <input
-                  className={fieldControlClass}
-                  value={productionHeaderDraft.productName}
-                  onChange={(event) => updateProductionHeaderDraft("productName", event.target.value)}
-                />
-              </FieldShell>
-            </div>
             <FieldShell label="Nơi nhận">
               <SelectControl value={productionHeaderDraft.destination} onChange={(value) => updateProductionHeaderDraft("destination", value)}>
                 {getDynamicOptions("lsx_noi_nhan", productionOrderDestinations).map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
                 ))}
               </SelectControl>
-            </FieldShell>
-            <FieldShell label="Số lượng">
-              <input
-                className={fieldControlClass}
-                min="0"
-                type="number"
-                value={productionHeaderDraft.qtyPiece || ""}
-                onChange={(event) => updateProductionHeaderDraft("qtyPiece", Number(event.target.value))}
-              />
             </FieldShell>
             <FieldShell label="Khách hàng">
               <input
@@ -955,17 +864,15 @@ export function MaterialDashboard() {
                 ))}
               </SelectControl>
             </FieldShell>
-            <FieldShell label="SL đã giao">
-              <input
-                className={fieldControlClass}
-                min="0"
-                type="number"
-                value={productionHeaderDraft.deliveredQty || ""}
-                onChange={(event) => updateProductionHeaderDraft("deliveredQty", Number(event.target.value))}
-              />
-            </FieldShell>
           </div>
         </div>
+
+        <ProductionItemsEditor
+          items={productionHeaderDraft.items}
+          onChange={updateProductionHeaderItems}
+          materials={materials}
+          getDynamicOptions={getDynamicOptions}
+        />
 
         <div className="rounded-md border border-line bg-white p-3">
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Kế hoạch sản xuất</p>
@@ -982,37 +889,14 @@ export function MaterialDashboard() {
                 onChange={(value) => updateProductionHeaderDraft("deadlineDate", value)}
               />
             </FieldShell>
-            <FieldShell label="NVL dự kiến">
-              <SelectControl value={productionHeaderDraft.plannedMaterial} onChange={(value) => updateProductionHeaderDraft("plannedMaterial", value)}>
-                {materials.map((material) => (
-                  <option key={material.id} value={material.name}>{material.code} - {material.name}</option>
-                ))}
-              </SelectControl>
-            </FieldShell>
-            <FieldShell label="Loại nguyên liệu">
-              <SelectControl value={productionHeaderDraft.materialSpec} onChange={(value) => updateProductionHeaderDraft("materialSpec", value)}>
-                {getDynamicOptions("loai_nguyen_lieu", productionOrderMaterialSpecOptions).map((item) => (
-                  <option key={item.value} value={item.value}>{item.label}</option>
-                ))}
-              </SelectControl>
-            </FieldShell>
             <FieldShell label="Ngày HT">
               <DateInput
                 value={productionHeaderDraft.completedDate}
                 onChange={(value) => updateProductionHeaderDraft("completedDate", value)}
               />
             </FieldShell>
-            <FieldShell label="TL hoàn tất (GR)">
-              <input
-                className={fieldControlClass}
-                min="0"
-                type="number"
-                value={productionHeaderDraft.completedWeightGram || ""}
-                onChange={(event) => updateProductionHeaderDraft("completedWeightGram", Number(event.target.value))}
-              />
-            </FieldShell>
             <div className="col-span-2">
-              <FieldShell label="Quy cách (Độ dài/Đường kính)">
+              <FieldShell label="Quy cách chung (Độ dài/Đường kính)">
                 <input
                   className={fieldControlClass}
                   value={productionHeaderDraft.specification}

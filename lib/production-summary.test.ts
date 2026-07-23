@@ -125,7 +125,8 @@ describe("buildOrderSummaries", () => {
       note: "",
       status: "Đang xử lý",
       createdAt: "20/07/26 10:00:00",
-      parentOrderCode: ""
+      parentOrderCode: "",
+      items: []
     };
 
     const summaries = buildOrderSummaries([], [header]);
