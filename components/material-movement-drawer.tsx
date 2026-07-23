@@ -30,7 +30,7 @@ import {
 } from "@/lib/production-journal-options";
 import type { StageOption } from "@/lib/production-summary";
 
-type MovementFormTab = "info" | "stage" | "advanced";
+type MovementFormTab = "info" | "stage";
 
 // Mau nhan trang thai cong doan hien o ben phai moi dong khau trong accordion.
 function stageStatusPillClass(status?: string) {
@@ -159,8 +159,7 @@ export function MaterialMovementDrawer({
           <div className="inline-flex flex-wrap gap-1 rounded-full border border-line bg-paper p-1">
             {([
               ["info", "Thông tin"],
-              ["stage", "Công đoạn"],
-              ["advanced", "Nâng cao"]
+              ["stage", "Công đoạn"]
             ] as const).map(([key, label]) => (
               <button
                 key={key}
@@ -405,6 +404,91 @@ export function MaterialMovementDrawer({
                               </FieldShell>
                             </div>
 
+                            <details className="mt-3 rounded-md border border-line bg-paper/50">
+                              <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                                Nâng cao — NXT / hao hụt của khâu này
+                              </summary>
+                              <div className="border-t border-line/70 p-3">
+                                <div className={balancedTwoColumnGrid}>
+                                  <FieldShell label="Tuổi vàng" required>
+                                    <SelectControl value={String(draft.goldAge ?? "")} onChange={(value) => onDraftChange("goldAge", Number(value))}>
+                                      <option value="">Chọn tuổi vàng</option>
+                                      {getDynamicOptions("tuoi_vang", movementGoldAgeOptions).map((option) => (
+                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                      ))}
+                                    </SelectControl>
+                                  </FieldShell>
+                                  <FieldShell label="Mã nối NXT" hint="Gõ để tìm nhanh trong danh sách.">
+                                    <SearchableSelect
+                                      value={draft.nxtLinkCode ?? ""}
+                                      onChange={(value) => onDraftChange("nxtLinkCode", value)}
+                                      groups={groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions))}
+                                      placeholder="Chọn mã nối"
+                                      clearLabel="Chọn mã nối"
+                                    />
+                                  </FieldShell>
+                                </div>
+                                <div className={`mt-3 ${balancedTwoColumnGrid}`}>
+                                  <FieldShell label="Nguồn nhập">
+                                    <SelectControl value={draft.importSource ?? ""} onChange={(value) => onDraftChange("importSource", value)}>
+                                      <option value="">Chọn nguồn nhập</option>
+                                      {getDynamicOptions("nguon_nhap", movementImportSourceOptions).map((option) => (
+                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                      ))}
+                                    </SelectControl>
+                                  </FieldShell>
+                                  <FieldShell label="Nguồn xuất">
+                                    <SelectControl value={draft.exportSource ?? ""} onChange={(value) => onDraftChange("exportSource", value)}>
+                                      <option value="">Chọn nguồn xuất</option>
+                                      {getDynamicOptions("nguon_xuat", movementExportSourceOptions).map((option) => (
+                                        <option key={option.value} value={option.value}>{option.label}</option>
+                                      ))}
+                                    </SelectControl>
+                                  </FieldShell>
+                                </div>
+                                <div className={`mt-3 ${balancedTwoColumnGrid}`}>
+                                  <FieldShell label="TL quy KCP xuất" hint="Tự tính = Xuất × tuổi vàng của khâu này; sửa lại nếu cần.">
+                                    <input
+                                      className={fieldControlClass}
+                                      type="number"
+                                      step="0.0001"
+                                      placeholder="0.0000"
+                                      value={draft.convertedIssueWeight || ""}
+                                      onChange={(event) => onDraftChange("convertedIssueWeight", Number(event.target.value))}
+                                    />
+                                  </FieldShell>
+                                  <FieldShell label="TL quy KCP nhập" hint="Tự tính = Nhập × tuổi vàng của khâu này; sửa lại nếu cần.">
+                                    <input
+                                      className={fieldControlClass}
+                                      type="number"
+                                      step="0.0001"
+                                      placeholder="0.0000"
+                                      value={draft.convertedReturnWeight || ""}
+                                      onChange={(event) => onDraftChange("convertedReturnWeight", Number(event.target.value))}
+                                    />
+                                  </FieldShell>
+                                </div>
+                                <div className={`mt-3 ${balancedTwoColumnGrid}`}>
+                                  <FieldShell label="Tháng tính hao" hint="Kỳ dùng để quyết toán hao hụt.">
+                                    <input
+                                      className={fieldControlClass}
+                                      type="month"
+                                      value={draft.lossPeriod ?? ""}
+                                      onChange={(event) => onDraftChange("lossPeriod", event.target.value)}
+                                    />
+                                  </FieldShell>
+                                  <FieldShell label="Tháng NXT" hint="Kỳ dùng cho báo cáo nhập xuất tồn.">
+                                    <input
+                                      className={fieldControlClass}
+                                      type="month"
+                                      value={draft.nxtPeriod ?? ""}
+                                      onChange={(event) => onDraftChange("nxtPeriod", event.target.value)}
+                                    />
+                                  </FieldShell>
+                                </div>
+                              </div>
+                            </details>
+
                             {single ? (
                               <button
                                 className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
@@ -487,96 +571,12 @@ export function MaterialMovementDrawer({
             </DrawerSection>
           ) : null}
 
-          {movementFormTab === "advanced" ? (
-            <DrawerSection title="Thông tin NXT / tính hao" note="Nhóm phục vụ báo cáo nhập xuất tồn và quy đổi hao hụt theo tuổi vàng. Chỉ nhập khi cần NXT, quy đổi KCP hoặc nguồn nhập/xuất.">
-              <div className="grid gap-3">
-                <div className={balancedTwoColumnGrid}>
-                  <FieldShell label="Tháng tính hao" hint="Kỳ dùng để quyết toán hao hụt.">
-                    <input
-                      className={fieldControlClass}
-                      type="month"
-                      value={draft.lossPeriod ?? ""}
-                      onChange={(event) => onDraftChange("lossPeriod", event.target.value)}
-                    />
-                  </FieldShell>
-                  <FieldShell label="Tháng NXT" hint="Kỳ dùng cho báo cáo nhập xuất tồn.">
-                    <input
-                      className={fieldControlClass}
-                      type="month"
-                      value={draft.nxtPeriod ?? ""}
-                      onChange={(event) => onDraftChange("nxtPeriod", event.target.value)}
-                    />
-                  </FieldShell>
-                </div>
-                <div className={balancedTwoColumnGrid}>
-                  <FieldShell label="Tuổi vàng" required>
-                    <SelectControl value={String(draft.goldAge ?? "")} onChange={(value) => onDraftChange("goldAge", Number(value))}>
-                      <option value="">Chọn tuổi vàng</option>
-                      {getDynamicOptions("tuoi_vang", movementGoldAgeOptions).map((item) => (
-                        <option key={item.value} value={item.value}>{item.label}</option>
-                      ))}
-                    </SelectControl>
-                  </FieldShell>
-                  <FieldShell label="Mã nối NXT" hint="Gõ để tìm nhanh trong danh sách.">
-                    <SearchableSelect
-                      value={draft.nxtLinkCode ?? ""}
-                      onChange={(value) => onDraftChange("nxtLinkCode", value)}
-                      groups={groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions))}
-                      placeholder="Chọn mã nối"
-                      clearLabel="Chọn mã nối"
-                    />
-                  </FieldShell>
-                </div>
-                <div className={balancedTwoColumnGrid}>
-                  <FieldShell label="Nguồn nhập">
-                    <SelectControl value={draft.importSource ?? ""} onChange={(value) => onDraftChange("importSource", value)}>
-                      <option value="">Chọn nguồn nhập</option>
-                      {getDynamicOptions("nguon_nhap", movementImportSourceOptions).map((item) => (
-                        <option key={item.value} value={item.value}>{item.label}</option>
-                      ))}
-                    </SelectControl>
-                  </FieldShell>
-                  <FieldShell label="Nguồn xuất">
-                    <SelectControl value={draft.exportSource ?? ""} onChange={(value) => onDraftChange("exportSource", value)}>
-                      <option value="">Chọn nguồn xuất</option>
-                      {getDynamicOptions("nguon_xuat", movementExportSourceOptions).map((item) => (
-                        <option key={item.value} value={item.value}>{item.label}</option>
-                      ))}
-                    </SelectControl>
-                  </FieldShell>
-                </div>
-                <div className={balancedTwoColumnGrid}>
-                  <FieldShell label="TL quy KCP xuất" hint="Trọng lượng xuất đã quy đổi theo tuổi vàng.">
-                    <input
-                      className={fieldControlClass}
-                      type="number"
-                      step="0.0001"
-                      placeholder="0.0000"
-                      value={draft.convertedIssueWeight || ""}
-                      onChange={(event) => onDraftChange("convertedIssueWeight", Number(event.target.value))}
-                    />
-                  </FieldShell>
-                  <FieldShell label="TL quy KCP nhập" hint="Trọng lượng nhập đã quy đổi theo tuổi vàng.">
-                    <input
-                      className={fieldControlClass}
-                      type="number"
-                      step="0.0001"
-                      placeholder="0.0000"
-                      value={draft.convertedReturnWeight || ""}
-                      onChange={(event) => onDraftChange("convertedReturnWeight", Number(event.target.value))}
-                    />
-                  </FieldShell>
-                </div>
-              </div>
-            </DrawerSection>
-          ) : null}
-
           </div>
         </div>
 
         <div className="shrink-0 border-t border-line bg-white/95 px-5 py-3 shadow-[0_-10px_30px_rgba(15,23,42,0.06)]">
           <p className="text-xs leading-5 text-zinc-500">
-            Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Chuyển tab để nhập từng nhóm; nút lưu luôn ở dưới đáy.
+            Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Mỗi khâu có mục &quot;Nâng cao&quot; riêng cho NXT/hao hụt; nút lưu luôn ở dưới đáy.
           </p>
           {isDraftForClosedOrder ? (
             <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">

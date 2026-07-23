@@ -61,7 +61,7 @@ export function useMaterialMovements({
   const [draft, setDraft] = useState<ProductionOrder>(createEmptyOrder());
   const [editingMovementId, setEditingMovementId] = useState<string | null>(null);
   const [isMovementFormOpen, setIsMovementFormOpen] = useState(false);
-  const [movementFormTab, setMovementFormTab] = useState<"info" | "stage" | "advanced">("info");
+  const [movementFormTab, setMovementFormTab] = useState<"info" | "stage">("info");
   const [savedMovementNotice, setSavedMovementNotice] = useState<SavedMovementNotice | null>(null);
 
   // Luu lai "anh chup" cua dong dang sua ngay khi gan editingMovementId, de
@@ -324,7 +324,15 @@ export function useMaterialMovements({
         returned: 0,
         transferred: 0,
         loss: 0,
-        sourceMaterialName: ""
+        sourceMaterialName: "",
+        // Reset nhom Nang cao (NXT/hao hut) ve trang thai rong cho khau moi,
+        // tranh ro ri quy doi KCP / nguon / ma noi tu khau truoc sang. Tuoi
+        // vang giu lai lam mac dinh; quy doi = 0 vi Xuat/Nhap vua reset ve 0.
+        convertedIssueWeight: 0,
+        convertedReturnWeight: 0,
+        importSource: "",
+        exportSource: "",
+        nxtLinkCode: ""
       }));
     }
     setRemoteError(null);
