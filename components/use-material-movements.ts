@@ -5,7 +5,7 @@ import type { ProductionOrder, Status } from "@/lib/demo-data";
 import type { WorkerMaster } from "@/lib/material-service";
 import {
   applyProductionBusinessRules,
-  buildProductionOrderCode,
+  buildUniqueProductionOrderCode,
   getCarryOverLossPeriod,
   getStageLabel,
   isLargeWeightMovement,
@@ -34,6 +34,10 @@ type UseMaterialMovementsParams = {
   workers: WorkerMaster[];
   stageRules: Record<string, HaoHutRule>;
   movementDraftCache: MovementDraftCache;
+  // Toan bo ma LSX da co (ca giao dich lan header chua co giao dich), dung
+  // de goi y so LSX tiep theo cho dung du user tao moi tu Nhat ky NVL hay
+  // tu Lenh san xuat - tranh de xuat lai STT1 moi lan mo form trong.
+  existingOrderCodes: string[];
   setOrders: Dispatch<SetStateAction<ProductionOrder[]>>;
   setMovementDraftCache: Dispatch<SetStateAction<MovementDraftCache>>;
   setSelectedOrderCode: (code: string | null) => void;
@@ -48,6 +52,7 @@ export function useMaterialMovements({
   workers,
   stageRules,
   movementDraftCache,
+  existingOrderCodes,
   setOrders,
   setMovementDraftCache,
   setSelectedOrderCode,
@@ -105,7 +110,10 @@ export function useMaterialMovements({
       next.powder = 0;
       next.nxtPeriod = key === "occurredDate" ? toMonthCode(occurredDate) : next.nxtPeriod;
       next.lossPeriod = key === "occurredDate" || key === "status" ? getCarryOverLossPeriod(occurredDate, statusValue) : next.lossPeriod;
-      next.code = key === "occurredDate" && (!current.code || current.code.startsWith("DHAG-")) ? buildProductionOrderCode("DHAG", occurredDate) : next.code;
+      next.code =
+        key === "occurredDate" && (!current.code || current.code.startsWith("DHAG-"))
+          ? buildUniqueProductionOrderCode("DHAG", occurredDate, existingOrderCodes)
+          : next.code;
       next.convertedIssueWeight = Number((issued * goldAge).toFixed(4));
       next.convertedReturnWeight = Number((returned * goldAge).toFixed(4));
       return next;
@@ -269,7 +277,11 @@ export function useMaterialMovements({
 
   function openEmptyMovementForm() {
     setEditingMovementId(null);
-    setDraft(createEmptyOrder());
+    const emptyOrder = createEmptyOrder();
+    setDraft({
+      ...emptyOrder,
+      code: buildUniqueProductionOrderCode("DHAG", emptyOrder.occurredDate || toIsoDate(), existingOrderCodes)
+    });
     setRemoteError(null);
     setMovementFormTab("info");
     setIsMovementFormOpen(true);

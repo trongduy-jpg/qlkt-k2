@@ -455,6 +455,7 @@ export function MaterialDashboard() {
     workers,
     stageRules,
     movementDraftCache,
+    existingOrderCodes: orderSummaries.map((summary) => summary.code),
     setOrders,
     setMovementDraftCache,
     setSelectedOrderCode,
