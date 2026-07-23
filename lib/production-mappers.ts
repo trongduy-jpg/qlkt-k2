@@ -93,7 +93,8 @@ export function createEmptyProductionOrderHeaderDraft(): Omit<ProductionOrderHea
     convertedIssueWeight: 0,
     convertedReturnWeight: 0,
     note: "",
-    status: "Đang xử lý"
+    status: "Đang xử lý",
+    parentOrderCode: ""
   };
 }
 
@@ -145,7 +146,8 @@ export function mapRemoteHeaderToProductionHeader(
     convertedReturnWeight: header.convertedReturnWeight ?? 0,
     note: header.note ?? "",
     status: header.status,
-    createdAt: header.createdAt
+    createdAt: header.createdAt,
+    parentOrderCode: header.parentOrderCode ?? ""
   };
 }
 
@@ -199,7 +201,8 @@ export function mergeProductionHeaderWithDraft(
     convertedIssueWeight: pickNumber(header.convertedIssueWeight, cachedDraft.convertedIssueWeight),
     convertedReturnWeight: pickNumber(header.convertedReturnWeight, cachedDraft.convertedReturnWeight),
     note: pickText(header.note, cachedDraft.note),
-    status: header.status || cachedDraft.status
+    status: header.status || cachedDraft.status,
+    parentOrderCode: pickText(header.parentOrderCode, cachedDraft.parentOrderCode)
   };
 }
 

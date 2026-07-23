@@ -9,6 +9,7 @@ import {
   Database,
   FileWarning,
   History,
+  Link2,
   ListChecks,
   Plus,
   Scale,
@@ -395,12 +396,26 @@ export function MaterialDashboard() {
     [orders, selectedOrderSummary]
   );
 
+  // Cac LSX khac duoc tao qua "+ Tao don moi cho khach nay" tu chinh LSX
+  // dang xem (con), dung de hien dau hieu "cung khach hang" tren giao dien.
+  const childOrdersOfSelected = useMemo(() => {
+    const code = selectedOrderSummary?.code;
+    if (!code) return [];
+    return orderSummaries.filter((summary) => summary.parentOrderCode === code);
+  }, [orderSummaries, selectedOrderSummary]);
+
   const selectedOrderMovementStats = useMemo(() => computeMovementTotals(selectedOrderMovements), [selectedOrderMovements]);
 
   const selectedOrderDetail = useMemo(
     () => buildSelectedOrderDetail(selectedOrderSummary, selectedOrderMovements, productionHeaders),
     [productionHeaders, selectedOrderMovements, selectedOrderSummary]
   );
+
+  const parentOrderOfSelected = useMemo(() => {
+    const parentCode = selectedOrderDetail?.parentOrderCode;
+    if (!parentCode) return null;
+    return orderSummaries.find((summary) => summary.code === parentCode) ?? null;
+  }, [orderSummaries, selectedOrderDetail]);
 
   const isEditingSelectedOrder = Boolean(selectedOrderSummary && editingProductionCode === selectedOrderSummary.code);
 
@@ -1265,7 +1280,8 @@ export function MaterialDashboard() {
       sku: selectedOrderSummary.sku || "",
       productName: selectedOrderSummary.productName || "",
       customerName: selectedOrderSummary.customerName || "",
-      salesType: selectedOrderSummary.salesType || ""
+      salesType: selectedOrderSummary.salesType || "",
+      parentOrderCode: selectedOrderSummary.code
     });
     setIsProductionFormOpen(true);
   }
@@ -1629,6 +1645,43 @@ export function MaterialDashboard() {
                                 {selectedOrderDetail.movementCount} giao dịch
                               </span>
                             </div>
+
+                            {parentOrderOfSelected || childOrdersOfSelected.length > 0 ? (
+                              <div className="flex flex-wrap items-center gap-2 rounded-md border border-dashed border-jade/40 bg-jade/5 px-3 py-2 text-xs">
+                                <Link2 size={14} className="shrink-0 text-jade" />
+                                {parentOrderOfSelected ? (
+                                  <span className="text-zinc-600">
+                                    Phát sinh từ LSX{" "}
+                                    <button
+                                      type="button"
+                                      className="font-semibold text-jade underline hover:text-jade/80"
+                                      onClick={() => selectProductionOrder(parentOrderOfSelected.code)}
+                                    >
+                                      {parentOrderOfSelected.code}
+                                    </button>
+                                    {" "}(cùng khách hàng{parentOrderOfSelected.customerName ? `: ${parentOrderOfSelected.customerName}` : ""})
+                                  </span>
+                                ) : null}
+                                {childOrdersOfSelected.length > 0 ? (
+                                  <span className="text-zinc-600">
+                                    {parentOrderOfSelected ? " · " : ""}
+                                    Đã tạo {childOrdersOfSelected.length} đơn khác cho khách này:{" "}
+                                    {childOrdersOfSelected.map((child, index) => (
+                                      <span key={child.code}>
+                                        {index > 0 ? ", " : ""}
+                                        <button
+                                          type="button"
+                                          className="font-semibold text-jade underline hover:text-jade/80"
+                                          onClick={() => selectProductionOrder(child.code)}
+                                        >
+                                          {child.code}
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </span>
+                                ) : null}
+                              </div>
+                            ) : null}
                           </div>
                         </div>
 

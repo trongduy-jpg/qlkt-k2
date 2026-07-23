@@ -194,7 +194,8 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       convertedIssueWeight: header.convertedIssueWeight,
       convertedReturnWeight: header.convertedReturnWeight,
       note: header.note,
-      status: header.status
+      status: header.status,
+      parentOrderCode: header.parentOrderCode
     };
   }
 
@@ -254,7 +255,8 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       convertedIssueWeight: summary.convertedIssueWeight || 0,
       convertedReturnWeight: summary.convertedReturnWeight || 0,
       note: summary.note || "",
-      status: summary.status
+      status: summary.status,
+      parentOrderCode: summary.parentOrderCode || ""
     };
   }
 

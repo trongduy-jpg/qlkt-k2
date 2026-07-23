@@ -55,6 +55,7 @@ export type OrderSummary = {
   note?: string;
   createdAt?: string;
   headerStatus?: Status;
+  parentOrderCode?: string;
   movementCount: number;
   issued: number;
   returned: number;
@@ -111,6 +112,7 @@ export type ProductionOrderHeader = {
   note: string;
   status: Status;
   createdAt: string;
+  parentOrderCode: string;
 };
 
 export type PendingJournalRow = {

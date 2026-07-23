@@ -56,6 +56,7 @@ export function buildOrderSummaries(orders: ProductionOrder[], productionHeaders
       note: header.note,
       createdAt: header.createdAt,
       headerStatus: header.status,
+      parentOrderCode: header.parentOrderCode,
       movementCount: 0,
       issued: 0,
       returned: 0,

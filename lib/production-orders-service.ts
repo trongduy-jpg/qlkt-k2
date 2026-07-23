@@ -8,7 +8,7 @@ export async function loadProductionOrderHeaders(): Promise<ProductionOrderHeade
 
   let result: any = await supabase
     .from("production_orders")
-    .select("id, order_code, sku, product_name, destination, order_date, occurred_date, document_no, document_in_no, document_line_no, movement_type, quantity_piece, planned_date, planned_stage, planned_worker, planned_material, material_spec, planned_gold_age, planned_material_type, delivery_status, order_month, sales_type, customer_name, specification, deadline_date, completed_date, delivered_qty, actual_progress_note, completed_weight_gram, issued_gram, returned_gram, powder_gram, transferred_weight_gram, loss_period, nxt_period, source_material_name, source_name, import_source, export_source, nxt_link_code, converted_issue_weight, converted_return_weight, note, status, created_at")
+    .select("id, order_code, sku, product_name, destination, order_date, occurred_date, document_no, document_in_no, document_line_no, movement_type, quantity_piece, planned_date, planned_stage, planned_worker, planned_material, material_spec, planned_gold_age, planned_material_type, delivery_status, order_month, sales_type, customer_name, specification, deadline_date, completed_date, delivered_qty, actual_progress_note, completed_weight_gram, issued_gram, returned_gram, powder_gram, transferred_weight_gram, loss_period, nxt_period, source_material_name, source_name, import_source, export_source, nxt_link_code, converted_issue_weight, converted_return_weight, note, status, created_at, parent_order_code")
     .order("created_at", { ascending: false });
 
   if (result.error || !result.data) {
@@ -63,7 +63,8 @@ export async function loadProductionOrderHeaders(): Promise<ProductionOrderHeade
     convertedReturnWeight: Number(row.converted_return_weight ?? 0),
     note: String(row.note ?? ""),
     status: fromDbStatus(String(row.status ?? "dang_xu_ly")),
-    createdAt: String(row.created_at ?? "")
+    createdAt: String(row.created_at ?? ""),
+    parentOrderCode: String(row.parent_order_code ?? "")
   }));
 }
 
@@ -118,7 +119,8 @@ export async function createProductionOrderHeader(input: ProductionOrderHeaderIn
         converted_issue_weight: input.convertedIssueWeight || null,
         converted_return_weight: input.convertedReturnWeight || null,
         note: input.note || null,
-        status: toDbStatus(input.status)
+        status: toDbStatus(input.status),
+        parent_order_code: input.parentOrderCode || null
       }
     )
     .select("id")
@@ -185,7 +187,8 @@ export async function updateProductionOrderHeader(orderCode: string, input: Prod
       converted_issue_weight: input.convertedIssueWeight || null,
       converted_return_weight: input.convertedReturnWeight || null,
       note: input.note || null,
-      status: toDbStatus(input.status)
+      status: toDbStatus(input.status),
+      parent_order_code: input.parentOrderCode || null
     })
     .eq("order_code", orderCode)
     .select("id")

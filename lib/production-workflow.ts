@@ -51,6 +51,7 @@ export type SelectedOrderDetail = {
   movementMaterials: string[];
   movementWorkers: string[];
   movementCount: number;
+  parentOrderCode?: string;
 };
 
 function addDays(dateString: string, days: number) {
@@ -202,6 +203,7 @@ export function buildSelectedOrderDetail(
     actualProgressNote: pickText(summary.actualProgressNote, matchingHeader?.actualProgressNote),
     movementMaterials,
     movementWorkers,
-    movementCount: movements.length
+    movementCount: movements.length,
+    parentOrderCode: pickText(summary.parentOrderCode, matchingHeader?.parentOrderCode)
   };
 }

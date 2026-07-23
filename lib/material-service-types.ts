@@ -95,6 +95,9 @@ export type ProductionOrderHeaderInput = {
   convertedReturnWeight?: number;
   note?: string;
   status: Status;
+  // Ma LSX goc khi don nay duoc tao qua "+ Tao don moi cho khach nay" -
+  // dung de hien dau hieu "cung khach hang" tren giao dien.
+  parentOrderCode?: string;
 };
 
 export type ProductionOrderHeaderRecord = ProductionOrderHeaderInput & {

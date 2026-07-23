@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Link2, Plus } from "lucide-react";
 import type { OrderSummary } from "@/lib/production-types";
 import type { ProductionOverview } from "@/lib/production-workflow";
 import type { StageOption } from "@/lib/production-summary";
@@ -221,7 +221,14 @@ export function ProductionOrdersView({
                     onClick={() => onSelectOrder(summary.code)}
                   >
                     <td className="px-3 py-3 align-top">
-                      <p className="font-semibold text-ink">{summary.code}</p>
+                      <p className="flex items-center gap-1.5 font-semibold text-ink">
+                        {summary.code}
+                        {summary.parentOrderCode ? (
+                          <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
+                            <Link2 size={12} className="text-jade" />
+                          </span>
+                        ) : null}
+                      </p>
                     </td>
                     <td className="px-3 py-3 align-top text-zinc-700">{summary.sku || "-"}</td>
                     <td className="px-3 py-3 align-top">
