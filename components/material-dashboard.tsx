@@ -465,6 +465,7 @@ export function MaterialDashboard() {
     openEmptyMovementForm,
     selectStageTab,
     switchToMovement,
+    selectItemForDraft,
     savedMovementNotice,
     dismissSavedMovementNotice
   } = useMaterialMovements({
@@ -497,21 +498,37 @@ export function MaterialDashboard() {
       .filter(Boolean);
   }, [stages]);
 
+  // Danh sach Ma hang cua LSX dang mo trong drawer NK NVL (1 LSX co the co
+  // nhieu Ma hang, moi Ma hang 1 tien trinh cong doan rieng). Rong neu LSX
+  // chua duoc tao chinh thuc (VD user ghi giao dich truoc khi tao LSX) -
+  // drawer se fallback ve nhap tay Ma hang nhu truoc.
+  const itemsForDraft = useMemo(() => {
+    const header = productionHeaders.find((item) => item.code === draft.code.trim());
+    return header?.items ?? [];
+  }, [productionHeaders, draft.code]);
+
+  const draftItemSku = draft.itemSku || draft.sku;
+
   const draftStageMovements = useMemo(
-    () => buildDraftStageMovements(orders, draft.code),
-    [orders, draft.code]
+    () => buildDraftStageMovements(orders, draft.code, draftItemSku),
+    [orders, draft.code, draftItemSku]
   );
 
-  // Tat ca giao dich da ghi nhan cho DUNG (LSX + khau) dang chon trong
-  // drawer - dung de hien danh sach tho da them cho khau nhieu tho.
+  // Tat ca giao dich da ghi nhan cho DUNG (LSX + Ma hang + khau) dang chon
+  // trong drawer - dung de hien danh sach tho da them cho khau nhieu tho.
   const currentDrawerStageMovements = useMemo(() => {
     const code = draft.code.trim();
     const stageCode = normalizeProductionStageCode(draft.stage);
     if (!code || !stageCode) return [];
     return orders
-      .filter((order) => order.code === code && normalizeProductionStageCode(order.stage) === stageCode)
+      .filter(
+        (order) =>
+          order.code === code &&
+          (order.itemSku || order.sku) === draftItemSku &&
+          normalizeProductionStageCode(order.stage) === stageCode
+      )
       .sort((left, right) => String(right.id).localeCompare(String(left.id)));
-  }, [orders, draft.code, draft.stage]);
+  }, [orders, draft.code, draft.stage, draftItemSku]);
 
   const selectedOrderStageProgress = useMemo(
     () => buildStageProgress(stageOptionsForDropdown, selectedOrderMovements),
@@ -1778,6 +1795,7 @@ export function MaterialDashboard() {
               draftStageMovements={draftStageMovements}
               currentDrawerStageMovements={currentDrawerStageMovements}
               workerOptionsForDraft={workerOptionsForDraft}
+              itemsForDraft={itemsForDraft}
               isDraftForClosedOrder={isDraftForClosedOrder}
               isDraftDirectChargeInvalid={isDraftDirectChargeInvalid}
               remoteError={remoteError}
@@ -1789,6 +1807,7 @@ export function MaterialDashboard() {
               onSave={addOrder}
               onRemoveMovement={removeOrder}
               onEditStageMovement={switchToMovement}
+              onSelectItem={selectItemForDraft}
             />
 
             {savedMovementNotice ? (

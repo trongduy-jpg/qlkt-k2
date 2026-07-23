@@ -10,7 +10,7 @@ import {
   fieldControlClass
 } from "@/components/production-ui";
 import type { ProductionOrder, Status } from "@/lib/demo-data";
-import type { WorkerMaster } from "@/lib/material-service";
+import type { ProductionOrderItem, WorkerMaster } from "@/lib/material-service";
 import { formatGram, isClosedStatus } from "@/lib/production-helpers";
 import {
   getStageLabel,
@@ -58,6 +58,7 @@ type MaterialMovementDrawerProps = {
   draftStageMovements: Map<string, ProductionOrder>;
   currentDrawerStageMovements: ProductionOrder[];
   workerOptionsForDraft: WorkerMaster[];
+  itemsForDraft: ProductionOrderItem[];
   isDraftForClosedOrder: boolean;
   isDraftDirectChargeInvalid: boolean;
   remoteError: string | null;
@@ -69,6 +70,7 @@ type MaterialMovementDrawerProps = {
   onSave: (resetMode?: "close" | "clearStage" | "keepStage") => void;
   onRemoveMovement: (id: string) => void;
   onEditStageMovement: (order: ProductionOrder) => void;
+  onSelectItem: (item: { sku: string; productName?: string }) => void;
 };
 
 export function MaterialMovementDrawer({
@@ -80,6 +82,7 @@ export function MaterialMovementDrawer({
   draftStageMovements,
   currentDrawerStageMovements,
   workerOptionsForDraft,
+  itemsForDraft,
   isDraftForClosedOrder,
   isDraftDirectChargeInvalid,
   remoteError,
@@ -90,13 +93,20 @@ export function MaterialMovementDrawer({
   onSelectStage,
   onSave,
   onRemoveMovement,
-  onEditStageMovement
+  onEditStageMovement,
+  onSelectItem
 }: MaterialMovementDrawerProps) {
   if (!isOpen) return null;
 
   const isEditing = Boolean(editingMovementId);
   const activeStageCode = normalizeStageCode(draft.stage);
   const balancedTwoColumnGrid = "grid gap-3 md:grid-cols-2";
+  // Ma hang dang duoc chon de ghi nhan cong doan. Neu LSX co danh sach Ma
+  // hang chinh thuc (tao qua man Lenh san xuat), bat buoc chon truoc khi
+  // hien accordion khau; neu chua co danh sach (VD ghi giao dich truoc khi
+  // tao LSX) thi dung tam Ma hang go tay o tab Thong tin nhu truoc.
+  const selectedItemSku = draft.itemSku || draft.sku;
+  const requiresItemSelection = itemsForDraft.length > 0 && !selectedItemSku.trim();
 
   return (
     <div>
@@ -191,13 +201,32 @@ export function MaterialMovementDrawer({
                       onChange={(event) => onDraftChange("code", event.target.value)}
                     />
                   </FieldShell>
-                  <FieldShell label="Mã hàng" required>
-                    <input
-                      className={fieldControlClass}
-                      placeholder="VD: RG750Y"
-                      value={draft.sku}
-                      onChange={(event) => onDraftChange("sku", event.target.value)}
-                    />
+                  <FieldShell
+                    label="Mã hàng"
+                    required
+                    hint={itemsForDraft.length > 0 ? "LSX này có nhiều Mã hàng, chọn đúng Mã hàng cần ghi nhận." : undefined}
+                  >
+                    {itemsForDraft.length > 0 ? (
+                      <SelectControl
+                        value={draft.itemSku || draft.sku}
+                        onChange={(value) => {
+                          const matched = itemsForDraft.find((item) => item.sku === value);
+                          onSelectItem({ sku: value, productName: matched?.productName });
+                        }}
+                      >
+                        <option value="">Chọn Mã hàng</option>
+                        {itemsForDraft.map((item) => (
+                          <option key={item.sku} value={item.sku}>{item.sku}</option>
+                        ))}
+                      </SelectControl>
+                    ) : (
+                      <input
+                        className={fieldControlClass}
+                        placeholder="VD: RG750Y"
+                        value={draft.sku}
+                        onChange={(event) => onDraftChange("sku", event.target.value)}
+                      />
+                    )}
                   </FieldShell>
                 </div>
                 <div className={`mt-3 ${balancedTwoColumnGrid}`}>
@@ -264,17 +293,50 @@ export function MaterialMovementDrawer({
             <DrawerSection
               title="Công đoạn & tiến độ"
               note={
-                draft.code
-                  ? "Bấm vào từng khâu để mở và điền Thợ/Xuất/Nhập; điền xong bấm Lưu để đóng khâu rồi chuyển sang khâu kế."
-                  : "Nhập Mã LSX ở tab Thông tin trước rồi mới ghi nhận khâu."
+                !draft.code
+                  ? "Nhập Mã LSX ở tab Thông tin trước rồi mới ghi nhận khâu."
+                  : requiresItemSelection
+                    ? "LSX này có nhiều Mã hàng — chọn đúng Mã hàng cần ghi nhận trước."
+                    : "Bấm vào từng khâu để mở và điền Thợ/Xuất/Nhập; điền xong bấm Lưu để đóng khâu rồi chuyển sang khâu kế."
               }
             >
               {!draft.code.trim() ? (
                 <p className="rounded-md border border-dashed border-line bg-paper/60 px-3 py-4 text-sm text-zinc-500">
                   Chưa có Mã LSX. Sang tab &quot;Thông tin&quot; nhập Mã LSX trước khi ghi nhận công đoạn.
                 </p>
+              ) : requiresItemSelection ? (
+                <div className="grid gap-2">
+                  {itemsForDraft.map((item) => (
+                    <button
+                      key={item.sku}
+                      type="button"
+                      className="flex items-center justify-between gap-3 rounded-lg border border-line bg-white px-3 py-2.5 text-left hover:border-jade hover:bg-jade/5"
+                      onClick={() => onSelectItem({ sku: item.sku, productName: item.productName })}
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-ink">{item.sku}</p>
+                        {item.productName ? <p className="truncate text-xs text-zinc-500">{item.productName}</p> : null}
+                      </div>
+                      <ChevronDown className="size-4 shrink-0 -rotate-90 text-zinc-400" />
+                    </button>
+                  ))}
+                </div>
               ) : (
                 <div className="grid gap-2">
+                  {itemsForDraft.length > 0 ? (
+                    <div className="flex items-center justify-between gap-3 rounded-lg border border-jade/40 bg-jade/5 px-3 py-2 text-sm">
+                      <span className="text-zinc-600">
+                        Mã hàng <span className="font-semibold text-ink">{selectedItemSku}</span>
+                      </span>
+                      <button
+                        type="button"
+                        className="font-semibold text-jade underline hover:text-jade/80"
+                        onClick={() => onSelectItem({ sku: "", productName: "" })}
+                      >
+                        Đổi Mã hàng
+                      </button>
+                    </div>
+                  ) : null}
                   {stageOptions.map((item, index) => {
                     const recorded = draftStageMovements.get(item.value);
                     const done = Boolean(recorded);

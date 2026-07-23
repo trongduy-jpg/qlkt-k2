@@ -291,7 +291,7 @@ export function useMaterialMovements({
   // do de sua (khong tao dong moi). Khau chua co dong hoac khau nhieu tho:
   // bat dau 1 draft moi cho khau ay.
   function selectStageTab(stageCode: string) {
-    const draftStageMovements = buildDraftStageMovements(orders, draft.code);
+    const draftStageMovements = buildDraftStageMovements(orders, draft.code, draft.itemSku || draft.sku);
     const existing = draftStageMovements.get(stageCode);
 
     if (existing && isSingleWorkerStage(stageCode)) {
@@ -331,6 +331,34 @@ export function useMaterialMovements({
     setRemoteError(null);
   }
 
+  // Chon Ma hang dang cap nhat trong LSX (1 LSX co the co nhieu Ma hang,
+  // moi Ma hang 1 tien trinh cong doan rieng). Reset lai draft nhu chuyen
+  // sang mot LSX/khau moi, vi doi Ma hang = doi hoan toan tien trinh dang xem.
+  function selectItemForDraft(item: { sku: string; productName?: string }) {
+    setEditingMovementId(null);
+    setDraft((current) => ({
+      ...current,
+      id: "",
+      sku: item.sku,
+      itemSku: item.sku,
+      productName: item.productName ?? current.productName,
+      stage: "",
+      worker: "",
+      qtyPiece: 0,
+      issued: 0,
+      returned: 0,
+      transferred: 0,
+      loss: 0,
+      sourceMaterialName: "",
+      convertedIssueWeight: 0,
+      convertedReturnWeight: 0,
+      importSource: "",
+      exportSource: "",
+      nxtLinkCode: ""
+    }));
+    setRemoteError(null);
+  }
+
   return {
     draft,
     setDraft,
@@ -349,6 +377,7 @@ export function useMaterialMovements({
     openEmptyMovementForm,
     selectStageTab,
     switchToMovement,
+    selectItemForDraft,
     savedMovementNotice,
     dismissSavedMovementNotice
   };

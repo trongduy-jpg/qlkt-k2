@@ -255,12 +255,17 @@ export function buildStageOptionsForDropdown(
   return Array.from(merged.values());
 }
 
-export function buildDraftStageMovements(orders: ProductionOrder[], code: string): Map<string, ProductionOrder> {
+// itemSku (neu truyen vao): chi lay tien trinh khau cua DUNG Ma hang do
+// trong LSX (1 LSX co the co nhieu Ma hang, moi Ma hang 1 tien trinh rieng).
+// Bo qua neu rong (tuong thich giao dich cu chua gan Ma hang).
+export function buildDraftStageMovements(orders: ProductionOrder[], code: string, itemSku?: string): Map<string, ProductionOrder> {
   const map = new Map<string, ProductionOrder>();
   const trimmedCode = code.trim();
   if (!trimmedCode) return map;
+  const trimmedItemSku = itemSku?.trim();
   for (const order of orders) {
     if (order.code !== trimmedCode) continue;
+    if (trimmedItemSku && (order.itemSku || order.sku) !== trimmedItemSku) continue;
     const stageCode = normalizeStageCode(order.stage);
     if (!stageCode) continue;
     const existing = map.get(stageCode);
