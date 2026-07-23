@@ -395,7 +395,10 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       }
       setProductionHeaderDraftCache(nextHeaderDraftCache);
       setSelectedOrderCode(nextHeader.code);
-      setEditingProductionCode(nextHeader.code);
+      // Thoat khoi che do sua sau khi luu thanh cong, quay lai xem thong tin
+      // (da cap nhat) o dang chi doc - truoc day giu nguyen editingProductionCode
+      // nen form sua "khong dong lai" du da luu xong.
+      setEditingProductionCode(null);
       pushAudit("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`);
       await createAuditLog("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`, saved.id);
     } catch (error) {

@@ -2,6 +2,7 @@
 
 import { Check, ChevronDown, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
+  DateInput,
   DrawerSection,
   FieldShell,
   SearchableSelect,
@@ -223,11 +224,9 @@ export function MaterialMovementDrawer({
               <DrawerSection title="Thông tin chứng từ" note="Phục vụ đối chiếu ngày nghiệp vụ và số chứng từ nhập/xuất.">
                 <div className={balancedTwoColumnGrid}>
                   <FieldShell label="Ngày nghiệp vụ" hint="Ngày phát sinh xuất/nhập NVL." required>
-                    <input
-                      className={fieldControlClass}
-                      type="date"
+                    <DateInput
                       value={draft.occurredDate ?? ""}
-                      onChange={(event) => onDraftChange("occurredDate", event.target.value)}
+                      onChange={(value) => onDraftChange("occurredDate", value)}
                     />
                   </FieldShell>
                   <FieldShell label="Nơi nhận" required>

@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-context";
 import {
   DetailGroup,
+  DateInput,
   DetailInlineList,
   DrawerSection,
   FieldShell,
@@ -774,21 +775,17 @@ export function MaterialDashboard() {
                 <div className="mt-3 grid grid-cols-12 gap-3">
                   <div className="col-span-12 md:col-span-6 xl:col-span-3">
                     <FieldShell label="Ngày đặt hàng">
-                    <input
-                      className={fieldControlClass}
-                      type="date"
+                    <DateInput
                       value={productionHeaderDraft.orderDate}
-                      onChange={(event) => updateProductionHeaderDraft("orderDate", event.target.value)}
+                      onChange={(value) => updateProductionHeaderDraft("orderDate", value)}
                     />
                     </FieldShell>
                   </div>
                   <div className="col-span-12 md:col-span-6 xl:col-span-3">
                     <FieldShell label="Ngày kế hoạch" hint="Ngày dự kiến bắt đầu/ghi nhận LSX.">
-                    <input
-                      className={fieldControlClass}
-                      type="date"
+                    <DateInput
                       value={productionHeaderDraft.plannedDate}
-                      onChange={(event) => updateProductionHeaderDraft("plannedDate", event.target.value)}
+                      onChange={(value) => updateProductionHeaderDraft("plannedDate", value)}
                     />
                     </FieldShell>
                   </div>
@@ -815,21 +812,17 @@ export function MaterialDashboard() {
                 <div className="mt-3 grid grid-cols-12 gap-3">
                   <div className="col-span-12 md:col-span-6 xl:col-span-3">
                     <FieldShell label="Deadline đơn hàng">
-                    <input
-                      className={fieldControlClass}
-                      type="date"
+                    <DateInput
                       value={productionHeaderDraft.deadlineDate}
-                      onChange={(event) => updateProductionHeaderDraft("deadlineDate", event.target.value)}
+                      onChange={(value) => updateProductionHeaderDraft("deadlineDate", value)}
                     />
                     </FieldShell>
                   </div>
                   <div className="col-span-12 md:col-span-6 xl:col-span-3">
                     <FieldShell label="Ngày HT">
-                    <input
-                      className={fieldControlClass}
-                      type="date"
+                    <DateInput
                       value={productionHeaderDraft.completedDate}
-                      onChange={(event) => updateProductionHeaderDraft("completedDate", event.target.value)}
+                      onChange={(value) => updateProductionHeaderDraft("completedDate", value)}
                     />
                     </FieldShell>
                   </div>
@@ -978,19 +971,15 @@ export function MaterialDashboard() {
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Kế hoạch sản xuất</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <FieldShell label="Ngày kế hoạch">
-              <input
-                className={fieldControlClass}
-                type="date"
+              <DateInput
                 value={productionHeaderDraft.plannedDate}
-                onChange={(event) => updateProductionHeaderDraft("plannedDate", event.target.value)}
+                onChange={(value) => updateProductionHeaderDraft("plannedDate", value)}
               />
             </FieldShell>
             <FieldShell label="Deadline đơn hàng">
-              <input
-                className={fieldControlClass}
-                type="date"
+              <DateInput
                 value={productionHeaderDraft.deadlineDate}
-                onChange={(event) => updateProductionHeaderDraft("deadlineDate", event.target.value)}
+                onChange={(value) => updateProductionHeaderDraft("deadlineDate", value)}
               />
             </FieldShell>
             <FieldShell label="NVL dự kiến">
@@ -1008,11 +997,9 @@ export function MaterialDashboard() {
               </SelectControl>
             </FieldShell>
             <FieldShell label="Ngày HT">
-              <input
-                className={fieldControlClass}
-                type="date"
+              <DateInput
                 value={productionHeaderDraft.completedDate}
-                onChange={(event) => updateProductionHeaderDraft("completedDate", event.target.value)}
+                onChange={(value) => updateProductionHeaderDraft("completedDate", value)}
               />
             </FieldShell>
             <FieldShell label="TL hoàn tất (GR)">

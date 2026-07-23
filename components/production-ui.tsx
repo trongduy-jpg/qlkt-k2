@@ -2,8 +2,9 @@
 
 import { Children, isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { Calendar, Check, ChevronDown, Search } from "lucide-react";
 import { hasMeaningfulDisplayValue } from "@/lib/production-helpers";
+import { formatDisplayDate } from "@/lib/production-business-rules";
 import type { SelectOption } from "@/lib/production-journal-options";
 
 // Cac primitive giao dien dung chung cho form/panel cua man san xuat.
@@ -11,6 +12,42 @@ import type { SelectOption } from "@/lib/production-journal-options";
 
 export const fieldControlClass =
   "h-11 w-full min-w-0 rounded-md border border-line bg-white px-3 text-sm text-ink outline-none transition-colors placeholder:text-zinc-400 focus:border-jade focus:ring-2 focus:ring-jade/20 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
+
+// <input type="date"> hien thi theo dinh dang ngay/thang cua trinh duyet/
+// he dieu hanh (VD Chrome en-US ra mm/dd/yyyy), khong the ep bang CSS/HTML
+// nen dan den lech voi dd/mm/yy dung o khap cac bang trong app. Component
+// nay giu nguyen input date goc (an di, van bat lich chon ngay native) va
+// phu 1 lop text hien dung dd/mm/yy len tren bang formatDisplayDate - dam
+// bao dong bo bat ke ngon ngu/vung cua trinh duyet nguoi dung.
+export function DateInput({
+  value,
+  onChange,
+  disabled
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="relative">
+      <div
+        className={`${fieldControlClass} pointer-events-none flex items-center justify-between ${
+          value ? "text-ink" : "text-zinc-400"
+        }`}
+      >
+        <span>{value ? formatDisplayDate(value) : "dd/mm/yyyy"}</span>
+        <Calendar size={15} className="text-zinc-400" />
+      </div>
+      <input
+        type="date"
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.value)}
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+      />
+    </div>
+  );
+}
 
 export function FieldShell({
   label,
