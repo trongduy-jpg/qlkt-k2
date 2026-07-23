@@ -5,6 +5,9 @@ export type ProductionOrder = {
   orderId?: string;
   code: string;
   sku: string;
+  // Ma hang cu the trong LSX ma giao dich nay thuoc ve (1 LSX co the co
+  // nhieu Ma hang). Rong = giao dich cu truoc khi tach tang Ma hang.
+  itemSku?: string;
   productName?: string;
   material: string;
   worker: string;

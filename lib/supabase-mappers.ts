@@ -33,6 +33,7 @@ export type MovementRow = {
   document_line_no?: string | null;
   movement_type?: ProductionOrder["movementType"] | null;
   qty_piece?: number | null;
+  item_sku?: string | null;
   stage_status?: string | null;
   issued_gram: number;
   returned_gram: number;
@@ -70,6 +71,7 @@ export function movementRowToProductionOrder(row: MovementRow): ProductionOrder 
     orderId: row.order_id ?? "",
     code: row.production_orders?.order_code ?? "",
     sku: row.production_orders?.sku ?? "",
+    itemSku: row.item_sku ?? "",
     productName: row.production_orders?.product_name ?? "",
     material: row.materials?.name ?? "",
     worker: row.workers?.full_name ?? "",

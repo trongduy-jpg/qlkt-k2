@@ -17,7 +17,9 @@ export type {
   ReferenceOption,
   DatabaseHealth,
   ProductionOrderHeaderInput,
-  ProductionOrderHeaderRecord
+  ProductionOrderHeaderRecord,
+  ProductionOrderItem,
+  ProductionOrderItemRecord
 } from "@/lib/material-service-types";
 
 export { loadMaterials, createMaterial, updateMaterial, deleteMaterial } from "@/lib/materials-service";
@@ -39,6 +41,8 @@ export {
   updateProductionOrderHeader,
   updateProductionOrderStatus
 } from "@/lib/production-orders-service";
+
+export { loadProductionOrderItems, replaceProductionOrderItems } from "@/lib/production-order-items-service";
 
 export {
   loadProductionOrders,

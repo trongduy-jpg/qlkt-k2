@@ -104,3 +104,25 @@ export type ProductionOrderHeaderRecord = ProductionOrderHeaderInput & {
   id: string;
   createdAt: string;
 };
+
+// Mot Ma hang (line item) thuoc 1 LSX. 1 LSX co the co nhieu Ma hang, moi
+// Ma hang co bo thong tin rieng va tien trinh cong doan rieng.
+export type ProductionOrderItem = {
+  sku: string;
+  productName?: string;
+  quantityPiece?: number;
+  materialSpec?: string;
+  plannedMaterial?: string;
+  plannedGoldAge?: number;
+  plannedMaterialType?: string;
+  deliveredQty?: number;
+  completedWeightGram?: number;
+  note?: string;
+  sortOrder?: number;
+};
+
+export type ProductionOrderItemRecord = ProductionOrderItem & {
+  id: string;
+  orderCode: string;
+  createdAt: string;
+};
