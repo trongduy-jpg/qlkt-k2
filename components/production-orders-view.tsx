@@ -43,21 +43,22 @@ function formatCodeMonthLabel(codeMonth: string) {
   return `Tháng ${month}/${year}`;
 }
 
-// Cac dong lien tiep cung 1 Ma LSX (nhieu Ma hang) duoc gom lai de hien 1 o
-// "Ma LSX" duy nhat, keo dai het nhom (rowSpan) - thay vi lap lai hoac dung
-// placeholder "cung LSX" o tung dong, giong cach bang tinh/UI chuyen nghiep
-// thuong nhom du lieu phan cap.
-function computeLsxGroupSpans(summaries: OrderSummary[]): number[] {
-  const spans = new Array(summaries.length).fill(0);
-  let groupStart = 0;
-  for (let index = 1; index <= summaries.length; index += 1) {
-    const isBoundary = index === summaries.length || summaries[index].code !== summaries[groupStart].code;
-    if (isBoundary) {
-      spans[groupStart] = index - groupStart;
-      groupStart = index;
-    }
-  }
-  return spans;
+type LsxGroupInfo = { isGroupStart: boolean; groupParity: 0 | 1 };
+
+// Danh dau dong dau tien cua moi nhom "cung 1 Ma LSX" (de ke duong phan
+// cach + doi mau nen xen ke giua cac nhom) - KHONG dung rowSpan de gop o,
+// vi cac dong cung 1 Ma LSX co the khong lien tiep trong danh sach da loc
+// (VD giao dich roi/chua gan Ma hang chinh thuc duoc gom o cuoi danh
+// sach), rowSpan trong truong hop do se lam bang bi lech cot.
+function computeLsxGroupInfo(summaries: OrderSummary[]): LsxGroupInfo[] {
+  let groupIndex = -1;
+  let previousCode: string | null = null;
+  return summaries.map((summary) => {
+    const isGroupStart = summary.code !== previousCode;
+    if (isGroupStart) groupIndex += 1;
+    previousCode = summary.code;
+    return { isGroupStart, groupParity: (groupIndex % 2) as 0 | 1 };
+  });
 }
 
 export function ProductionOrdersView({
@@ -240,11 +241,11 @@ export function ProductionOrdersView({
               </thead>
               <tbody>
                 {(() => {
-                  const lsxGroupSpans = computeLsxGroupSpans(filteredOrderSummaries);
+                  const lsxGroupInfo = computeLsxGroupInfo(filteredOrderSummaries);
                   return filteredOrderSummaries.map((summary, index) => {
-                    const isGroupStart = lsxGroupSpans[index] > 0;
+                    const { isGroupStart, groupParity } = lsxGroupInfo[index];
                     const isRowSelected = selectedOrderCode === summary.code && selectedItemSku === summary.sku;
-                    const rowBgClass = isRowSelected ? "bg-emerald-50/60" : "bg-white";
+                    const rowBgClass = isRowSelected ? "bg-emerald-50/60" : groupParity === 1 ? "bg-paper/50" : "bg-white";
                     return (
                       <tr
                         key={orderRowKey(summary)}
@@ -254,26 +255,16 @@ export function ProductionOrdersView({
                         onClick={() => onSelectOrder(summary.code, summary.sku)}
                       >
                         <td className="px-3 py-3 align-top font-semibold text-ink">{summary.sku || "-"}</td>
-                        {isGroupStart ? (
-                          <td
-                            className="border-r border-line/70 bg-paper/40 px-3 py-3 align-middle"
-                            rowSpan={lsxGroupSpans[index]}
-                          >
-                            <p className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
-                              {summary.code}
-                              {summary.parentOrderCode ? (
-                                <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
-                                  <Link2 size={12} className="text-jade" />
-                                </span>
-                              ) : null}
-                            </p>
-                            {lsxGroupSpans[index] > 1 ? (
-                              <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
-                                {lsxGroupSpans[index]} Mã hàng
-                              </p>
+                        <td className="px-3 py-3 align-top">
+                          <p className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
+                            {summary.code}
+                            {summary.parentOrderCode ? (
+                              <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
+                                <Link2 size={12} className="text-jade" />
+                              </span>
                             ) : null}
-                          </td>
-                        ) : null}
+                          </p>
+                        </td>
                         <td className="px-3 py-3 align-top">
                           <p className={`max-w-[240px] truncate font-medium ${hasMeaningfulText(summary.productName) ? "text-zinc-800" : "text-zinc-400"}`}>
                             {summary.productName || "Chưa cập nhật"}
