@@ -216,11 +216,10 @@ export function ProductionOrdersView({
             </span>
           </div>
           <div className="max-h-[70vh] overflow-auto rounded-md border border-line bg-white">
-            <table className="w-full min-w-[1360px] border-collapse text-sm">
+            <table className="w-full min-w-[1220px] border-collapse text-sm">
               <thead className="sticky top-0 z-10">
                 <tr className="border-b border-line bg-paper text-left text-[11px] uppercase tracking-wider text-zinc-500 shadow-sm">
-                  <th className="px-3 py-3">Mã hàng</th>
-                  <th className="px-3 py-3">Mã LSX</th>
+                  <th className="px-3 py-3">Mã hàng / Mã LSX</th>
                   <th className="px-3 py-3">Tên hàng</th>
                   <th className="px-3 py-3">Khách hàng</th>
                   <th className="px-3 py-3">SR/KH</th>
@@ -254,9 +253,9 @@ export function ProductionOrdersView({
                         } ${rowBgClass}`}
                         onClick={() => onSelectOrder(summary.code, summary.sku)}
                       >
-                        <td className="px-3 py-3 align-top font-semibold text-ink">{summary.sku || "-"}</td>
                         <td className="px-3 py-3 align-top">
-                          <p className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
+                          <p className="font-semibold text-ink">{summary.sku || "-"}</p>
+                          <p className="mt-0.5 flex items-center gap-1.5 font-mono text-xs text-zinc-500">
                             {summary.code}
                             {summary.parentOrderCode ? (
                               <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
@@ -296,14 +295,14 @@ export function ProductionOrdersView({
                           <CurrentStage summary={summary} stageOptionsForDropdown={stageOptionsForDropdown} />
                         </td>
                         <td className="px-3 py-3 align-top">
-                          <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
+                          <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
                             {summary.deliveryStatus || "Chưa cập nhật"}
                           </span>
                         </td>
                         <td
                           className={`sticky right-0 px-3 py-3 align-top shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.15)] transition-colors group-hover:bg-emerald-50/40 ${rowBgClass}`}
                         >
-                          <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
+                          <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
                             {summary.status}
                           </span>
                         </td>
