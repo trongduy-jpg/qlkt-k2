@@ -90,7 +90,13 @@ export function buildSeedMovementFromSummary(
     movementType: summary.movementType ?? baseDraft.movementType,
     qtyPiece: pickNumber(summary.qtyPiece, header?.qtyPiece, baseDraft.qtyPiece),
     occurredDate: pickText(summary.occurredDate, summary.plannedDate, header?.occurredDate, header?.plannedDate, baseDraft.occurredDate),
-    stage: pickText(summary.plannedStage, header?.plannedStage, baseDraft.stage),
+    // Khong dung summary.plannedStage/header.plannedStage lam mac dinh -
+    // do la gia tri "du kien" ngam dinh ngay khi tao LSX (VD "CKE"), chua
+    // ai thuc su chon. Ban ghi seed nay chi la placeholder de LSX xuat
+    // hien trong NK NVL khi Chot ma chua co giao dich nao - de trong Cong
+    // doan de nguoi dung tu chon khi cap nhat, tranh hien nham nhu da co
+    // ai lam khau nay roi.
+    stage: "",
     stageStatus: "Đang thực hiện",
     worker: pickText(summary.plannedWorker, header?.plannedWorker, baseDraft.worker),
     material: pickText(summary.plannedMaterial, header?.plannedMaterial, summary.materials[0], baseDraft.material),
