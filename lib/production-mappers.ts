@@ -71,7 +71,11 @@ export function createEmptyOrder(): ProductionOrder {
     productName: "",
     material: "Vàng 18K",
     worker: "",
-    stage: "CKE",
+    // Khong dat mac dinh la mot khau cu the (VD "CKE") - de trong de bat
+    // nguoi dung phai tu chon Cong doan (validateMovementDraft da bat
+    // buoc truong nay), tranh truong hop luu nham voi khau mac dinh ma
+    // khong ai thuc su chon.
+    stage: "",
     stageStatus: "Đang thực hiện",
     destination: "KCP",
     occurredDate: today,
@@ -290,7 +294,12 @@ export function mergeMovementWithContext(
     productName: pickText(order.productName, cachedDraft?.productName, header?.productName),
     material: pickText(order.material, cachedDraft?.material, header?.plannedMaterial),
     worker: pickText(order.worker, cachedDraft?.worker, header?.plannedWorker),
-    stage: normalizeProductionStageCode(pickText(order.stage, cachedDraft?.stage, header?.plannedStage)),
+    // Khong fallback ve header?.plannedStage: do la gia tri "du kien" mac
+    // dinh cua LSX (VD "CKE"), khong phai khau thuc su da ghi nhan. Neu
+    // giao dich chua co stage (order.stage rong) thi de trong, tranh moi
+    // lan tai lai du lieu (reloadOperationalData) lai bi gan nham 1 khau
+    // mac dinh nhu the da co ai chon.
+    stage: normalizeProductionStageCode(pickText(order.stage, cachedDraft?.stage)),
     occurredDate: pickText(order.occurredDate, cachedDraft?.occurredDate, header?.occurredDate, header?.plannedDate),
     destination: pickText(order.destination, cachedDraft?.destination, header?.destination),
     documentNo: pickText(order.documentNo, cachedDraft?.documentNo, header?.documentNo),

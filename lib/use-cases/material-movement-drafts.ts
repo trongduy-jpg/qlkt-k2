@@ -46,7 +46,11 @@ export function buildMovementDraftFromSummary({
     movementType: summary.movementType ?? baseDraft.movementType,
     qtyPiece: pickNumber(baseDraft.qtyPiece, summary.qtyPiece),
     occurredDate: pickText(baseDraft.occurredDate, summary.occurredDate, summary.plannedDate),
-    stage: stageOverride || pickText(baseDraft.stage, summary.plannedStage),
+    // Khong fallback ve summary.plannedStage o day: gia tri do co the chi
+    // la "du kien" mac dinh cua LSX (chua ai chon), khong phai tien do
+    // that. Neu baseDraft.stage rong (chua co giao dich thuc), de trong
+    // de nguoi dung tu chon thay vi ngam dinh nham 1 khau cu the.
+    stage: stageOverride || baseDraft.stage,
     stageStatus: baseDraft.stageStatus || "Đang thực hiện",
     worker: stageOverride
       ? pickText(workerFromStage, baseDraft.worker, summary.plannedWorker)
