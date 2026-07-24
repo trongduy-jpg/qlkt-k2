@@ -134,6 +134,7 @@ export function MaterialMovementDrawer({
             type="button"
             onClick={onClose}
             title="Đóng form"
+            aria-label="Đóng form"
           >
             <X size={17} />
           </button>
@@ -588,6 +589,7 @@ export function MaterialMovementDrawer({
                                               className="inline-flex size-6 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50"
                                               type="button"
                                               title="Sửa thông tin thợ này"
+                                              aria-label="Sửa thông tin thợ này"
                                               disabled={isBeingEdited}
                                               onClick={() => onEditStageMovement(movement)}
                                             >
@@ -597,6 +599,7 @@ export function MaterialMovementDrawer({
                                               className="inline-flex size-6 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                                               type="button"
                                               title="Xóa thợ này khỏi khâu"
+                                              aria-label="Xóa thợ này khỏi khâu"
                                               disabled={isClosedStatus(movement.status)}
                                               onClick={() => onRemoveMovement(movement.id)}
                                             >

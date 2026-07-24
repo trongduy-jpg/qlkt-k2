@@ -981,6 +981,7 @@ export function MaterialDashboard() {
                   className="ml-1 shrink-0 text-zinc-400 hover:text-zinc-600"
                   onClick={dismissSavedMovementNotice}
                   title="Đóng thông báo"
+                  aria-label="Đóng thông báo"
                 >
                   <X size={15} />
                 </button>

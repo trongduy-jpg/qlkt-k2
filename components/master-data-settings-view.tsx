@@ -208,6 +208,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"
                     type="button"
                     title="Sửa NVL"
+                    aria-label="Sửa NVL"
                     onClick={() => onStartEditMaterial(material)}
                   >
                     <Pencil size={13} />
@@ -216,6 +217,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
                     type="button"
                     title="Xóa NVL"
+                    aria-label="Xóa NVL"
                     onClick={() => onDeleteMaterial(material.id)}
                   >
                     <Trash2 size={13} />
@@ -301,6 +303,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"
                     type="button"
                     title="Sửa thợ"
+                    aria-label="Sửa thợ"
                     onClick={() => onStartEditWorker(worker)}
                   >
                     <Pencil size={13} />
@@ -309,6 +312,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
                     type="button"
                     title="Xóa thợ"
+                    aria-label="Xóa thợ"
                     onClick={() => onDeleteWorker(worker.id)}
                   >
                     <Trash2 size={13} />
@@ -377,6 +381,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"
                     type="button"
                     title="Sửa công đoạn"
+                    aria-label="Sửa công đoạn"
                     onClick={() => onStartEditStage(stage)}
                   >
                     <Pencil size={13} />
@@ -385,6 +390,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
                     type="button"
                     title="Xóa công đoạn"
+                    aria-label="Xóa công đoạn"
                     onClick={() => onDeleteStage(stage.id)}
                   >
                     <Trash2 size={13} />
@@ -452,6 +458,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper"
                     type="button"
                     title="Sửa lựa chọn"
+                    aria-label="Sửa lựa chọn"
                     onClick={() => onStartEditReferenceOption(option)}
                   >
                     <Pencil size={13} />
@@ -460,6 +467,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
                     type="button"
                     title="Xóa lựa chọn"
+                    aria-label="Xóa lựa chọn"
                     onClick={() => onDeleteReferenceOption(option.id)}
                   >
                     <Trash2 size={13} />
@@ -536,6 +544,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     type="button"
                     title="Sửa người dùng"
                     onClick={() => onStartEditAppUser(user)}
+                    aria-label="Sửa người dùng"
                   >
                     <Pencil size={13} />
                   </button>
@@ -543,6 +552,7 @@ export function MasterDataSettingsView({ isVisible }: { isVisible: boolean }) {
                     className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                     type="button"
                     title={user.id === currentUserId ? "Không thể tự xóa chính mình" : "Xóa người dùng"}
+                    aria-label={user.id === currentUserId ? "Không thể tự xóa chính mình" : "Xóa người dùng"}
                     disabled={user.id === currentUserId}
                     onClick={() => onDeleteAppUser(user.id)}
                   >

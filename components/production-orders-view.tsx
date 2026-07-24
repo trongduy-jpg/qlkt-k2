@@ -116,6 +116,7 @@ export function ProductionOrdersView({
             value={productionDeliveryStatus}
             onChange={(event) => onDeliveryStatusChange(event.target.value)}
             title="Lọc theo trạng thái LSX"
+            aria-label="Lọc theo trạng thái LSX"
           >
             <option>Tất cả trạng thái LSX</option>
             {productionOrderDeliveryStatusOptions.map((item) => (
@@ -129,6 +130,7 @@ export function ProductionOrdersView({
             value={productionDestinationFilter}
             onChange={(event) => onDestinationFilterChange(event.target.value)}
             title="Lọc theo cửa hàng"
+            aria-label="Lọc theo cửa hàng"
           >
             <option value={ALL_DESTINATIONS_FILTER}>{ALL_DESTINATIONS_FILTER}</option>
             {productionOrderDestinations.map((item) => (
@@ -142,6 +144,7 @@ export function ProductionOrdersView({
             value={productionCodeMonthFilter}
             onChange={(event) => onCodeMonthFilterChange(event.target.value)}
             title="Lọc theo tháng (dựa vào Mã LSX)"
+            aria-label="Lọc theo tháng"
           >
             <option value={ALL_CODE_MONTHS_FILTER}>{ALL_CODE_MONTHS_FILTER}</option>
             {productionCodeMonthOptions.map((codeMonth) => (
@@ -154,6 +157,7 @@ export function ProductionOrdersView({
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={productionSalesType}
             onChange={(event) => onSalesTypeChange(event.target.value)}
+            aria-label="Lọc theo SR/KH"
           >
             <option>Tất cả SR/KH</option>
             {productionOrderSalesTypeOptions.map((item) => (
@@ -166,6 +170,7 @@ export function ProductionOrdersView({
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={productionDeadlineFilter}
             onChange={(event) => onDeadlineFilterChange(event.target.value)}
+            aria-label="Lọc theo deadline"
           >
             <option>Tất cả deadline</option>
             <option>Quá hạn</option>
@@ -178,6 +183,7 @@ export function ProductionOrdersView({
             placeholder="Tìm LSX, mã hàng, khách hàng..."
             value={productionCustomerQuery}
             onChange={(event) => onCustomerQueryChange(event.target.value)}
+            aria-label="Tìm kiếm LSX, mã hàng, khách hàng"
           />
         </div>
 

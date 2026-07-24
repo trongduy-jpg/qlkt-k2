@@ -65,6 +65,7 @@ export function AppShell({
               type="button"
               onClick={onClearRemoteError}
               title="Đóng thông báo lỗi"
+              aria-label="Đóng thông báo lỗi"
             >
               <X size={15} />
             </button>

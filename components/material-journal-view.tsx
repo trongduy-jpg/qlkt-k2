@@ -52,11 +52,13 @@ export function MaterialJournalView({
             placeholder="Tìm LSX, mã hàng, thợ..."
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
+            aria-label="Tìm kiếm LSX, mã hàng, thợ"
           />
           <select
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={status}
             onChange={(event) => onStatusChange(event.target.value as (typeof statusOptions)[number])}
+            aria-label="Lọc theo trạng thái vận hành"
           >
             {statusOptions.map((item) => (
               <option key={item} value={item}>

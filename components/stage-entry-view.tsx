@@ -166,6 +166,7 @@ export function StageEntryView({
                                   className="inline-flex size-6 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
                                   type="button"
                                   title="Xóa dòng ghi nhận này"
+                                  aria-label="Xóa dòng ghi nhận này"
                                   onClick={() => onDeleteEntry(entry.id)}
                                 >
                                   <Trash2 size={12} />

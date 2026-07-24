@@ -83,6 +83,7 @@ export function ProductionItemsEditor({
                   type="button"
                   className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                   title="Xóa Mã hàng này"
+                  aria-label="Xóa Mã hàng này"
                   disabled={list.length <= 1}
                   onClick={() => removeItem(index)}
                 >

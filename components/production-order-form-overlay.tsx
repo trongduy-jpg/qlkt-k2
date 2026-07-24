@@ -98,6 +98,7 @@ function FormHeader({
         type="button"
         onClick={onCancel}
         title="Đóng form"
+        aria-label="Đóng form"
       >
         <X size={16} />
       </button>

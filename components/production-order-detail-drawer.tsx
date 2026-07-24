@@ -92,6 +92,7 @@ export function ProductionOrderDetailDrawer({
             type="button"
             onClick={onClose}
             title="Đóng"
+            aria-label="Đóng"
           >
             <X size={17} />
           </button>

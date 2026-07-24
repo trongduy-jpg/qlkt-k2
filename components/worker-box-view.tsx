@@ -420,7 +420,7 @@ function WorkerBoxDetail({
             {line.stageCode} - {line.stageName} · {line.materialName}
           </p>
         </div>
-        <button className="inline-flex size-9 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper" type="button" onClick={onClose} title="Đóng">
+        <button className="inline-flex size-9 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper" type="button" onClick={onClose} title="Đóng" aria-label="Đóng">
           <X size={17} />
         </button>
       </div>
