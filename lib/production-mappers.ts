@@ -258,9 +258,24 @@ export function mergeProductionHeaderWithDraft(
     status: header.status || cachedDraft.status,
     parentOrderCode: pickText(header.parentOrderCode, cachedDraft.parentOrderCode),
     // Uu tien danh sach Ma hang tu draft (dang sua) neu co, khong thi lay
-    // tu du lieu remote da gan.
-    items: cachedDraft.items && cachedDraft.items.length > 0 ? cachedDraft.items : header.items
+    // tu du lieu remote da gan. Rieng "status" (trang thai van hanh cua
+    // tung Ma hang: Dang xu ly/Da chot) LUON lay tu header (server, vua
+    // tai lai) - khong duoc de draft cache (co the cu, tu truoc khi Chot/
+    // Mo lai LSX) ghi de len, neu khong "Chot LSX" se bi revert ve trang
+    // thai cu ngay sau khi reload.
+    items: mergeItemsStatusFromHeader(
+      cachedDraft.items && cachedDraft.items.length > 0 ? cachedDraft.items : header.items,
+      header.items
+    )
   };
+}
+
+function mergeItemsStatusFromHeader(
+  items: ProductionOrderItem[],
+  authoritativeItems: ProductionOrderItem[]
+): ProductionOrderItem[] {
+  const statusBySku = new Map(authoritativeItems.map((item) => [item.sku, item.status]));
+  return items.map((item) => (statusBySku.has(item.sku) ? { ...item, status: statusBySku.get(item.sku) } : item));
 }
 
 export function mergeMovementWithContext(

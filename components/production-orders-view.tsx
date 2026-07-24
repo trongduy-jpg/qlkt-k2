@@ -326,7 +326,13 @@ function CurrentStage({
   summary: OrderSummary;
   stageOptionsForDropdown: StageOption[];
 }) {
-  const stageCode = summary.plannedStage ? normalizeStageCode(summary.plannedStage) : "";
+  // plannedStage mac dinh la "CKE" ngay tu khi tao LSX (chua ai chon cong
+  // doan nao ca) - neu chua co giao dich NK NVL nao (movementCount === 0)
+  // thi day chi la gia tri "du kien" trong form, KHONG phai tien do thuc
+  // te. Phai kiem tra movementCount truoc, khong chi dua vao plannedStage
+  // co rong hay khong, neu khong se hien nham "Khau X/12" cho LSX chua ai
+  // ghi nhan cong doan nao.
+  const stageCode = summary.movementCount > 0 && summary.plannedStage ? normalizeStageCode(summary.plannedStage) : "";
   const stageIndex = stageCode ? stageOptionsForDropdown.findIndex((item) => item.value === stageCode) : -1;
 
   if (stageIndex < 0) {
