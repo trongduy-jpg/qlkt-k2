@@ -11,6 +11,157 @@ const materialCodeByName: Record<string, string> = {
   "Bạc 92.5": "AG925"
 };
 
+// Danh sach cot select cho material_movements dung chung o moi cho doc/ghi
+// (load, create, update) - tranh liet ke tay lap lai o tung noi (de lech
+// cot / quen cot khi them truong moi). fallback la ban rut gon dung khi
+// Supabase bao loi thieu cot/schema cache (truoc khi user chay migration
+// + reload schema).
+const MOVEMENT_SELECT_COLUMNS = `
+  id,
+  order_id,
+  process_name,
+  occurred_date,
+  destination,
+  document_no,
+  document_in_no,
+  document_line_no,
+  movement_type,
+  qty_piece,
+  item_sku,
+  stage_status,
+  issued_gram,
+  returned_gram,
+  powder_gram,
+  transferred_weight_gram,
+  loss_gram,
+  loss_period,
+  nxt_period,
+  gold_age,
+  source_material_name,
+  source_name,
+  import_source,
+  export_source,
+  material_type,
+  nxt_link_code,
+  converted_issue_weight,
+  converted_return_weight,
+  status,
+  production_orders(order_code, sku, product_name),
+  materials(name),
+  workers(full_name)
+`;
+
+const MOVEMENT_SELECT_COLUMNS_FALLBACK = `
+  id,
+  order_id,
+  process_name,
+  issued_gram,
+  returned_gram,
+  powder_gram,
+  loss_gram,
+  status,
+  production_orders(order_code, sku),
+  materials(name),
+  workers(full_name)
+`;
+
+function isMissingColumnError(message: string | undefined) {
+  return Boolean(message?.includes("column") || message?.includes("schema cache"));
+}
+
+// Xay payload ghi vao material_movements tu 1 ProductionOrder - dung chung
+// cho ca create va update, tranh liet ke tay field lap lai o 2 noi (chinh
+// nguyen nhan gay bug rot field o cac phien sua truoc).
+function buildMovementRow(
+  order: ProductionOrder,
+  params: { orderId: string; materialId: string; workerId: string; note: string }
+) {
+  return {
+    order_id: params.orderId,
+    material_id: params.materialId,
+    worker_id: params.workerId,
+    process_name: order.stage,
+    issued_gram: order.issued,
+    returned_gram: order.returned,
+    powder_gram: order.powder,
+    status: toDbStatus(order.status),
+    note: params.note,
+    occurred_date: order.occurredDate || null,
+    destination: order.destination || null,
+    document_no: order.documentNo || null,
+    document_in_no: order.documentInNo || null,
+    document_line_no: order.documentLineNo || null,
+    movement_type: order.movementType || "issue",
+    qty_piece: order.qtyPiece || null,
+    item_sku: order.itemSku || order.sku || null,
+    stage_status: order.stageStatus || null,
+    transferred_weight_gram: order.transferred || null,
+    gold_age: order.goldAge || null,
+    source_material_name: order.sourceMaterialName || null,
+    source_name: order.sourceName || null,
+    import_source: order.importSource || null,
+    export_source: order.exportSource || null,
+    material_type: order.materialType || null,
+    nxt_link_code: order.nxtLinkCode || null,
+    loss_period: order.lossPeriod || null,
+    nxt_period: order.nxtPeriod || null,
+    converted_issue_weight: order.convertedIssueWeight || null,
+    converted_return_weight: order.convertedReturnWeight || null
+  };
+}
+
+// Ban rut gon cua buildMovementRow, dung lam fallback khi insert day du bi
+// Supabase tu choi vi thieu cot (chua chay migration/reload schema).
+function buildMovementRowBaseOnly(
+  order: ProductionOrder,
+  params: { orderId: string; materialId: string; workerId: string; note: string }
+) {
+  return {
+    order_id: params.orderId,
+    material_id: params.materialId,
+    worker_id: params.workerId,
+    process_name: order.stage,
+    issued_gram: order.issued,
+    returned_gram: order.returned,
+    powder_gram: order.powder,
+    status: toDbStatus(order.status),
+    note: params.note
+  };
+}
+
+// Gop ket qua tra ve tu Supabase (data map qua movementRowToProductionOrder)
+// voi cac truong "goc" cua order dang giu o client - dung chung cho ca
+// create va update de tranh viet tay lap lai danh sach field o 2 noi.
+function mergeMovementResult(order: ProductionOrder, data: unknown): ProductionOrder {
+  return {
+    ...order,
+    ...movementRowToProductionOrder(data as unknown as MovementRow),
+    code: order.code,
+    sku: order.sku,
+    itemSku: order.itemSku || order.sku,
+    productName: order.productName,
+    destination: order.destination,
+    occurredDate: order.occurredDate,
+    documentNo: order.documentNo,
+    documentInNo: order.documentInNo,
+    documentLineNo: order.documentLineNo,
+    movementType: order.movementType,
+    qtyPiece: order.qtyPiece,
+    transferred: order.transferred,
+    lossPeriod: order.lossPeriod,
+    nxtPeriod: order.nxtPeriod,
+    goldAge: order.goldAge,
+    sourceMaterialName: order.sourceMaterialName,
+    nxtLinkCode: order.nxtLinkCode,
+    sourceName: order.sourceName,
+    importSource: order.importSource,
+    exportSource: order.exportSource,
+    materialType: order.materialType,
+    convertedIssueWeight: order.convertedIssueWeight,
+    convertedReturnWeight: order.convertedReturnWeight
+  };
+}
+
 export async function loadProductionOrders(): Promise<ProductionOrder[]> {
   if (!isSupabaseConfigured || !supabase) {
     return productionOrders;
@@ -18,58 +169,13 @@ export async function loadProductionOrders(): Promise<ProductionOrder[]> {
 
   let result: any = await supabase
     .from("material_movements")
-    .select(`
-      id,
-      order_id,
-      process_name,
-      occurred_date,
-      destination,
-      document_no,
-      document_in_no,
-      document_line_no,
-      movement_type,
-      qty_piece,
-      item_sku,
-      stage_status,
-      issued_gram,
-      returned_gram,
-      powder_gram,
-      transferred_weight_gram,
-      loss_gram,
-      loss_period,
-      nxt_period,
-      gold_age,
-      source_material_name,
-      source_name,
-      import_source,
-      export_source,
-      material_type,
-      nxt_link_code,
-      converted_issue_weight,
-      converted_return_weight,
-      status,
-      production_orders(order_code, sku, product_name),
-      materials(name),
-      workers(full_name)
-    `)
+    .select(MOVEMENT_SELECT_COLUMNS)
     .order("occurred_date", { ascending: false, nullsFirst: false });
 
-  if (result.error?.message?.includes("column") || result.error?.message?.includes("schema cache")) {
+  if (isMissingColumnError(result.error?.message)) {
     result = await supabase
       .from("material_movements")
-      .select(`
-        id,
-        order_id,
-        process_name,
-        issued_gram,
-        returned_gram,
-        powder_gram,
-        loss_gram,
-        status,
-        production_orders(order_code, sku),
-        materials(name),
-        workers(full_name)
-      `)
+      .select(MOVEMENT_SELECT_COLUMNS_FALLBACK)
       .order("id", { ascending: false });
   }
 
@@ -195,132 +301,27 @@ export async function createMaterialMovement(order: ProductionOrder): Promise<Pr
     upsertWorker(order.worker, order.stage)
   ]);
 
-  const movementPayload = {
-    order_id: orderId,
-    material_id: materialId,
-    worker_id: workerId,
-    process_name: order.stage,
-    issued_gram: order.issued,
-    returned_gram: order.returned,
-    powder_gram: order.powder,
-    status: toDbStatus(order.status),
-    note: "Created from QLKT K2 demo"
-  };
-
-  const extendedMovementPayload = {
-    ...movementPayload,
-    occurred_date: order.occurredDate || null,
-    destination: order.destination || null,
-    document_no: order.documentNo || null,
-    document_in_no: order.documentInNo || null,
-    document_line_no: order.documentLineNo || null,
-    movement_type: order.movementType || "issue",
-    qty_piece: order.qtyPiece || null,
-    item_sku: order.itemSku || order.sku || null,
-    stage_status: order.stageStatus || null,
-    transferred_weight_gram: order.transferred || null,
-    gold_age: order.goldAge || null,
-    source_material_name: order.sourceMaterialName || null,
-    source_name: order.sourceName || null,
-    import_source: order.importSource || null,
-    export_source: order.exportSource || null,
-    material_type: order.materialType || null,
-    nxt_link_code: order.nxtLinkCode || null,
-    loss_period: order.lossPeriod || null,
-    nxt_period: order.nxtPeriod || null,
-    converted_issue_weight: order.convertedIssueWeight || null,
-    converted_return_weight: order.convertedReturnWeight || null
-  };
+  const rowParams = { orderId, materialId, workerId, note: "Created from QLKT K2 demo" };
+  const fullRow = buildMovementRow(order, rowParams);
 
   let insertResult = await supabase
     .from("material_movements")
-    .insert(extendedMovementPayload)
-    .select(`
-      id,
-      process_name,
-      occurred_date,
-      destination,
-      document_no,
-      document_in_no,
-      document_line_no,
-      movement_type,
-      qty_piece,
-      item_sku,
-      stage_status,
-      issued_gram,
-      returned_gram,
-      powder_gram,
-      transferred_weight_gram,
-      loss_gram,
-      loss_period,
-      nxt_period,
-      gold_age,
-      source_material_name,
-      source_name,
-      import_source,
-      export_source,
-      material_type,
-      nxt_link_code,
-      converted_issue_weight,
-      converted_return_weight,
-      status,
-      order_id,
-      production_orders(order_code, sku, product_name),
-      materials(name),
-      workers(full_name)
-    `)
+    .insert(fullRow)
+    .select(MOVEMENT_SELECT_COLUMNS)
     .single();
 
-  if (insertResult.error?.message.includes("column") || insertResult.error?.message.includes("schema cache")) {
+  if (isMissingColumnError(insertResult.error?.message)) {
     insertResult = await supabase
       .from("material_movements")
-      .insert(movementPayload)
-      .select(`
-        id,
-        order_id,
-        process_name,
-        issued_gram,
-        returned_gram,
-        powder_gram,
-        loss_gram,
-        status,
-        production_orders(order_code, sku),
-        materials(name),
-        workers(full_name)
-      `)
+      .insert(buildMovementRowBaseOnly(order, rowParams))
+      .select(MOVEMENT_SELECT_COLUMNS_FALLBACK)
       .single();
   }
 
   const { data, error } = insertResult;
 
   if (error || !data) throw new Error(`Cannot create material movement: ${error?.message ?? "unknown error"}`);
-  return {
-    ...order,
-    ...movementRowToProductionOrder(data as unknown as MovementRow),
-    code: order.code,
-    sku: order.sku,
-    itemSku: order.itemSku || order.sku,
-    productName: order.productName,
-    destination: order.destination,
-    occurredDate: order.occurredDate,
-    documentNo: order.documentNo,
-    documentInNo: order.documentInNo,
-    documentLineNo: order.documentLineNo,
-    movementType: order.movementType,
-    qtyPiece: order.qtyPiece,
-    transferred: order.transferred,
-    lossPeriod: order.lossPeriod,
-    nxtPeriod: order.nxtPeriod,
-    goldAge: order.goldAge,
-    sourceMaterialName: order.sourceMaterialName,
-    nxtLinkCode: order.nxtLinkCode,
-    sourceName: order.sourceName,
-    importSource: order.importSource,
-    exportSource: order.exportSource,
-    materialType: order.materialType,
-    convertedIssueWeight: order.convertedIssueWeight,
-    convertedReturnWeight: order.convertedReturnWeight
-  };
+  return mergeMovementResult(order, data);
 }
 
 export async function updateMaterialMovement(order: ProductionOrder): Promise<ProductionOrder> {
@@ -333,108 +334,18 @@ export async function updateMaterialMovement(order: ProductionOrder): Promise<Pr
     upsertWorker(order.worker, order.stage)
   ]);
 
-  const movementPayload = {
-    order_id: orderId,
-    material_id: materialId,
-    worker_id: workerId,
-    process_name: order.stage,
-    issued_gram: order.issued,
-    returned_gram: order.returned,
-    powder_gram: order.powder,
-    status: toDbStatus(order.status),
-    note: "Updated from QLKT K2 demo",
-    occurred_date: order.occurredDate || null,
-    destination: order.destination || null,
-    document_no: order.documentNo || null,
-    document_in_no: order.documentInNo || null,
-    document_line_no: order.documentLineNo || null,
-    movement_type: order.movementType || "issue",
-    qty_piece: order.qtyPiece || null,
-    item_sku: order.itemSku || order.sku || null,
-    stage_status: order.stageStatus || null,
-    transferred_weight_gram: order.transferred || null,
-    gold_age: order.goldAge || null,
-    source_material_name: order.sourceMaterialName || null,
-    source_name: order.sourceName || null,
-    import_source: order.importSource || null,
-    export_source: order.exportSource || null,
-    material_type: order.materialType || null,
-    nxt_link_code: order.nxtLinkCode || null,
-    loss_period: order.lossPeriod || null,
-    nxt_period: order.nxtPeriod || null,
-    converted_issue_weight: order.convertedIssueWeight || null,
-    converted_return_weight: order.convertedReturnWeight || null
-  };
+  const fullRow = buildMovementRow(order, { orderId, materialId, workerId, note: "Updated from QLKT K2 demo" });
 
   const { data, error } = await supabase
     .from("material_movements")
-    .update(movementPayload)
+    .update(fullRow)
     .eq("id", order.id)
-    .select(`
-      id,
-      process_name,
-      order_id,
-      occurred_date,
-      destination,
-      document_no,
-      document_in_no,
-      document_line_no,
-      movement_type,
-      qty_piece,
-      item_sku,
-      stage_status,
-      issued_gram,
-      returned_gram,
-      powder_gram,
-      transferred_weight_gram,
-      loss_gram,
-      loss_period,
-      nxt_period,
-      gold_age,
-      source_material_name,
-      source_name,
-      import_source,
-      export_source,
-      material_type,
-      nxt_link_code,
-      converted_issue_weight,
-      converted_return_weight,
-      status,
-      production_orders(order_code, sku, product_name),
-      materials(name),
-      workers(full_name)
-    `)
+    .select(MOVEMENT_SELECT_COLUMNS)
     .single();
 
   if (error || !data) throw new Error(`Cannot update material movement: ${error?.message ?? "unknown error"}`);
 
-  return {
-    ...order,
-    ...movementRowToProductionOrder(data as unknown as MovementRow),
-    code: order.code,
-    sku: order.sku,
-    itemSku: order.itemSku || order.sku,
-    productName: order.productName,
-    destination: order.destination,
-    occurredDate: order.occurredDate,
-    documentNo: order.documentNo,
-    documentInNo: order.documentInNo,
-    documentLineNo: order.documentLineNo,
-    movementType: order.movementType,
-    qtyPiece: order.qtyPiece,
-    transferred: order.transferred,
-    lossPeriod: order.lossPeriod,
-    nxtPeriod: order.nxtPeriod,
-    goldAge: order.goldAge,
-    sourceMaterialName: order.sourceMaterialName,
-    nxtLinkCode: order.nxtLinkCode,
-    sourceName: order.sourceName,
-    importSource: order.importSource,
-    exportSource: order.exportSource,
-    materialType: order.materialType,
-    convertedIssueWeight: order.convertedIssueWeight,
-    convertedReturnWeight: order.convertedReturnWeight
-  };
+  return mergeMovementResult(order, data);
 }
 
 export async function updateMaterialMovementStatus(id: string, status: Status) {
