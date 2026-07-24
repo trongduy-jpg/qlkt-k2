@@ -43,6 +43,23 @@ function formatCodeMonthLabel(codeMonth: string) {
   return `Tháng ${month}/${year}`;
 }
 
+// Cac dong lien tiep cung 1 Ma LSX (nhieu Ma hang) duoc gom lai de hien 1 o
+// "Ma LSX" duy nhat, keo dai het nhom (rowSpan) - thay vi lap lai hoac dung
+// placeholder "cung LSX" o tung dong, giong cach bang tinh/UI chuyen nghiep
+// thuong nhom du lieu phan cap.
+function computeLsxGroupSpans(summaries: OrderSummary[]): number[] {
+  const spans = new Array(summaries.length).fill(0);
+  let groupStart = 0;
+  for (let index = 1; index <= summaries.length; index += 1) {
+    const isBoundary = index === summaries.length || summaries[index].code !== summaries[groupStart].code;
+    if (isBoundary) {
+      spans[groupStart] = index - groupStart;
+      groupStart = index;
+    }
+  }
+  return spans;
+}
+
 export function ProductionOrdersView({
   isVisible,
   productionOverview,
@@ -220,77 +237,85 @@ export function ProductionOrdersView({
                 </tr>
               </thead>
               <tbody>
-                {filteredOrderSummaries.map((summary, index) => {
-                  const previousSummary = filteredOrderSummaries[index - 1];
-                  const isSameLsxAsPrevious = previousSummary?.code === summary.code;
-                  return (
-                    <tr
-                      key={orderRowKey(summary)}
-                      className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
-                        isSameLsxAsPrevious ? "" : "border-t-2 border-t-line"
-                      } ${
-                        selectedOrderCode === summary.code && selectedItemSku === summary.sku ? "bg-emerald-50/60" : "bg-white"
-                      }`}
-                      onClick={() => onSelectOrder(summary.code, summary.sku)}
-                    >
-                      <td className="px-3 py-3 align-top font-semibold text-ink">{summary.sku || "-"}</td>
-                      <td className="px-3 py-3 align-top">
-                        {isSameLsxAsPrevious ? (
-                          <span className="pl-1 text-xs italic text-zinc-400">↳ cùng LSX</span>
-                        ) : (
-                          <p className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
-                            {summary.code}
-                            {summary.parentOrderCode ? (
-                              <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
-                                <Link2 size={12} className="text-jade" />
-                              </span>
-                            ) : null}
-                          </p>
-                        )}
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        <p className={`max-w-[240px] truncate font-medium ${hasMeaningfulText(summary.productName) ? "text-zinc-800" : "text-zinc-400"}`}>
-                          {summary.productName || "Chưa cập nhật"}
-                        </p>
-                      </td>
-                      <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.customerName) ? "text-zinc-700" : "text-zinc-400"}`}>
-                        {summary.customerName || "Chưa cập nhật"}
-                      </td>
-                      <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.salesType) ? "text-zinc-700" : "text-zinc-400"}`}>
-                        {summary.salesType || "Chưa cập nhật"}
-                      </td>
-                      <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
-                        {formatDisplayDate(summary.deadlineDate) || "Chưa cập nhật"}
-                      </td>
-                      <td className="px-3 py-3 text-right align-top text-zinc-700">
-                        {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
-                      </td>
-                      <td
-                        className={`px-3 py-3 text-right align-top ${summary.movementCount > 0 ? "text-zinc-700" : "text-zinc-400"}`}
-                        title={
-                          summary.movementCount > 0
-                            ? `${summary.movementCount} dòng đã ghi trong Nhật ký NVL`
-                            : "Chưa có giao dịch nào trong Nhật ký NVL cho LSX này"
-                        }
+                {(() => {
+                  const lsxGroupSpans = computeLsxGroupSpans(filteredOrderSummaries);
+                  return filteredOrderSummaries.map((summary, index) => {
+                    const isGroupStart = lsxGroupSpans[index] > 0;
+                    return (
+                      <tr
+                        key={orderRowKey(summary)}
+                        className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
+                          isGroupStart ? "border-t-2 border-t-line" : ""
+                        } ${
+                          selectedOrderCode === summary.code && selectedItemSku === summary.sku ? "bg-emerald-50/60" : "bg-white"
+                        }`}
+                        onClick={() => onSelectOrder(summary.code, summary.sku)}
                       >
-                        {summary.movementCount}
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        <CurrentStage summary={summary} stageOptionsForDropdown={stageOptionsForDropdown} />
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
-                          {summary.deliveryStatus || "Chưa cập nhật"}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
-                          {summary.status}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        <td className="px-3 py-3 align-top font-semibold text-ink">{summary.sku || "-"}</td>
+                        {isGroupStart ? (
+                          <td
+                            className="border-r border-line/70 bg-paper/40 px-3 py-3 align-middle"
+                            rowSpan={lsxGroupSpans[index]}
+                          >
+                            <p className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
+                              {summary.code}
+                              {summary.parentOrderCode ? (
+                                <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
+                                  <Link2 size={12} className="text-jade" />
+                                </span>
+                              ) : null}
+                            </p>
+                            {lsxGroupSpans[index] > 1 ? (
+                              <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
+                                {lsxGroupSpans[index]} Mã hàng
+                              </p>
+                            ) : null}
+                          </td>
+                        ) : null}
+                        <td className="px-3 py-3 align-top">
+                          <p className={`max-w-[240px] truncate font-medium ${hasMeaningfulText(summary.productName) ? "text-zinc-800" : "text-zinc-400"}`}>
+                            {summary.productName || "Chưa cập nhật"}
+                          </p>
+                        </td>
+                        <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.customerName) ? "text-zinc-700" : "text-zinc-400"}`}>
+                          {summary.customerName || "Chưa cập nhật"}
+                        </td>
+                        <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.salesType) ? "text-zinc-700" : "text-zinc-400"}`}>
+                          {summary.salesType || "Chưa cập nhật"}
+                        </td>
+                        <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
+                          {formatDisplayDate(summary.deadlineDate) || "Chưa cập nhật"}
+                        </td>
+                        <td className="px-3 py-3 text-right align-top text-zinc-700">
+                          {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
+                        </td>
+                        <td
+                          className={`px-3 py-3 text-right align-top ${summary.movementCount > 0 ? "text-zinc-700" : "text-zinc-400"}`}
+                          title={
+                            summary.movementCount > 0
+                              ? `${summary.movementCount} dòng đã ghi trong Nhật ký NVL`
+                              : "Chưa có giao dịch nào trong Nhật ký NVL cho LSX này"
+                          }
+                        >
+                          {summary.movementCount}
+                        </td>
+                        <td className="px-3 py-3 align-top">
+                          <CurrentStage summary={summary} stageOptionsForDropdown={stageOptionsForDropdown} />
+                        </td>
+                        <td className="px-3 py-3 align-top">
+                          <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
+                            {summary.deliveryStatus || "Chưa cập nhật"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3 align-top">
+                          <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
+                            {summary.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
               </tbody>
             </table>
           </div>
