@@ -191,12 +191,12 @@ export function ProductionOrdersView({
               {filteredOrderSummaries.length} Mã hàng
             </span>
           </div>
-          <div className="overflow-x-auto rounded-md border border-line bg-white">
+          <div className="max-h-[70vh] overflow-auto rounded-md border border-line bg-white">
             <table className="w-full min-w-[1360px] border-collapse text-sm">
-              <thead>
-                <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
-                  <th className="px-3 py-3">Mã LSX</th>
+              <thead className="sticky top-0 z-10">
+                <tr className="border-b border-line bg-paper text-left text-[11px] uppercase tracking-wider text-zinc-500 shadow-sm">
                   <th className="px-3 py-3">Mã hàng</th>
+                  <th className="px-3 py-3">Mã LSX</th>
                   <th className="px-3 py-3">Tên hàng</th>
                   <th className="px-3 py-3">Khách hàng</th>
                   <th className="px-3 py-3">SR/KH</th>
@@ -214,67 +214,77 @@ export function ProductionOrdersView({
                 </tr>
               </thead>
               <tbody>
-                {filteredOrderSummaries.map((summary) => (
-                  <tr
-                    key={orderRowKey(summary)}
-                    className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
-                      selectedOrderCode === summary.code && selectedItemSku === summary.sku ? "bg-emerald-50/60" : "bg-white"
-                    }`}
-                    onClick={() => onSelectOrder(summary.code, summary.sku)}
-                  >
-                    <td className="px-3 py-3 align-top">
-                      <p className="flex items-center gap-1.5 font-semibold text-ink">
-                        {summary.code}
-                        {summary.parentOrderCode ? (
-                          <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
-                            <Link2 size={12} className="text-jade" />
-                          </span>
-                        ) : null}
-                      </p>
-                    </td>
-                    <td className="px-3 py-3 align-top text-zinc-700">{summary.sku || "-"}</td>
-                    <td className="px-3 py-3 align-top">
-                      <p className={`max-w-[240px] truncate font-medium ${hasMeaningfulText(summary.productName) ? "text-zinc-800" : "text-zinc-400"}`}>
-                        {summary.productName || "Chưa cập nhật"}
-                      </p>
-                    </td>
-                    <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.customerName) ? "text-zinc-700" : "text-zinc-400"}`}>
-                      {summary.customerName || "Chưa cập nhật"}
-                    </td>
-                    <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.salesType) ? "text-zinc-700" : "text-zinc-400"}`}>
-                      {summary.salesType || "Chưa cập nhật"}
-                    </td>
-                    <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
-                      {formatDisplayDate(summary.deadlineDate) || "Chưa cập nhật"}
-                    </td>
-                    <td className="px-3 py-3 text-right align-top text-zinc-700">
-                      {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
-                    </td>
-                    <td
-                      className={`px-3 py-3 text-right align-top ${summary.movementCount > 0 ? "text-zinc-700" : "text-zinc-400"}`}
-                      title={
-                        summary.movementCount > 0
-                          ? `${summary.movementCount} dòng đã ghi trong Nhật ký NVL`
-                          : "Chưa có giao dịch nào trong Nhật ký NVL cho LSX này"
-                      }
+                {filteredOrderSummaries.map((summary, index) => {
+                  const previousSummary = filteredOrderSummaries[index - 1];
+                  const isSameLsxAsPrevious = previousSummary?.code === summary.code;
+                  return (
+                    <tr
+                      key={orderRowKey(summary)}
+                      className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
+                        isSameLsxAsPrevious ? "" : "border-t-2 border-t-line"
+                      } ${
+                        selectedOrderCode === summary.code && selectedItemSku === summary.sku ? "bg-emerald-50/60" : "bg-white"
+                      }`}
+                      onClick={() => onSelectOrder(summary.code, summary.sku)}
                     >
-                      {summary.movementCount}
-                    </td>
-                    <td className="px-3 py-3 align-top">
-                      <CurrentStage summary={summary} stageOptionsForDropdown={stageOptionsForDropdown} />
-                    </td>
-                    <td className="px-3 py-3 align-top">
-                      <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
-                        {summary.deliveryStatus || "Chưa cập nhật"}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 align-top">
-                      <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
-                        {summary.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-3 py-3 align-top font-semibold text-ink">{summary.sku || "-"}</td>
+                      <td className="px-3 py-3 align-top">
+                        {isSameLsxAsPrevious ? (
+                          <span className="pl-1 text-xs italic text-zinc-400">↳ cùng LSX</span>
+                        ) : (
+                          <p className="flex items-center gap-1.5 font-mono text-xs text-zinc-500">
+                            {summary.code}
+                            {summary.parentOrderCode ? (
+                              <span title={`Phát sinh từ LSX ${summary.parentOrderCode} (cùng khách hàng)`}>
+                                <Link2 size={12} className="text-jade" />
+                              </span>
+                            ) : null}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 align-top">
+                        <p className={`max-w-[240px] truncate font-medium ${hasMeaningfulText(summary.productName) ? "text-zinc-800" : "text-zinc-400"}`}>
+                          {summary.productName || "Chưa cập nhật"}
+                        </p>
+                      </td>
+                      <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.customerName) ? "text-zinc-700" : "text-zinc-400"}`}>
+                        {summary.customerName || "Chưa cập nhật"}
+                      </td>
+                      <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.salesType) ? "text-zinc-700" : "text-zinc-400"}`}>
+                        {summary.salesType || "Chưa cập nhật"}
+                      </td>
+                      <td className={`px-3 py-3 align-top ${hasMeaningfulText(summary.deadlineDate) ? "text-zinc-700" : "text-zinc-400"}`}>
+                        {formatDisplayDate(summary.deadlineDate) || "Chưa cập nhật"}
+                      </td>
+                      <td className="px-3 py-3 text-right align-top text-zinc-700">
+                        {summary.qtyPiece && summary.qtyPiece > 0 ? summary.qtyPiece : "Chưa cập nhật"}
+                      </td>
+                      <td
+                        className={`px-3 py-3 text-right align-top ${summary.movementCount > 0 ? "text-zinc-700" : "text-zinc-400"}`}
+                        title={
+                          summary.movementCount > 0
+                            ? `${summary.movementCount} dòng đã ghi trong Nhật ký NVL`
+                            : "Chưa có giao dịch nào trong Nhật ký NVL cho LSX này"
+                        }
+                      >
+                        {summary.movementCount}
+                      </td>
+                      <td className="px-3 py-3 align-top">
+                        <CurrentStage summary={summary} stageOptionsForDropdown={stageOptionsForDropdown} />
+                      </td>
+                      <td className="px-3 py-3 align-top">
+                        <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
+                          {summary.deliveryStatus || "Chưa cập nhật"}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 align-top">
+                        <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
+                          {summary.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
