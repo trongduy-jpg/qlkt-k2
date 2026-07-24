@@ -299,7 +299,8 @@ export function MaterialDashboard() {
     updateProductionHeaderItems,
     buildProductionHeaderDraftFromSummary,
     cancelProductionHeaderEdit,
-    saveProductionHeader
+    saveProductionHeader,
+    quickUpdateDeliveryStatus
   } = useProductionOrders({
     orderSummaries,
     productionHeaders,
@@ -930,6 +931,7 @@ export function MaterialDashboard() {
             onSaveEdit={saveProductionHeader}
             onCloseOrder={closeSelectedProductionOrder}
             onReopenOrder={reopenSelectedProductionOrder}
+            onQuickDeliveryStatusChange={quickUpdateDeliveryStatus}
           />
 
           <div className={`${isMovement || isMovementFormOpen ? "unified-stack" : "hidden"}`}>

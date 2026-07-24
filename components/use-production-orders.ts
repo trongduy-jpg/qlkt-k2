@@ -140,59 +140,64 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     };
   }
 
-  function normalizeProductionHeaderDraft(createdAt?: string): ProductionOrderHeader {
-    const occurredDate = productionHeaderDraft.occurredDate || productionHeaderDraft.plannedDate || toIsoDate();
-    const plannedDate = productionHeaderDraft.plannedDate || occurredDate;
-    const issued = Number(productionHeaderDraft.issued || 0);
-    const returned = Number(productionHeaderDraft.returned || 0);
-    const transferred = Number(productionHeaderDraft.transferred || 0);
-    const goldAge = Number(productionHeaderDraft.plannedGoldAge || 0.75);
+  // draftOverride: dung khi noi goi da co san draft moi nhat trong tay (vd
+  // quickUpdateDeliveryStatus) va khong the doi setState + render xong moi
+  // doc lai state productionHeaderDraft (closure cua lan render hien tai
+  // van la gia tri cu). Khong truyen thi doc tu state nhu binh thuong.
+  function normalizeProductionHeaderDraft(createdAt?: string, draftOverride?: HeaderDraft): ProductionOrderHeader {
+    const source = draftOverride ?? productionHeaderDraft;
+    const occurredDate = source.occurredDate || source.plannedDate || toIsoDate();
+    const plannedDate = source.plannedDate || occurredDate;
+    const issued = Number(source.issued || 0);
+    const returned = Number(source.returned || 0);
+    const transferred = Number(source.transferred || 0);
+    const goldAge = Number(source.plannedGoldAge || 0.75);
 
     return {
-      ...productionHeaderDraft,
+      ...source,
       id: crypto.randomUUID(),
-      code: productionHeaderDraft.code.trim(),
-      sku: productionHeaderDraft.sku.trim(),
-      productName: productionHeaderDraft.productName.trim(),
-      destination: productionHeaderDraft.destination || "CH1",
-      orderDate: productionHeaderDraft.orderDate || occurredDate,
+      code: source.code.trim(),
+      sku: source.sku.trim(),
+      productName: source.productName.trim(),
+      destination: source.destination || "CH1",
+      orderDate: source.orderDate || occurredDate,
       occurredDate,
-      documentNo: productionHeaderDraft.documentNo.trim(),
-      documentInNo: productionHeaderDraft.documentInNo.trim(),
-      documentLineNo: productionHeaderDraft.documentLineNo.trim(),
-      movementType: productionHeaderDraft.movementType || "issue",
-      qtyPiece: Number(productionHeaderDraft.qtyPiece || 0),
+      documentNo: source.documentNo.trim(),
+      documentInNo: source.documentInNo.trim(),
+      documentLineNo: source.documentLineNo.trim(),
+      movementType: source.movementType || "issue",
+      qtyPiece: Number(source.qtyPiece || 0),
       plannedDate,
-      plannedStage: productionHeaderDraft.plannedStage || "CKE",
-      plannedWorker: productionHeaderDraft.plannedWorker || "",
-      plannedMaterial: productionHeaderDraft.plannedMaterial || "Vàng 18K",
-      materialSpec: productionHeaderDraft.materialSpec || "18KY",
+      plannedStage: source.plannedStage || "CKE",
+      plannedWorker: source.plannedWorker || "",
+      plannedMaterial: source.plannedMaterial || "Vàng 18K",
+      materialSpec: source.materialSpec || "18KY",
       plannedGoldAge: goldAge,
-      plannedMaterialType: productionHeaderDraft.plannedMaterialType || "NL18K",
-      deliveryStatus: productionHeaderDraft.deliveryStatus || "Chưa Hoàn Tất",
-      orderMonth: productionHeaderDraft.orderMonth || toMonthCode(plannedDate),
-      salesType: productionHeaderDraft.salesType || "SR",
-      customerName: productionHeaderDraft.customerName.trim(),
-      specification: productionHeaderDraft.specification.trim(),
-      deadlineDate: productionHeaderDraft.deadlineDate || "",
-      completedDate: productionHeaderDraft.completedDate || "",
-      deliveredQty: Number(productionHeaderDraft.deliveredQty || 0),
-      actualProgressNote: productionHeaderDraft.actualProgressNote.trim(),
-      completedWeightGram: Number(productionHeaderDraft.completedWeightGram || 0),
+      plannedMaterialType: source.plannedMaterialType || "NL18K",
+      deliveryStatus: source.deliveryStatus || "Chưa Hoàn Tất",
+      orderMonth: source.orderMonth || toMonthCode(plannedDate),
+      salesType: source.salesType || "SR",
+      customerName: source.customerName.trim(),
+      specification: source.specification.trim(),
+      deadlineDate: source.deadlineDate || "",
+      completedDate: source.completedDate || "",
+      deliveredQty: Number(source.deliveredQty || 0),
+      actualProgressNote: source.actualProgressNote.trim(),
+      completedWeightGram: Number(source.completedWeightGram || 0),
       issued,
       returned,
-      powder: Number(productionHeaderDraft.powder || 0),
+      powder: Number(source.powder || 0),
       transferred,
-      lossPeriod: productionHeaderDraft.lossPeriod || getCarryOverLossPeriod(occurredDate, productionHeaderDraft.status),
-      nxtPeriod: productionHeaderDraft.nxtPeriod || toMonthCode(occurredDate),
-      sourceMaterialName: productionHeaderDraft.sourceMaterialName || "",
-      sourceName: productionHeaderDraft.sourceName || "",
-      importSource: productionHeaderDraft.importSource || "",
-      exportSource: productionHeaderDraft.exportSource || "",
-      nxtLinkCode: productionHeaderDraft.nxtLinkCode || "",
-      convertedIssueWeight: Number(productionHeaderDraft.convertedIssueWeight || (issued * goldAge).toFixed(4)),
-      convertedReturnWeight: Number(productionHeaderDraft.convertedReturnWeight || (returned * goldAge).toFixed(4)),
-      note: productionHeaderDraft.note.trim(),
+      lossPeriod: source.lossPeriod || getCarryOverLossPeriod(occurredDate, source.status),
+      nxtPeriod: source.nxtPeriod || toMonthCode(occurredDate),
+      sourceMaterialName: source.sourceMaterialName || "",
+      sourceName: source.sourceName || "",
+      importSource: source.importSource || "",
+      exportSource: source.exportSource || "",
+      nxtLinkCode: source.nxtLinkCode || "",
+      convertedIssueWeight: Number(source.convertedIssueWeight || (issued * goldAge).toFixed(4)),
+      convertedReturnWeight: Number(source.convertedReturnWeight || (returned * goldAge).toFixed(4)),
+      note: source.note.trim(),
       createdAt: createdAt ?? formatDisplayDateTime(new Date())
     };
   }
@@ -390,16 +395,17 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     await createProductionOrderFromHeader();
   }
 
-  async function updateProductionOrderFromHeader() {
+  async function updateProductionOrderFromHeader(draftOverride?: HeaderDraft) {
     if (!editingProductionCode) return;
 
-    const code = productionHeaderDraft.code.trim();
+    const effectiveDraft = draftOverride ?? productionHeaderDraft;
+    const code = effectiveDraft.code.trim();
 
     if (!code) {
       setRemoteError("Cần nhập Mã LSX trước khi cập nhật lệnh sản xuất.");
       return;
     }
-    if (!(productionHeaderDraft.items ?? []).some((item) => item.sku.trim().length > 0)) {
+    if (!(effectiveDraft.items ?? []).some((item) => item.sku.trim().length > 0)) {
       setRemoteError("Cần nhập ít nhất 1 Mã hàng trước khi cập nhật lệnh sản xuất.");
       return;
     }
@@ -411,7 +417,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
 
     const existingHeader = productionHeaders.find((header) => header.code === editingProductionCode);
     const normalizedHeader = {
-      ...normalizeProductionHeaderDraft(existingHeader?.createdAt),
+      ...normalizeProductionHeaderDraft(existingHeader?.createdAt, effectiveDraft),
       id: existingHeader?.id ?? crypto.randomUUID()
     };
     const items = resolveDraftItems(normalizedHeader);
@@ -492,6 +498,19 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     }
   }
 
+  // Trang thai LSX la truong nguoi dung doi thuong xuyen nen cho phep bam
+  // 1 nut la doi + luu ngay, khong can mo rong form roi bam Luu. Truyen
+  // thang draft moi (khong doc lai state) de tranh loi doc gia tri cu do
+  // setState chua kip render lai truoc khi goi ham luu.
+  async function quickUpdateDeliveryStatus(status: string) {
+    if (!editingProductionCode) return;
+    const code = editingProductionCode;
+    const nextDraft = { ...productionHeaderDraft, deliveryStatus: status };
+    setProductionHeaderDraft(nextDraft);
+    await updateProductionOrderFromHeader(nextDraft);
+    setEditingProductionCode(code);
+  }
+
   return {
     productionHeaderDraft,
     setProductionHeaderDraft,
@@ -503,6 +522,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     createProductionOrderFromHeader,
     cancelProductionHeaderEdit,
     saveProductionHeader,
-    updateProductionOrderFromHeader
+    updateProductionOrderFromHeader,
+    quickUpdateDeliveryStatus
   };
 }
