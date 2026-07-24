@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import {
   AlertTriangle,
@@ -10,7 +10,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth-context";
 import {
   formatGram,
-  hasMeaningfulText,
   isClosedStatus,
   statusOptions
 } from "@/lib/production-helpers";
@@ -24,8 +23,6 @@ import {
   buildLossReportRows,
   buildOrderSummaries,
   buildStageOptionsForDropdown,
-  buildStageProgress,
-  computeMovementTotals,
   orderLineKey,
   selectMovementsForOrder
 } from "@/lib/production-summary";
@@ -34,7 +31,6 @@ import {
   ALL_DESTINATIONS_FILTER,
   buildOrderCodeMonthOptions,
   buildProductionOverview,
-  buildSelectedOrderDetail,
   filterJournalOrders,
   filterProductionSummaries,
   pickCurrentStagePerOrder
@@ -50,10 +46,12 @@ import { ProductionOrderDetailDrawer } from "@/components/production-order-detai
 import { ProductionOrderFormOverlay } from "@/components/production-order-form-overlay";
 import { ProductionOrderInlineEditForm } from "@/components/production-order-inline-edit-form";
 import { ProductionOrdersView } from "@/components/production-orders-view";
+import { useLocalStoragePersistence } from "@/components/use-local-storage-persistence";
 import { useMasterDataCrud } from "@/components/use-master-data-crud";
 import { useMaterialMovements } from "@/components/use-material-movements";
 import { useOperationalData } from "@/components/use-operational-data";
 import { useProductionOrders } from "@/components/use-production-orders";
+import { useSelectedProductionOrder } from "@/components/use-selected-production-order";
 import { AppShell } from "@/components/app-shell";
 import { DashboardOverviewView } from "@/components/dashboard-overview-view";
 import { PriceTableView } from "@/components/price-table-view";
@@ -62,8 +60,7 @@ import { buildWorkerBoxLinesFromMovements } from "@/lib/worker-box-service";
 import {
   alerts,
   kpis,
-  priceRows,
-  productionOrders
+  priceRows
 } from "@/lib/demo-data";
 import type { ProductionOrder, Status } from "@/lib/domain/production";
 import {
@@ -74,7 +71,6 @@ import {
 import {
   applyProductionBusinessRules,
   buildUniqueProductionOrderCode,
-  formatDisplayDate,
   formatDisplayDateTime,
   getStageLabel,
   isSingleWorkerStage,
@@ -86,19 +82,12 @@ import {
 import {
   createAuditLog,
   createMaterialMovement,
-  updateProductionOrderStatus,
   type ReferenceOption,
 } from "@/lib/material-service";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { loadAppUsers } from "@/lib/auth-service";
 import { getModuleFromPath, getPathForModule } from "@/lib/navigation";
 import { buildMovementDraftFromSummary, buildSeedMovementFromSummary } from "@/lib/use-cases/material-movement-drafts";
-
-const storageKey = "qlkt-k2-material-orders";
-const productionOrderHeaderKey = "qlkt-k2-production-order-headers";
-const auditKey = "qlkt-k2-audit-events";
-const movementDraftCacheKey = "qlkt-k2-movement-draft-cache";
-const productionHeaderDraftCacheKey = "qlkt-k2-production-header-draft-cache";
 
 function normalizeStageCode(stage: string) {
   return normalizeProductionStageCode(stage);
@@ -159,7 +148,6 @@ export function MaterialDashboard() {
     reloadOperationalData
   } = useOperationalData({ movementDraftCache, productionHeaderDraftCache });
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
-  const [hasLoadedStorage, setHasLoadedStorage] = useState(false);
   const [isProductionFormOpen, setIsProductionFormOpen] = useState(false);
   const [isAlertPanelOpen, setIsAlertPanelOpen] = useState(false);
   const { appUser, signOut } = useAuth();
@@ -176,57 +164,20 @@ export function MaterialDashboard() {
     setRemoteError
   });
 
-  useEffect(() => {
-    const savedOrders = window.localStorage.getItem(storageKey);
-    const savedProductionHeaders = window.localStorage.getItem(productionOrderHeaderKey);
-    const savedAudit = window.localStorage.getItem(auditKey);
-    const savedMovementDraftCache = window.localStorage.getItem(movementDraftCacheKey);
-    const savedProductionHeaderDraftCache = window.localStorage.getItem(productionHeaderDraftCacheKey);
-
-    if (savedOrders) {
-      try {
-        setOrders(JSON.parse(savedOrders) as ProductionOrder[]);
-      } catch {
-        setOrders(productionOrders);
-      }
-    }
-
-    if (savedProductionHeaders) {
-      try {
-        setProductionHeaders(JSON.parse(savedProductionHeaders) as ProductionOrderHeader[]);
-      } catch {
-        setProductionHeaders([]);
-      }
-    }
-
-    if (savedAudit) {
-      try {
-        setAuditEvents(JSON.parse(savedAudit) as AuditEvent[]);
-      } catch {
-        setAuditEvents([]);
-      }
-    }
-
-    if (savedMovementDraftCache) {
-      try {
-        setMovementDraftCache(JSON.parse(savedMovementDraftCache) as Record<string, ProductionOrder>);
-      } catch {
-        setMovementDraftCache({});
-      }
-    }
-
-    if (savedProductionHeaderDraftCache) {
-      try {
-        setProductionHeaderDraftCache(
-          JSON.parse(savedProductionHeaderDraftCache) as Record<string, Omit<ProductionOrderHeader, "id" | "createdAt">>
-        );
-      } catch {
-        setProductionHeaderDraftCache({});
-      }
-    }
-
-    setHasLoadedStorage(true);
-  }, []);
+  // Doc/ghi localStorage (du lieu demo khi chua co Supabase + cache draft)
+  // da tach ra hook rieng.
+  const { hasLoadedStorage, setHasLoadedStorage } = useLocalStoragePersistence({
+    orders,
+    setOrders,
+    productionHeaders,
+    setProductionHeaders,
+    auditEvents,
+    setAuditEvents,
+    movementDraftCache,
+    setMovementDraftCache,
+    productionHeaderDraftCache,
+    setProductionHeaderDraftCache
+  });
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -253,31 +204,6 @@ export function MaterialDashboard() {
 
     void loadRemoteData();
   }, []);
-
-  useEffect(() => {
-    if (!hasLoadedStorage) return;
-    window.localStorage.setItem(storageKey, JSON.stringify(orders));
-  }, [hasLoadedStorage, orders]);
-
-  useEffect(() => {
-    if (!hasLoadedStorage) return;
-    window.localStorage.setItem(productionOrderHeaderKey, JSON.stringify(productionHeaders));
-  }, [hasLoadedStorage, productionHeaders]);
-
-  useEffect(() => {
-    if (!hasLoadedStorage) return;
-    window.localStorage.setItem(auditKey, JSON.stringify(auditEvents));
-  }, [auditEvents, hasLoadedStorage]);
-
-  useEffect(() => {
-    if (!hasLoadedStorage) return;
-    window.localStorage.setItem(movementDraftCacheKey, JSON.stringify(movementDraftCache));
-  }, [hasLoadedStorage, movementDraftCache]);
-
-  useEffect(() => {
-    if (!hasLoadedStorage) return;
-    window.localStorage.setItem(productionHeaderDraftCacheKey, JSON.stringify(productionHeaderDraftCache));
-  }, [hasLoadedStorage, productionHeaderDraftCache]);
 
   // Bang NK NVL chi hien 1 dong/LSX (cong doan hien tai = khau xa nhat da
   // ghi nhan). Xem lich su cac khau truoc thi mo drawer. Gom nhom truoc,
@@ -341,62 +267,56 @@ export function MaterialDashboard() {
     ]
   );
 
-  const selectedOrderSummary = useMemo(() => {
-    if (selectedOrderCode && selectedItemSku) {
-      const exact = filteredOrderSummaries.find((item) => item.code === selectedOrderCode && item.sku === selectedItemSku);
-      if (exact) return exact;
-    }
-    return filteredOrderSummaries.find((item) => item.code === selectedOrderCode) ?? filteredOrderSummaries[0] ?? null;
-  }, [filteredOrderSummaries, selectedOrderCode, selectedItemSku]);
+  const stageOptionsForDropdown = useMemo(() => {
+    const all = buildStageOptionsForDropdown(stages, journalStages);
+    const byCode = new Map(all.map((item) => [item.value, item]));
+    // Chi hien thi 12 cong doan chinh, dung dung thu tu quy trinh.
+    return mainJournalStageCodes
+      .map((code) => byCode.get(code) ?? { value: code, label: code })
+      .filter(Boolean);
+  }, [stages]);
 
-  useEffect(() => {
-    if (!isProductionDetailOpen || !selectedOrderSummary) return;
-
-    if (isClosedStatus(selectedOrderSummary.status)) {
-      setEditingProductionCode(null);
-      return;
-    }
-
-    setEditingProductionCode(selectedOrderSummary.code);
-    setProductionHeaderDraft(buildProductionHeaderDraftFromSummary(selectedOrderSummary));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProductionDetailOpen, selectedOrderSummary?.code, selectedOrderSummary?.sku, selectedOrderSummary?.status]);
-
-  const selectedOrderMovements = useMemo(
-    () => selectMovementsForOrder(orders, selectedOrderSummary?.code, selectedOrderSummary?.sku),
-    [orders, selectedOrderSummary]
-  );
-
-  // Cac LSX khac duoc tao qua "+ Tao don moi cho khach nay" tu chinh LSX
-  // dang xem (con), dung de hien dau hieu "cung khach hang" tren giao dien.
-  // orderSummaries co the co nhieu dong cung ma LSX (moi Ma hang 1 dong)
-  // nen loc trung theo code truoc khi hien danh sach lien ket.
-  const childOrdersOfSelected = useMemo(() => {
-    const code = selectedOrderSummary?.code;
-    if (!code) return [];
-    const seenCodes = new Set<string>();
-    return orderSummaries.filter((summary) => {
-      if (summary.parentOrderCode !== code) return false;
-      if (seenCodes.has(summary.code)) return false;
-      seenCodes.add(summary.code);
-      return true;
-    });
-  }, [orderSummaries, selectedOrderSummary]);
-
-  const selectedOrderMovementStats = useMemo(() => computeMovementTotals(selectedOrderMovements), [selectedOrderMovements]);
-
-  const selectedOrderDetail = useMemo(
-    () => buildSelectedOrderDetail(selectedOrderSummary, selectedOrderMovements, productionHeaders),
-    [productionHeaders, selectedOrderMovements, selectedOrderSummary]
-  );
-
-  const parentOrderOfSelected = useMemo(() => {
-    const parentCode = selectedOrderDetail?.parentOrderCode;
-    if (!parentCode) return null;
-    return orderSummaries.find((summary) => summary.code === parentCode) ?? null;
-  }, [orderSummaries, selectedOrderDetail]);
-
-  const isEditingSelectedOrder = Boolean(selectedOrderSummary && editingProductionCode === selectedOrderSummary.code);
+  // Derived state + handler xoay quanh "LSX/Ma hang dang duoc chon" (sidebar
+  // chi tiet, dong/mo lai LSX, xem NK NVL cua don do) da tach ra hook rieng.
+  const {
+    selectedOrderSummary,
+    selectedOrderMovements,
+    childOrdersOfSelected,
+    selectedOrderMovementStats,
+    selectedOrderDetail,
+    parentOrderOfSelected,
+    isEditingSelectedOrder,
+    selectedOrderStageProgress,
+    selectProductionOrder,
+    viewSelectedOrderMovements,
+    closeSelectedProductionOrder,
+    reopenSelectedProductionOrder
+  } = useSelectedProductionOrder({
+    orders,
+    setOrders,
+    productionHeaders,
+    setProductionHeaders,
+    orderSummaries,
+    filteredOrderSummaries,
+    stageOptionsForDropdown,
+    selectedOrderCode,
+    setSelectedOrderCode,
+    selectedItemSku,
+    setSelectedItemSku,
+    isProductionDetailOpen,
+    setIsProductionDetailOpen,
+    editingProductionCode,
+    setEditingProductionCode,
+    setProductionHeaderDraft,
+    buildProductionHeaderDraftFromSummary,
+    setRecentCreatedOrderCode,
+    setQuery,
+    setStatus,
+    setActiveModule,
+    reloadOperationalData,
+    pushAudit,
+    setRemoteError
+  });
 
   const productionOverview = useMemo(() => buildProductionOverview(filteredOrderSummaries), [filteredOrderSummaries]);
 
@@ -467,15 +387,6 @@ export function MaterialDashboard() {
     return matches.length > 0 ? matches : workers;
   }, [draft.stage, workers]);
 
-  const stageOptionsForDropdown = useMemo(() => {
-    const all = buildStageOptionsForDropdown(stages, journalStages);
-    const byCode = new Map(all.map((item) => [item.value, item]));
-    // Chi hien thi 12 cong doan chinh, dung dung thu tu quy trinh.
-    return mainJournalStageCodes
-      .map((code) => byCode.get(code) ?? { value: code, label: code })
-      .filter(Boolean);
-  }, [stages]);
-
   // Danh sach Ma hang cua LSX dang mo trong drawer NK NVL (1 LSX co the co
   // nhieu Ma hang, moi Ma hang 1 tien trinh cong doan rieng). Rong neu LSX
   // chua duoc tao chinh thuc (VD user ghi giao dich truoc khi tao LSX) -
@@ -507,11 +418,6 @@ export function MaterialDashboard() {
       )
       .sort((left, right) => String(right.id).localeCompare(String(left.id)));
   }, [orders, draft.code, draft.stage, draftItemSku]);
-
-  const selectedOrderStageProgress = useMemo(
-    () => buildStageProgress(stageOptionsForDropdown, selectedOrderMovements),
-    [stageOptionsForDropdown, selectedOrderMovements]
-  );
 
   const stageEntryFilteredOrders = useMemo(() => {
     // Man "Ghi nhan cong doan" van thao tac theo Ma LSX (chua tach theo Ma
@@ -582,19 +488,6 @@ export function MaterialDashboard() {
     ].slice(0, 20));
   }
 
-  function resetDemoData() {
-    setOrders(productionOrders);
-    setProductionHeaders([]);
-    setAuditEvents([]);
-    setMovementDraftCache({});
-    setProductionHeaderDraftCache({});
-    window.localStorage.removeItem(storageKey);
-    window.localStorage.removeItem(productionOrderHeaderKey);
-    window.localStorage.removeItem(auditKey);
-    window.localStorage.removeItem(movementDraftCacheKey);
-    window.localStorage.removeItem(productionHeaderDraftCacheKey);
-  }
-
   function exportJson() {
     const blob = new Blob([JSON.stringify({ productionHeaders, orders, auditEvents }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -603,15 +496,6 @@ export function MaterialDashboard() {
     link.download = "qlkt-k2-demo-data.json";
     link.click();
     URL.revokeObjectURL(url);
-  }
-
-  function selectProductionOrder(code: string, itemSku?: string) {
-    setSelectedOrderCode(code);
-    setSelectedItemSku(itemSku ?? null);
-    setIsProductionDetailOpen(true);
-    setRecentCreatedOrderCode(code);
-    setQuery("");
-    setActiveModule("Lệnh sản xuất");
   }
 
   function renderProductionFormOverlay() {
@@ -672,10 +556,6 @@ export function MaterialDashboard() {
     setRemoteError(null);
   }
 
-  function prepareMovementForSelectedOrder() {
-    prepareMovementForSummary(selectedOrderSummary);
-  }
-
   function openMovementForStage(stageCode: string) {
     prepareMovementForSummary(selectedOrderSummary, stageCode);
   }
@@ -725,79 +605,6 @@ export function MaterialDashboard() {
       setRemoteError(null);
     } catch (error) {
       setRemoteError(error instanceof Error ? error.message : "Không ghi nhận được khâu này");
-    }
-  }
-
-  function viewSelectedOrderMovements() {
-    if (!selectedOrderSummary) return;
-    setQuery(selectedOrderSummary.code);
-    setStatus("Tất cả");
-    setActiveModule("Nhật ký NVL");
-  }
-
-  async function closeSelectedProductionOrder() {
-    if (!selectedOrderSummary) return;
-    if (isClosedStatus(selectedOrderSummary.status)) {
-      const detail = `LSX ${selectedOrderSummary.code} đã được chốt trước đó`;
-      pushAudit("blocked_close_production_order", detail);
-      setRemoteError(detail);
-      return;
-    }
-
-    try {
-      if (selectedOrderMovements.length === 0) {
-        const seedMovement = buildSeedMovementFromSummary(
-          selectedOrderSummary,
-          productionHeaders.find((header) => header.code === selectedOrderSummary.code)
-        );
-        const savedSeed = isSupabaseConfigured ? await createMaterialMovement(seedMovement) : seedMovement;
-        setOrders((current) => [savedSeed, ...current.filter((item) => item.id !== savedSeed.id)]);
-        setSelectedOrderCode(savedSeed.code);
-        setSelectedItemSku(savedSeed.itemSku || savedSeed.sku || null);
-        setQuery(savedSeed.code);
-      }
-
-      setProductionHeaders((current) =>
-        current.map((header) => (header.code === selectedOrderSummary.code ? { ...header, status: "Đã chốt" } : header))
-      );
-
-      if (isSupabaseConfigured) {
-        await updateProductionOrderStatus(selectedOrderSummary.code, "Đã chốt");
-        await reloadOperationalData();
-      }
-
-      setSelectedOrderCode(selectedOrderSummary.code);
-      setSelectedItemSku(selectedOrderSummary.sku || null);
-      setQuery(selectedOrderSummary.code);
-      setStatus("Tất cả");
-      setActiveModule("Nhật ký NVL");
-      pushAudit("close_production_order", `Chốt LSX ${selectedOrderSummary.code}`);
-      await createAuditLog("close_production_order", `Chốt LSX ${selectedOrderSummary.code}`, selectedOrderMovements[0]?.id);
-    } catch (error) {
-      setRemoteError(error instanceof Error ? error.message : "Không chốt được LSX");
-    }
-  }
-
-  async function reopenSelectedProductionOrder() {
-    if (!selectedOrderSummary) return;
-    if (!isClosedStatus(selectedOrderSummary.status)) return;
-
-    try {
-      setProductionHeaders((current) =>
-        current.map((header) => (header.code === selectedOrderSummary.code ? { ...header, status: "Đang xử lý" } : header))
-      );
-
-      if (isSupabaseConfigured) {
-        await updateProductionOrderStatus(selectedOrderSummary.code, "Đang xử lý");
-        await reloadOperationalData();
-      }
-
-      setSelectedOrderCode(selectedOrderSummary.code);
-      setSelectedItemSku(selectedOrderSummary.sku || null);
-      pushAudit("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`);
-      await createAuditLog("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`, selectedOrderMovements[0]?.id);
-    } catch (error) {
-      setRemoteError(error instanceof Error ? error.message : "Không mở lại được LSX");
     }
   }
 
@@ -1002,7 +809,7 @@ export function MaterialDashboard() {
                   type="button"
                   onClick={() => setIsAlertPanelOpen((current) => !current)}
                 >
-                  {isAlertPanelOpen ? "Thu g\u1ECDn" : "Xem c\u1EA3nh b\u00E1o"}
+                  {isAlertPanelOpen ? "Thu gọn" : "Xem cảnh báo"}
                 </button>
               </div>
               {isAlertPanelOpen ? (
