@@ -233,7 +233,9 @@ export function ProductionOrdersView({
                   </th>
                   <th className="px-3 py-3">Khâu hiện tại</th>
                   <th className="px-3 py-3">Trạng thái LSX</th>
-                  <th className="px-3 py-3">Trạng thái vận hành</th>
+                  <th className="sticky right-0 z-20 bg-paper px-3 py-3 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.15)]">
+                    Trạng thái vận hành
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -241,14 +243,14 @@ export function ProductionOrdersView({
                   const lsxGroupSpans = computeLsxGroupSpans(filteredOrderSummaries);
                   return filteredOrderSummaries.map((summary, index) => {
                     const isGroupStart = lsxGroupSpans[index] > 0;
+                    const isRowSelected = selectedOrderCode === summary.code && selectedItemSku === summary.sku;
+                    const rowBgClass = isRowSelected ? "bg-emerald-50/60" : "bg-white";
                     return (
                       <tr
                         key={orderRowKey(summary)}
-                        className={`cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
+                        className={`group cursor-pointer border-b border-line/70 transition hover:bg-emerald-50/40 ${
                           isGroupStart ? "border-t-2 border-t-line" : ""
-                        } ${
-                          selectedOrderCode === summary.code && selectedItemSku === summary.sku ? "bg-emerald-50/60" : "bg-white"
-                        }`}
+                        } ${rowBgClass}`}
                         onClick={() => onSelectOrder(summary.code, summary.sku)}
                       >
                         <td className="px-3 py-3 align-top font-semibold text-ink">{summary.sku || "-"}</td>
@@ -307,7 +309,9 @@ export function ProductionOrdersView({
                             {summary.deliveryStatus || "Chưa cập nhật"}
                           </span>
                         </td>
-                        <td className="px-3 py-3 align-top">
+                        <td
+                          className={`sticky right-0 px-3 py-3 align-top shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.15)] transition-colors group-hover:bg-emerald-50/40 ${rowBgClass}`}
+                        >
                           <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[summary.status]}`}>
                             {summary.status}
                           </span>
