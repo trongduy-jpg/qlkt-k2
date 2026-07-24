@@ -167,6 +167,37 @@ describe("buildOrderSummaries", () => {
     expect(rowB.qtyPiece).toBe(20);
     expect(orderRowKey(rowA)).not.toBe(orderRowKey(rowB));
   });
+
+  it("Chot 1 Ma hang khong lam Ma hang khac cung LSX bi hien Da chot", () => {
+    const header = makeHeader({
+      code: "DHAG-26081",
+      status: "Đang xử lý",
+      items: [
+        { sku: "RG003", productName: "Nhẫn C", quantityPiece: 5, status: "Đã chốt" },
+        { sku: "RG004", productName: "Nhẫn D", quantityPiece: 7, status: "Đang xử lý" }
+      ]
+    });
+
+    const summaries = buildOrderSummaries([], [header]);
+    expect(summaries).toHaveLength(2);
+
+    const closed = summaries.find((item) => item.sku === "RG003")!;
+    const stillOpen = summaries.find((item) => item.sku === "RG004")!;
+    expect(closed.status).toBe("Đã chốt");
+    expect(stillOpen.status).toBe("Đang xử lý");
+  });
+
+  it("Ma hang chua co status rieng (du lieu cu truoc migration 0024) fallback ve status cua header", () => {
+    const header = makeHeader({
+      code: "DHAG-26082",
+      status: "Đã chốt",
+      items: [{ sku: "RG005", productName: "Nhẫn E", quantityPiece: 1 }]
+    });
+
+    const summaries = buildOrderSummaries([], [header]);
+    expect(summaries).toHaveLength(1);
+    expect(summaries[0].status).toBe("Đã chốt");
+  });
 });
 
 describe("buildDraftStageMovements va buildStageProgress", () => {

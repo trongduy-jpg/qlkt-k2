@@ -120,6 +120,10 @@ export type ProductionOrderItem = {
   completedWeightGram?: number;
   note?: string;
   sortOrder?: number;
+  // Trang thai van hanh (Dang xu ly/Treo no/Da chot) cua RIENG Ma hang nay -
+  // 1 LSX co the co nhieu Ma hang, moi Ma hang chot/mo lai doc lap, khong
+  // con dung chung 1 status cua ca header (production_orders.status) nua.
+  status?: Status;
 };
 
 export type ProductionOrderItemRecord = ProductionOrderItem & {

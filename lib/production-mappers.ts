@@ -1,4 +1,4 @@
-import type { ProductionOrder } from "@/lib/domain/production";
+import type { ProductionOrder, Status } from "@/lib/domain/production";
 import { pickNumber, pickText } from "@/lib/production-helpers";
 import {
   buildProductionOrderCode,
@@ -23,12 +23,15 @@ export function createEmptyProductionOrderItem(): ProductionOrderItem {
     plannedWeightGram: 0,
     deliveredQty: 0,
     completedWeightGram: 0,
-    note: ""
+    note: "",
+    status: "Đang xử lý"
   };
 }
 
 // Dung header (cac truong sku/... primary cu) tao 1 Ma hang - fallback khi
-// LSX chua co dong nao trong production_order_items.
+// LSX chua co dong nao trong production_order_items. status ke thua tu
+// header/summary (LSX cu, chua tach Ma hang, chi co 1 Ma hang = trang thai
+// cua chinh LSX do).
 export function itemFromHeaderPrimary(header: {
   sku?: string;
   productName?: string;
@@ -39,6 +42,7 @@ export function itemFromHeaderPrimary(header: {
   plannedMaterialType?: string;
   completedWeightGram?: number;
   deliveredQty?: number;
+  status?: Status;
 }): ProductionOrderItem {
   return {
     ...createEmptyProductionOrderItem(),
@@ -50,7 +54,8 @@ export function itemFromHeaderPrimary(header: {
     plannedGoldAge: header.plannedGoldAge || 0.75,
     plannedMaterialType: header.plannedMaterialType || "NL18K",
     deliveredQty: header.deliveredQty ?? 0,
-    completedWeightGram: header.completedWeightGram ?? 0
+    completedWeightGram: header.completedWeightGram ?? 0,
+    status: header.status || "Đang xử lý"
   };
 }
 

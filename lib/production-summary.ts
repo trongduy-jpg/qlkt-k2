@@ -112,7 +112,10 @@ function buildRowFromHeaderItem(
     returned,
     powder,
     loss,
-    status: header.status,
+    // Trang thai van hanh (Dang xu ly/Treo no/Da chot) cua RIENG Ma hang nay.
+    // Uu tien item.status (Chot/Mo lai tu sidebar ghi vao day); fallback ve
+    // header.status cho du lieu cu truoc migration 0024 (item chua co status).
+    status: item.status || header.status,
     workers,
     materials
   };

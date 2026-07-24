@@ -1,9 +1,12 @@
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { fromDbStatus, toDbStatus } from "@/lib/supabase-mappers";
+import type { Status } from "@/lib/domain/production";
 import type { ProductionOrderItem, ProductionOrderItemRecord } from "@/lib/material-service-types";
 
 // Tang "Ma hang (line item)": 1 LSX co the co nhieu Ma hang, moi Ma hang
 // mot bo thong tin rieng (Ten hang, So luong, Quy cach, TL du kien, SL da
-// giao, TL HT...). Bang production_order_items (migration 0022).
+// giao, TL HT..., trang thai van hanh rieng). Bang production_order_items
+// (migration 0022, cot status them o migration 0024).
 
 function isMissingTableError(message?: string | null) {
   if (!message) return false;
@@ -13,13 +16,17 @@ function isMissingTableError(message?: string | null) {
   );
 }
 
+function isMissingColumnError(message?: string | null) {
+  return Boolean(message?.includes("column") || message?.includes("schema cache"));
+}
+
 export async function loadProductionOrderItems(): Promise<ProductionOrderItemRecord[]> {
   if (!isSupabaseConfigured || !supabase) return [];
 
   const { data, error } = await supabase
     .from("production_order_items")
     .select(
-      "id, order_code, sku, product_name, quantity_piece, material_spec, planned_material, planned_gold_age, planned_material_type, planned_weight_gram, delivered_qty, completed_weight_gram, note, sort_order, created_at"
+      "id, order_code, sku, product_name, quantity_piece, material_spec, planned_material, planned_gold_age, planned_material_type, planned_weight_gram, delivered_qty, completed_weight_gram, note, status, sort_order, created_at"
     )
     .order("order_code", { ascending: true })
     .order("sort_order", { ascending: true });
@@ -46,13 +53,16 @@ export async function loadProductionOrderItems(): Promise<ProductionOrderItemRec
     deliveredQty: Number(row.delivered_qty ?? 0),
     completedWeightGram: Number(row.completed_weight_gram ?? 0),
     note: String(row.note ?? ""),
+    status: row.status ? fromDbStatus(String(row.status)) : undefined,
     sortOrder: Number(row.sort_order ?? 0),
     createdAt: String(row.created_at ?? "")
   }));
 }
 
 // Thay toan bo danh sach Ma hang cua 1 LSX bang danh sach moi (xoa het roi
-// chen lai) - phu hop voi form quan ly danh sach Ma hang cua LSX.
+// chen lai) - phu hop voi form quan ly danh sach Ma hang cua LSX. Trang
+// thai van hanh (status) cua tung Ma hang duoc giu nguyen vi draft.items
+// luon mang theo gia tri hien tai (item.status) khi sua cac truong khac.
 export async function replaceProductionOrderItems(orderCode: string, items: ProductionOrderItem[]): Promise<void> {
   if (!isSupabaseConfigured || !supabase) return;
 
@@ -81,6 +91,7 @@ export async function replaceProductionOrderItems(orderCode: string, items: Prod
     delivered_qty: item.deliveredQty || 0,
     completed_weight_gram: item.completedWeightGram || 0,
     note: item.note?.trim() || null,
+    status: toDbStatus(item.status || "Đang xử lý"),
     sort_order: item.sortOrder ?? index
   }));
 
@@ -88,5 +99,29 @@ export async function replaceProductionOrderItems(orderCode: string, items: Prod
   if (ins.error) {
     if (isMissingTableError(ins.error.message)) return;
     throw new Error(`Không lưu được Mã hàng của LSX ${trimmedCode}: ${ins.error.message}`);
+  }
+}
+
+// Doi trang thai van hanh cua DUNG 1 Ma hang (khong dung cho ca LSX) - dung
+// cho "Chot LSX"/"Mo lai LSX" tu sidebar, vi moi Ma hang trong cung 1 LSX
+// co the o trang thai khac nhau (VD Ma hang A da chot, Ma hang B con dang
+// xu ly). Neu chua chay migration 0024 (chua co cot status) thi bo qua
+// eim lang - fallback ve status cua header nhu truoc.
+export async function updateProductionOrderItemStatus(orderCode: string, sku: string, status: Status): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+
+  const trimmedCode = orderCode.trim();
+  const trimmedSku = sku.trim();
+  if (!trimmedCode || !trimmedSku) return;
+
+  const { error } = await supabase
+    .from("production_order_items")
+    .update({ status: toDbStatus(status) })
+    .eq("order_code", trimmedCode)
+    .eq("sku", trimmedSku);
+
+  if (error) {
+    if (isMissingTableError(error.message) || isMissingColumnError(error.message)) return;
+    throw new Error(`Không cập nhật được trạng thái Mã hàng ${trimmedSku}: ${error.message}`);
   }
 }

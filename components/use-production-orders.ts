@@ -268,7 +268,8 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
               plannedGoldAge: summary.plannedGoldAge,
               plannedMaterialType: summary.plannedMaterialType,
               deliveredQty: summary.deliveredQty,
-              completedWeightGram: summary.completedWeightGram
+              completedWeightGram: summary.completedWeightGram,
+              status: summary.status
             })
           ];
 

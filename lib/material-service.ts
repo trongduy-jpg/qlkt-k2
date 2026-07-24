@@ -42,7 +42,11 @@ export {
   updateProductionOrderStatus
 } from "@/lib/production-orders-service";
 
-export { loadProductionOrderItems, replaceProductionOrderItems } from "@/lib/production-order-items-service";
+export {
+  loadProductionOrderItems,
+  replaceProductionOrderItems,
+  updateProductionOrderItemStatus
+} from "@/lib/production-order-items-service";
 
 export {
   loadProductionOrders,

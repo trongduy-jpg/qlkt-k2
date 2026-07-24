@@ -12,7 +12,12 @@ import {
 } from "@/lib/production-summary";
 import { buildSelectedOrderDetail, type SelectedOrderDetail } from "@/lib/production-workflow";
 import { isClosedStatus } from "@/lib/production-helpers";
-import { createAuditLog, createMaterialMovement, updateProductionOrderStatus } from "@/lib/material-service";
+import {
+  createAuditLog,
+  createMaterialMovement,
+  updateProductionOrderItemStatus,
+  updateProductionOrderStatus
+} from "@/lib/material-service";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { buildSeedMovementFromSummary } from "@/lib/use-cases/material-movement-drafts";
 
@@ -178,12 +183,31 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
         setQuery(savedSeed.code);
       }
 
+      // Chi doi trang thai cua DUNG Ma hang dang xem, khong dung ca header -
+      // 1 LSX co the co nhieu Ma hang, moi Ma hang chot doc lap. LSX cu chua
+      // co danh sach Ma hang chinh thuc (items rong) thi van doi o header,
+      // vi luc do "Ma hang" chi la 1 pseudo-item suy ra tu chinh header.
+      const targetSku = selectedOrderSummary.sku;
       setProductionHeaders((current) =>
-        current.map((header) => (header.code === selectedOrderSummary.code ? { ...header, status: "Đã chốt" } : header))
+        current.map((header) => {
+          if (header.code !== selectedOrderSummary.code) return header;
+          if (header.items.length > 0) {
+            return {
+              ...header,
+              items: header.items.map((item) => (item.sku === targetSku ? { ...item, status: "Đã chốt" } : item))
+            };
+          }
+          return { ...header, status: "Đã chốt" };
+        })
       );
 
       if (isSupabaseConfigured) {
-        await updateProductionOrderStatus(selectedOrderSummary.code, "Đã chốt");
+        const header = productionHeaders.find((item) => item.code === selectedOrderSummary.code);
+        if (header && header.items.length > 0) {
+          await updateProductionOrderItemStatus(selectedOrderSummary.code, targetSku, "Đã chốt");
+        } else {
+          await updateProductionOrderStatus(selectedOrderSummary.code, "Đã chốt");
+        }
         await reloadOperationalData();
       }
 
@@ -192,7 +216,7 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
       setQuery(selectedOrderSummary.code);
       setStatus("Tất cả");
       setActiveModule("Nhật ký NVL");
-      pushAudit("close_production_order", `Chốt LSX ${selectedOrderSummary.code}`);
+      pushAudit("close_production_order", `Chốt LSX ${selectedOrderSummary.code} - Mã hàng ${targetSku}`);
       await createAuditLog("close_production_order", `Chốt LSX ${selectedOrderSummary.code}`, selectedOrderMovements[0]?.id);
     } catch (error) {
       setRemoteError(error instanceof Error ? error.message : "Không chốt được LSX");
@@ -204,18 +228,33 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
     if (!isClosedStatus(selectedOrderSummary.status)) return;
 
     try {
+      const targetSku = selectedOrderSummary.sku;
       setProductionHeaders((current) =>
-        current.map((header) => (header.code === selectedOrderSummary.code ? { ...header, status: "Đang xử lý" } : header))
+        current.map((header) => {
+          if (header.code !== selectedOrderSummary.code) return header;
+          if (header.items.length > 0) {
+            return {
+              ...header,
+              items: header.items.map((item) => (item.sku === targetSku ? { ...item, status: "Đang xử lý" } : item))
+            };
+          }
+          return { ...header, status: "Đang xử lý" };
+        })
       );
 
       if (isSupabaseConfigured) {
-        await updateProductionOrderStatus(selectedOrderSummary.code, "Đang xử lý");
+        const header = productionHeaders.find((item) => item.code === selectedOrderSummary.code);
+        if (header && header.items.length > 0) {
+          await updateProductionOrderItemStatus(selectedOrderSummary.code, targetSku, "Đang xử lý");
+        } else {
+          await updateProductionOrderStatus(selectedOrderSummary.code, "Đang xử lý");
+        }
         await reloadOperationalData();
       }
 
       setSelectedOrderCode(selectedOrderSummary.code);
       setSelectedItemSku(selectedOrderSummary.sku || null);
-      pushAudit("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`);
+      pushAudit("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} - Mã hàng ${targetSku} để cập nhật phát sinh mới`);
       await createAuditLog("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`, selectedOrderMovements[0]?.id);
     } catch (error) {
       setRemoteError(error instanceof Error ? error.message : "Không mở lại được LSX");
