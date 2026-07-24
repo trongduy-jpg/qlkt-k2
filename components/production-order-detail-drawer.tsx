@@ -42,8 +42,6 @@ type ProductionOrderDetailDrawerProps = {
   onSaveEdit: () => void;
   onCloseOrder: () => void;
   onReopenOrder: () => void;
-  onStartNewOrderForSameCustomer: () => void;
-  onEditAllItems: () => void;
 };
 
 export function ProductionOrderDetailDrawer({
@@ -62,9 +60,7 @@ export function ProductionOrderDetailDrawer({
   onViewMovements,
   onSaveEdit,
   onCloseOrder,
-  onReopenOrder,
-  onStartNewOrderForSameCustomer,
-  onEditAllItems
+  onReopenOrder
 }: ProductionOrderDetailDrawerProps) {
   if (!detail || !summary) return null;
 
@@ -320,14 +316,6 @@ export function ProductionOrderDetailDrawer({
               >
                 Chốt LSX
               </button>
-              <button
-                className="rounded-md border border-dashed border-line bg-paper px-3 py-2 text-sm font-semibold text-ink hover:border-ink sm:col-span-2"
-                type="button"
-                onClick={onEditAllItems}
-                title="Mở form đầy đủ để thêm/xóa Mã hàng hoặc sửa các Mã hàng khác của LSX này"
-              >
-                Sửa toàn bộ LSX (thêm/xóa Mã hàng)
-              </button>
             </div>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
@@ -348,14 +336,6 @@ export function ProductionOrderDetailDrawer({
               </button>
             </div>
           )}
-          <button
-            className="w-full rounded-md border border-dashed border-line bg-paper px-3 py-2 text-sm font-semibold text-ink hover:border-ink"
-            type="button"
-            onClick={onStartNewOrderForSameCustomer}
-            title="Tạo LSX mới, tự điền sẵn khách hàng và SR/KH từ đơn đang xem"
-          >
-            + Tạo đơn mới cho khách hàng này
-          </button>
         </div>
       </aside>
     </>

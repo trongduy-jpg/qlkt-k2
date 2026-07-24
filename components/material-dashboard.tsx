@@ -613,22 +613,6 @@ export function MaterialDashboard() {
     setActiveModule("Lệnh sản xuất");
   }
 
-  function openProductionOrderForEdit(code: string) {
-    setSelectedOrderCode(code);
-    setIsProductionDetailOpen(true);
-    const summary = orderSummaries.find((item) => item.code === code);
-    if (!summary) return;
-
-    if (isClosedStatus(summary.status)) {
-      setRemoteError(`LSX ${summary.code} đã chốt nên không thể chỉnh sửa thông tin gốc.`);
-      return;
-    }
-
-    setEditingProductionCode(summary.code);
-    setProductionHeaderDraft(buildProductionHeaderDraftFromSummary(summary));
-    setIsProductionFormOpen(true);
-  }
-
   function renderProductionFormOverlay() {
     return (
       <ProductionOrderFormOverlay
@@ -816,22 +800,6 @@ export function MaterialDashboard() {
     }
   }
 
-  function startNewOrderForSameCustomer() {
-    if (!selectedOrderSummary) return;
-
-    const emptyDraft = createEmptyProductionOrderHeaderDraft();
-    setEditingProductionCode(null);
-    setProductionHeaderDraft({
-      ...emptyDraft,
-      code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), productionHeaders.map((header) => header.code)),
-      sku: selectedOrderSummary.sku || "",
-      productName: selectedOrderSummary.productName || "",
-      customerName: selectedOrderSummary.customerName || "",
-      salesType: selectedOrderSummary.salesType || "",
-      parentOrderCode: selectedOrderSummary.code
-    });
-    setIsProductionFormOpen(true);
-  }
   const isDashboard = activeModule === "Dashboard";
   const isProduction = activeModule === "Lệnh sản xuất";
   const isMovement = activeModule === "Nhật ký NVL";
@@ -962,10 +930,6 @@ export function MaterialDashboard() {
             onSaveEdit={saveProductionHeader}
             onCloseOrder={closeSelectedProductionOrder}
             onReopenOrder={reopenSelectedProductionOrder}
-            onStartNewOrderForSameCustomer={startNewOrderForSameCustomer}
-            onEditAllItems={() => {
-              if (selectedOrderSummary) openProductionOrderForEdit(selectedOrderSummary.code);
-            }}
           />
 
           <div className={`${isMovement || isMovementFormOpen ? "unified-stack" : "hidden"}`}>
