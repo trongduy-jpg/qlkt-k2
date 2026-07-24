@@ -341,7 +341,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       return;
     }
 
-    if (orderSummaries.some((summary) => summary.code === code)) {
+    if (productionHeaders.some((header) => header.code === code)) {
       setRemoteError(`LSX ${code} đã tồn tại. Vui lòng kiểm tra lại mã lệnh.`);
       return;
     }

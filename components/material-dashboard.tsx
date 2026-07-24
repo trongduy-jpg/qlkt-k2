@@ -652,6 +652,7 @@ export function MaterialDashboard() {
         getDynamicOptions={getDynamicOptions}
         onDraftChange={updateProductionHeaderDraft}
         onItemsChange={updateProductionHeaderItems}
+        focusItemSku={selectedItemSku}
       />
     );
   }
@@ -822,7 +823,7 @@ export function MaterialDashboard() {
     setEditingProductionCode(null);
     setProductionHeaderDraft({
       ...emptyDraft,
-      code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), orderSummaries.map((summary) => summary.code)),
+      code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), productionHeaders.map((header) => header.code)),
       sku: selectedOrderSummary.sku || "",
       productName: selectedOrderSummary.productName || "",
       customerName: selectedOrderSummary.customerName || "",
@@ -932,7 +933,7 @@ export function MaterialDashboard() {
               const emptyDraft = createEmptyProductionOrderHeaderDraft();
               setProductionHeaderDraft({
                 ...emptyDraft,
-                code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), orderSummaries.map((summary) => summary.code))
+                code: buildUniqueProductionOrderCode("DHAG", emptyDraft.occurredDate || toIsoDate(), productionHeaders.map((header) => header.code))
               });
               setIsProductionFormOpen((current) => !current);
             }}
@@ -962,6 +963,9 @@ export function MaterialDashboard() {
             onCloseOrder={closeSelectedProductionOrder}
             onReopenOrder={reopenSelectedProductionOrder}
             onStartNewOrderForSameCustomer={startNewOrderForSameCustomer}
+            onEditAllItems={() => {
+              if (selectedOrderSummary) openProductionOrderForEdit(selectedOrderSummary.code);
+            }}
           />
 
           <div className={`${isMovement || isMovementFormOpen ? "unified-stack" : "hidden"}`}>

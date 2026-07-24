@@ -17,6 +17,7 @@ type ProductionOrderInlineEditFormProps = {
   getDynamicOptions: (listKey: string, staticFallback: SelectOption[]) => SelectOption[];
   onDraftChange: <K extends keyof ProductionHeaderDraft>(key: K, value: ProductionHeaderDraft[K]) => void;
   onItemsChange: (items: ProductionHeaderDraft["items"]) => void;
+  focusItemSku?: string | null;
 };
 
 export function ProductionOrderInlineEditForm({
@@ -24,7 +25,8 @@ export function ProductionOrderInlineEditForm({
   materials,
   getDynamicOptions,
   onDraftChange,
-  onItemsChange
+  onItemsChange,
+  focusItemSku
 }: ProductionOrderInlineEditFormProps) {
   return (
     <div className="space-y-4">
@@ -79,6 +81,7 @@ export function ProductionOrderInlineEditForm({
         onChange={onItemsChange}
         materials={materials}
         getDynamicOptions={getDynamicOptions}
+        focusSku={focusItemSku}
       />
 
       <div className="rounded-md border border-line bg-white p-3">
