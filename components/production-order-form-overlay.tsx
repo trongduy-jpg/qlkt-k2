@@ -38,7 +38,7 @@ export function ProductionOrderFormOverlay({
   onCancel,
   onSave
 }: ProductionOrderFormOverlayProps) {
-  if (!isOpen || editingCode) return null;
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-40 bg-ink/35 px-4 py-6 backdrop-blur-sm">
@@ -52,6 +52,7 @@ export function ProductionOrderFormOverlay({
               draft={draft}
               getDynamicOptions={getDynamicOptions}
               onDraftChange={onDraftChange}
+              isCodeLocked={Boolean(editingCode)}
             />
 
             <div className="mt-4">
@@ -123,11 +124,13 @@ function FormIntro({ deliveryStatus }: { deliveryStatus: string }) {
 function OrderIdentitySection({
   draft,
   getDynamicOptions,
-  onDraftChange
+  onDraftChange,
+  isCodeLocked
 }: {
   draft: ProductionHeaderDraft;
   getDynamicOptions: (listKey: string, staticFallback: SelectOption[]) => SelectOption[];
   onDraftChange: ProductionOrderFormOverlayProps["onDraftChange"];
+  isCodeLocked?: boolean;
 }) {
   return (
     <div className="mt-4 rounded-md border border-line bg-white/90 p-4">
@@ -139,6 +142,7 @@ function OrderIdentitySection({
               className={fieldControlClass}
               placeholder="VD: DHAG-260713"
               value={draft.code}
+              disabled={isCodeLocked}
               onChange={(event) => onDraftChange("code", event.target.value)}
             />
           </FieldShell>

@@ -82,6 +82,7 @@ export function ProductionOrderInlineEditForm({
         materials={materials}
         getDynamicOptions={getDynamicOptions}
         focusSku={focusItemSku}
+        allowManageItems={false}
       />
 
       <div className="rounded-md border border-line bg-white p-3">

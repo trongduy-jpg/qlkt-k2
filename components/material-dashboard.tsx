@@ -946,7 +946,7 @@ export function MaterialDashboard() {
           />
 
           <ProductionOrderDetailDrawer
-            isOpen={isProductionDetailOpen && !(isProductionFormOpen && !editingProductionCode)}
+            isOpen={isProductionDetailOpen && !isProductionFormOpen}
             isEditing={isEditingSelectedOrder}
             detail={selectedOrderDetail}
             summary={selectedOrderSummary}

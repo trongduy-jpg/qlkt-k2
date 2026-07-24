@@ -14,7 +14,8 @@ export function ProductionItemsEditor({
   onChange,
   materials,
   getDynamicOptions,
-  focusSku
+  focusSku,
+  allowManageItems = true
 }: {
   items: ProductionOrderItem[];
   onChange: (items: ProductionOrderItem[]) => void;
@@ -25,11 +26,16 @@ export function ProductionItemsEditor({
   // nguyen cac Ma hang khac cua LSX phia sau. Khong truyen (hoac khong tim
   // thay) thi hien toan bo danh sach nhu form Tao LSX.
   focusSku?: string | null;
+  // Chi cho phep them/xoa Ma hang tai 1 noi duy nhat: form Tao/Sua toan bo
+  // LSX (mac dinh true). Sidebar sua nhanh 1 dong luon truyen false de
+  // tranh tao Ma hang moi ngoai form chinh, giu he thong gon/de dung.
+  allowManageItems?: boolean;
 }) {
   const fullList = items.length > 0 ? items : [createEmptyProductionOrderItem()];
   const focusIndex = focusSku ? fullList.findIndex((item) => item.sku === focusSku) : -1;
   const isFocused = focusIndex >= 0;
   const list = isFocused ? [fullList[focusIndex]] : fullList;
+  const canManageItems = allowManageItems && !isFocused;
 
   function updateItem(index: number, patch: Partial<ProductionOrderItem>) {
     const targetIndex = isFocused ? focusIndex : index;
@@ -54,8 +60,10 @@ export function ProductionItemsEditor({
           </p>
           <p className="mt-0.5 text-xs text-zinc-500">
             {isFocused
-              ? `Đang sửa đúng Mã hàng này (LSX có ${fullList.length} Mã hàng). Để thêm/xóa Mã hàng khác, vào "Sửa toàn bộ LSX".`
-              : "1 LSX có thể có nhiều Mã hàng; mỗi Mã hàng nhập thông tin riêng và có tiến trình công đoạn riêng."}
+              ? `Đang sửa đúng Mã hàng này (LSX có ${fullList.length} Mã hàng). Để thêm Mã hàng mới hoặc xóa Mã hàng khác, vào "Sửa toàn bộ LSX".`
+              : canManageItems
+                ? "1 LSX có thể có nhiều Mã hàng; mỗi Mã hàng nhập thông tin riêng và có tiến trình công đoạn riêng."
+                : "Để thêm Mã hàng mới hoặc xóa Mã hàng, vào \"Sửa toàn bộ LSX\"."}
           </p>
         </div>
         <span className="rounded-full border border-line bg-paper px-2.5 py-1 text-[11px] font-semibold text-zinc-600">
@@ -70,7 +78,7 @@ export function ProductionItemsEditor({
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink text-[11px] font-bold text-white">
                 {(isFocused ? focusIndex : index) + 1}
               </span>
-              {isFocused ? null : (
+              {canManageItems ? (
                 <button
                   type="button"
                   className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
@@ -80,7 +88,7 @@ export function ProductionItemsEditor({
                 >
                   <Trash2 size={13} />
                 </button>
-              )}
+              ) : null}
             </div>
 
             <div className="mt-2 grid grid-cols-12 gap-3">
@@ -185,7 +193,7 @@ export function ProductionItemsEditor({
         ))}
       </div>
 
-      {isFocused ? null : (
+      {canManageItems ? (
         <button
           type="button"
           className="mt-3 inline-flex items-center justify-center gap-2 rounded-md border border-ink bg-white px-3 py-2 text-sm font-semibold text-ink hover:bg-paper"
@@ -194,7 +202,7 @@ export function ProductionItemsEditor({
           <Plus size={15} />
           Thêm Mã hàng
         </button>
-      )}
+      ) : null}
     </div>
   );
 }

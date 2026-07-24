@@ -484,6 +484,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       // (da cap nhat) o dang chi doc - truoc day giu nguyen editingProductionCode
       // nen form sua "khong dong lai" du da luu xong.
       setEditingProductionCode(null);
+      setIsProductionFormOpen(false);
       pushAudit("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`);
       await createAuditLog("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`, saved.id);
     } catch (error) {
