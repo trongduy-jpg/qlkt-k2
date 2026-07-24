@@ -3,9 +3,9 @@
 import { Link2, Plus } from "lucide-react";
 import type { OrderSummary } from "@/lib/production-types";
 import type { ProductionOverview } from "@/lib/production-workflow";
-import { orderRowKey, type StageOption } from "@/lib/production-summary";
+import { orderRowKey } from "@/lib/production-summary";
 import { deliveryStatusClass, hasMeaningfulText, statusClass } from "@/lib/production-helpers";
-import { formatDisplayDate, getStageLabel, normalizeStageCode } from "@/lib/production-business-rules";
+import { formatDisplayDate } from "@/lib/production-business-rules";
 import {
   productionOrderDeliveryStatusOptions,
   productionOrderDestinations,
@@ -19,7 +19,6 @@ type ProductionOrdersViewProps = {
   filteredOrderSummaries: OrderSummary[];
   selectedOrderCode: string | null;
   selectedItemSku: string | null;
-  stageOptionsForDropdown: StageOption[];
   productionDeliveryStatus: string;
   productionSalesType: string;
   productionDeadlineFilter: string;
@@ -67,7 +66,6 @@ export function ProductionOrdersView({
   filteredOrderSummaries,
   selectedOrderCode,
   selectedItemSku,
-  stageOptionsForDropdown,
   productionDeliveryStatus,
   productionSalesType,
   productionDeadlineFilter,
@@ -216,7 +214,7 @@ export function ProductionOrdersView({
             </span>
           </div>
           <div className="max-h-[70vh] overflow-auto rounded-md border border-line bg-white">
-            <table className="w-full min-w-[1220px] border-collapse text-sm">
+            <table className="w-full min-w-[1080px] border-collapse text-sm">
               <thead className="sticky top-0 z-10">
                 <tr className="border-b border-line bg-paper text-left text-[11px] uppercase tracking-wider text-zinc-500 shadow-sm">
                   <th className="px-3 py-3">Mã hàng / Mã LSX</th>
@@ -231,7 +229,6 @@ export function ProductionOrdersView({
                   >
                     Số GD NVL
                   </th>
-                  <th className="px-3 py-3">Khâu hiện tại</th>
                   <th className="px-3 py-3">Trạng thái LSX</th>
                   <th className="sticky right-0 z-20 bg-paper px-3 py-3 shadow-[-6px_0_8px_-6px_rgba(15,23,42,0.15)]">
                     Trạng thái vận hành
@@ -292,9 +289,6 @@ export function ProductionOrdersView({
                           {summary.movementCount}
                         </td>
                         <td className="px-3 py-3 align-top">
-                          <CurrentStage summary={summary} stageOptionsForDropdown={stageOptionsForDropdown} />
-                        </td>
-                        <td className="px-3 py-3 align-top">
                           <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${deliveryStatusClass[summary.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
                             {summary.deliveryStatus || "Chưa cập nhật"}
                           </span>
@@ -316,35 +310,5 @@ export function ProductionOrdersView({
         </div>
       </div>
     </section>
-  );
-}
-
-function CurrentStage({
-  summary,
-  stageOptionsForDropdown
-}: {
-  summary: OrderSummary;
-  stageOptionsForDropdown: StageOption[];
-}) {
-  // plannedStage mac dinh la "CKE" ngay tu khi tao LSX (chua ai chon cong
-  // doan nao ca) - neu chua co giao dich NK NVL nao (movementCount === 0)
-  // thi day chi la gia tri "du kien" trong form, KHONG phai tien do thuc
-  // te. Phai kiem tra movementCount truoc, khong chi dua vao plannedStage
-  // co rong hay khong, neu khong se hien nham "Khau X/12" cho LSX chua ai
-  // ghi nhan cong doan nao.
-  const stageCode = summary.movementCount > 0 && summary.plannedStage ? normalizeStageCode(summary.plannedStage) : "";
-  const stageIndex = stageCode ? stageOptionsForDropdown.findIndex((item) => item.value === stageCode) : -1;
-
-  if (stageIndex < 0) {
-    return <span className="text-xs text-zinc-400">Chưa bắt đầu</span>;
-  }
-
-  return (
-    <span className="inline-flex flex-col text-xs">
-      <span className="font-semibold text-ink">
-        Khâu {stageIndex + 1}/{stageOptionsForDropdown.length}
-      </span>
-      <span className="text-zinc-500">{getStageLabel(stageCode)}</span>
-    </span>
   );
 }

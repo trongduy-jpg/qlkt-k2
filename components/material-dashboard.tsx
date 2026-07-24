@@ -651,7 +651,6 @@ export function MaterialDashboard() {
             filteredOrderSummaries={filteredOrderSummaries}
             selectedOrderCode={selectedOrderCode}
             selectedItemSku={selectedItemSku}
-            stageOptionsForDropdown={stageOptionsForDropdown}
             productionDeliveryStatus={productionDeliveryStatus}
             productionSalesType={productionSalesType}
             productionDeadlineFilter={productionDeadlineFilter}
