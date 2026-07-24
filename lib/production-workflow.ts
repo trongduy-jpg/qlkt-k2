@@ -2,6 +2,7 @@ import type { ProductionOrder, Status } from "@/lib/domain/production";
 import { pickNumber, pickText } from "@/lib/production-helpers";
 import { extractOrderCodeMonth, normalizeStageCode, toIsoDate } from "@/lib/production-business-rules";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
+import { orderLineKey } from "@/lib/production-summary";
 
 export const ALL_DESTINATIONS_FILTER = "Tất cả cửa hàng";
 export const ALL_CODE_MONTHS_FILTER = "Tất cả tháng";
@@ -54,6 +55,13 @@ export type SelectedOrderDetail = {
   parentOrderCode?: string;
 };
 
+function pickPositiveNumber(...values: Array<number | null | undefined>) {
+  for (const value of values) {
+    if (typeof value === "number" && Number.isFinite(value) && value > 0) return value;
+  }
+  return pickNumber(...values);
+}
+
 function addDays(dateString: string, days: number) {
   const date = new Date(`${dateString}T00:00:00`);
   date.setDate(date.getDate() + days);
@@ -102,33 +110,31 @@ export function buildOrderCodeMonthOptions(summaries: OrderSummary[]): string[] 
   return Array.from(months).sort((a, b) => b.localeCompare(a));
 }
 
-// Gom cac giao dich (moi khau = 1 dong) ve DUNG 1 dong/LSX, dai dien la
-// "cong doan hien tai" = khau xa nhat trong quy trinh (stageOrder) da co
-// ghi nhan. Bang NK NVL chi hien dong dai dien nay, xem lich su cac khau
-// truoc thi mo drawer (accordion da liet ke day du). Neu cung 1 khau co
-// nhieu tho / cung index quy trinh thi lay ban ghi occurredDate moi nhat,
-// hoa nua thi giu ban ghi xuat hien truoc trong mang (thuong da sort moi->cu).
+// Gom cac giao dich ve 1 dong hien hanh cho tung "LSX + Ma hang". Khong
+// dung moi Ma LSX lam khoa vi 1 LSX co the chua nhieu Ma hang can theo doi
+// doc lap.
 export function pickCurrentStagePerOrder(orders: ProductionOrder[], stageOrder: string[]): ProductionOrder[] {
   const orderIndexByStage = new Map(stageOrder.map((code, index) => [code, index]));
   const stageRank = (order: ProductionOrder) => orderIndexByStage.get(normalizeStageCode(order.stage)) ?? -1;
 
   const representativeByCode = new Map<string, { order: ProductionOrder; position: number }>();
   orders.forEach((order, position) => {
-    const current = representativeByCode.get(order.code);
+    const rowKey = orderLineKey(order.code, order.itemSku || order.sku);
+    const current = representativeByCode.get(rowKey);
     if (!current) {
-      representativeByCode.set(order.code, { order, position });
+      representativeByCode.set(rowKey, { order, position });
       return;
     }
 
     const rankDiff = stageRank(order) - stageRank(current.order);
     if (rankDiff > 0) {
-      representativeByCode.set(order.code, { order, position });
+      representativeByCode.set(rowKey, { order, position });
       return;
     }
     if (rankDiff === 0) {
       const dateDiff = (order.occurredDate || "").localeCompare(current.order.occurredDate || "");
       if (dateDiff > 0 || (dateDiff === 0 && position < current.position)) {
-        representativeByCode.set(order.code, { order, position });
+        representativeByCode.set(rowKey, { order, position });
       }
     }
   });
@@ -182,18 +188,19 @@ export function buildSelectedOrderDetail(
   if (!summary) return null;
 
   const matchingHeader = headers.find((header) => header.code === summary.code);
+  const matchingItem = matchingHeader?.items.find((item) => item.sku === summary.sku);
   const latestMovement = movements[0] ?? null;
   const movementWorkers = Array.from(new Set(movements.map((item) => item.worker).filter((item) => item && item.trim().length > 0)));
   const movementMaterials = Array.from(new Set(movements.map((item) => item.material).filter((item) => item && item.trim().length > 0)));
   const movementStages = Array.from(new Set(movements.map((item) => item.stage).filter((item) => item && item.trim().length > 0)));
 
-  const qtyPiece = pickNumber(latestMovement?.qtyPiece, summary.qtyPiece, matchingHeader?.qtyPiece);
-  const deliveredQty = pickNumber(summary.deliveredQty, matchingHeader?.deliveredQty);
+  const qtyPiece = pickPositiveNumber(latestMovement?.qtyPiece, summary.qtyPiece, matchingItem?.quantityPiece, matchingHeader?.qtyPiece);
+  const deliveredQty = pickPositiveNumber(summary.deliveredQty, matchingItem?.deliveredQty, matchingHeader?.deliveredQty);
 
   return {
     code: summary.code,
-    sku: pickText(summary.sku, matchingHeader?.sku),
-    productName: pickText(summary.productName, matchingHeader?.productName),
+    sku: pickText(summary.sku, matchingItem?.sku, matchingHeader?.sku),
+    productName: pickText(summary.productName, matchingItem?.productName, matchingHeader?.productName),
     deliveryStatus: pickText(summary.deliveryStatus, matchingHeader?.deliveryStatus),
     operationalStatus: latestMovement?.status || summary.status,
     customerName: pickText(summary.customerName, matchingHeader?.customerName),
@@ -206,9 +213,9 @@ export function buildSelectedOrderDetail(
     destination: pickText(latestMovement?.destination, summary.destination, matchingHeader?.destination),
     stage: pickText(latestMovement?.stage, movementStages[0], summary.plannedStage, matchingHeader?.plannedStage),
     worker: pickText(latestMovement?.worker, movementWorkers[0], summary.plannedWorker, matchingHeader?.plannedWorker),
-    plannedMaterial: pickText(latestMovement?.material, movementMaterials[0], summary.plannedMaterial, matchingHeader?.plannedMaterial),
-    materialSpec: pickText(summary.materialSpec, matchingHeader?.materialSpec),
-    goldAgeValue: pickNumber(latestMovement?.goldAge, summary.plannedGoldAge, matchingHeader?.plannedGoldAge),
+    plannedMaterial: pickText(latestMovement?.material, movementMaterials[0], summary.plannedMaterial, matchingItem?.plannedMaterial, matchingHeader?.plannedMaterial),
+    materialSpec: pickText(summary.materialSpec, matchingItem?.materialSpec, matchingHeader?.materialSpec),
+    goldAgeValue: pickNumber(latestMovement?.goldAge, summary.plannedGoldAge, matchingItem?.plannedGoldAge, matchingHeader?.plannedGoldAge),
     actualProgressNote: pickText(summary.actualProgressNote, matchingHeader?.actualProgressNote),
     movementMaterials,
     movementWorkers,

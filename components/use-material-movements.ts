@@ -16,7 +16,7 @@ import {
   toMonthCode,
   type HaoHutRule
 } from "@/lib/production-business-rules";
-import { buildDraftStageMovements } from "@/lib/production-summary";
+import { buildDraftStageMovements, orderLineKey } from "@/lib/production-summary";
 import { createAuditLog, createMaterialMovement, deleteMaterialMovement, updateMaterialMovement } from "@/lib/material-service";
 import { createEmptyOrder } from "@/lib/production-mappers";
 import { isClosedStatus, validateMovementDraft } from "@/lib/production-helpers";
@@ -41,6 +41,7 @@ type UseMaterialMovementsParams = {
   setOrders: Dispatch<SetStateAction<ProductionOrder[]>>;
   setMovementDraftCache: Dispatch<SetStateAction<MovementDraftCache>>;
   setSelectedOrderCode: (code: string | null) => void;
+  setSelectedItemSku: (sku: string | null) => void;
   setActiveModule: (label: string) => void;
   reloadOperationalData: (options?: ReloadOperationalDataOptions) => Promise<unknown>;
   pushAudit: (action: string, detail: string) => void;
@@ -56,6 +57,7 @@ export function useMaterialMovements({
   setOrders,
   setMovementDraftCache,
   setSelectedOrderCode,
+  setSelectedItemSku,
   setActiveModule,
   reloadOperationalData,
   pushAudit,
@@ -82,11 +84,12 @@ export function useMaterialMovements({
     if (!code) return;
 
     setMovementDraftCache((current) => {
-      const previous = current[code];
+      const lineKey = orderLineKey(code, draft.itemSku || draft.sku);
+      const previous = current[lineKey];
       if (previous && JSON.stringify(previous) === JSON.stringify(draft)) {
         return current;
       }
-      return { ...current, [code]: draft };
+      return { ...current, [lineKey]: draft };
     });
   }, [draft, isMovementFormOpen, setMovementDraftCache]);
 
@@ -145,8 +148,14 @@ export function useMaterialMovements({
     }
 
     const normalizedStageCode = normalizeStageCode(normalizedDraft.stage);
+    const normalizedItemSku = (normalizedDraft.itemSku || normalizedDraft.sku).trim();
     const existingStageMovement = isSingleWorkerStage(normalizedStageCode)
-      ? orders.find((order) => order.code === normalizedDraft.code.trim() && normalizeStageCode(order.stage) === normalizedStageCode)
+      ? orders.find(
+          (order) =>
+            order.code === normalizedDraft.code.trim() &&
+            (order.itemSku || order.sku) === normalizedItemSku &&
+            normalizeStageCode(order.stage) === normalizedStageCode
+        )
       : undefined;
     const effectiveEditingId = editingMovementId || existingStageMovement?.id || null;
 
@@ -155,6 +164,7 @@ export function useMaterialMovements({
       id: effectiveEditingId || normalizedDraft.id || crypto.randomUUID(),
       code: normalizedDraft.code.trim(),
       sku: normalizedDraft.sku.trim(),
+      itemSku: normalizedItemSku,
       worker: normalizedDraft.worker.trim()
     };
 
@@ -166,7 +176,8 @@ export function useMaterialMovements({
         : isSupabaseConfigured
           ? await createMaterialMovement(nextOrder)
           : nextOrder;
-      const nextMovementDraftCache = { ...movementDraftCache, [savedOrder.code]: savedOrder };
+      const savedLineKey = orderLineKey(savedOrder.code, savedOrder.itemSku || savedOrder.sku);
+      const nextMovementDraftCache = { ...movementDraftCache, [savedLineKey]: savedOrder };
       setMovementDraftCache(nextMovementDraftCache);
 
       if (isSupabaseConfigured) {
@@ -182,6 +193,7 @@ export function useMaterialMovements({
       }
 
       setSelectedOrderCode(savedOrder.code);
+      setSelectedItemSku(savedOrder.itemSku || savedOrder.sku || null);
       const stageLabel = getStageLabel(savedOrder.stage);
       const workerLabel = savedOrder.worker || "(chưa có thợ)";
       if (effectiveEditingId) {

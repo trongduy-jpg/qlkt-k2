@@ -11,8 +11,12 @@ import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types
 // Khoa nhan dien 1 dong trong bang LSX/NK NVL: 1 LSX co the co nhieu Ma
 // hang (line item), moi Ma hang la 1 dong rieng - khong con dung Ma LSX
 // (code) don le lam khoa nua vi code co the lap lai giua cac dong.
+export function orderLineKey(code: string, sku: string | undefined | null): string {
+  return `${code}::${sku?.trim() || "-"}`;
+}
+
 export function orderRowKey(summary: { code: string; sku: string }): string {
-  return `${summary.code}::${summary.sku}`;
+  return orderLineKey(summary.code, summary.sku);
 }
 
 function sortMovementsLatestFirst(movements: ProductionOrder[]): ProductionOrder[] {

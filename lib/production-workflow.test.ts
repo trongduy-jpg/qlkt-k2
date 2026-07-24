@@ -183,6 +183,16 @@ describe("pickCurrentStagePerOrder", () => {
     ];
     expect(pickCurrentStagePerOrder(rows, STAGE_ORDER).map((item) => item.id)).toEqual(["b"]);
   });
+
+  it("khong gop hai Ma hang khac nhau trong cung LSX vao mot dong NK NVL", () => {
+    const rows = [
+      makeMovement({ id: "rg1", code: "DHAG-1", sku: "RG001", itemSku: "RG001", stage: "CKE" }),
+      makeMovement({ id: "rg2", code: "DHAG-1", sku: "RG002", itemSku: "RG002", stage: "CKE" })
+    ];
+
+    const result = pickCurrentStagePerOrder(rows, STAGE_ORDER);
+    expect(result.map((item) => item.id).sort()).toEqual(["rg1", "rg2"]);
+  });
 });
 
 describe("filterJournalOrders", () => {
@@ -256,6 +266,35 @@ describe("buildSelectedOrderDetail", () => {
       worker: "Worker movement",
       plannedMaterial: "Platinum 900",
       movementCount: 1
+    });
+  });
+
+  it("sidebar lay dung thong tin Ma hang dang chon, khong fallback ve Ma hang primary cua LSX", () => {
+    const detail = buildSelectedOrderDetail(
+      makeSummary({ code: "DHAG-2", sku: "RG002", productName: "", qtyPiece: 0, plannedMaterial: "", materialSpec: "" }),
+      [],
+      [
+        makeHeader({
+          code: "DHAG-2",
+          sku: "RG001",
+          productName: "Nhan primary",
+          qtyPiece: 10,
+          plannedMaterial: "Vang primary",
+          items: [
+            { sku: "RG001", productName: "Nhan primary", quantityPiece: 10, plannedMaterial: "Vang 18K" },
+            { sku: "RG002", productName: "Nhan item 2", quantityPiece: 22, plannedMaterial: "Bac 92.5", materialSpec: "BAC925" }
+          ]
+        })
+      ]
+    );
+
+    expect(detail).toMatchObject({
+      code: "DHAG-2",
+      sku: "RG002",
+      productName: "Nhan item 2",
+      qtyPiece: 22,
+      plannedMaterial: "Bac 92.5",
+      materialSpec: "BAC925"
     });
   });
 });

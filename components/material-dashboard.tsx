@@ -26,6 +26,7 @@ import {
   buildStageOptionsForDropdown,
   buildStageProgress,
   computeMovementTotals,
+  orderLineKey,
   selectMovementsForOrder
 } from "@/lib/production-summary";
 import {
@@ -307,6 +308,7 @@ export function MaterialDashboard() {
     setProductionHeaders,
     setOrders,
     setSelectedOrderCode,
+    setSelectedItemSku,
     setRecentCreatedOrderCode,
     isProductionFormOpen,
     setIsProductionFormOpen,
@@ -357,7 +359,7 @@ export function MaterialDashboard() {
     setEditingProductionCode(selectedOrderSummary.code);
     setProductionHeaderDraft(buildProductionHeaderDraftFromSummary(selectedOrderSummary));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProductionDetailOpen, selectedOrderSummary?.code, selectedOrderSummary?.status]);
+  }, [isProductionDetailOpen, selectedOrderSummary?.code, selectedOrderSummary?.sku, selectedOrderSummary?.status]);
 
   const selectedOrderMovements = useMemo(
     () => selectMovementsForOrder(orders, selectedOrderSummary?.code, selectedOrderSummary?.sku),
@@ -451,6 +453,7 @@ export function MaterialDashboard() {
     setOrders,
     setMovementDraftCache,
     setSelectedOrderCode,
+    setSelectedItemSku,
     setActiveModule,
     reloadOperationalData,
     pushAudit,
@@ -654,8 +657,11 @@ export function MaterialDashboard() {
   }
   function prepareMovementForSummary(summary: OrderSummary | null, stageOverride?: string) {
     if (!summary) return;
-    const cachedDraft = movementDraftCache[summary.code];
-    const latestMovement = orders.find((order) => order.code === summary.code);
+    const lineKey = orderLineKey(summary.code, summary.sku);
+    const cachedDraft = movementDraftCache[lineKey] ?? movementDraftCache[summary.code];
+    const latestMovement =
+      selectedOrderMovements[0] ??
+      orders.find((order) => order.code === summary.code && (order.itemSku || order.sku) === summary.sku);
     const headerFallback = productionHeaders.find((header) => header.code === summary.code);
 
     setDraft((current) => {
@@ -670,6 +676,7 @@ export function MaterialDashboard() {
       });
     });
     setSelectedOrderCode(summary.code);
+    setSelectedItemSku(summary.sku || null);
     setQuery(summary.code);
     setStatus("Tất cả");
     setEditingMovementId(null);
@@ -760,6 +767,7 @@ export function MaterialDashboard() {
         const savedSeed = isSupabaseConfigured ? await createMaterialMovement(seedMovement) : seedMovement;
         setOrders((current) => [savedSeed, ...current.filter((item) => item.id !== savedSeed.id)]);
         setSelectedOrderCode(savedSeed.code);
+        setSelectedItemSku(savedSeed.itemSku || savedSeed.sku || null);
         setQuery(savedSeed.code);
       }
 
@@ -773,6 +781,7 @@ export function MaterialDashboard() {
       }
 
       setSelectedOrderCode(selectedOrderSummary.code);
+      setSelectedItemSku(selectedOrderSummary.sku || null);
       setQuery(selectedOrderSummary.code);
       setStatus("Tất cả");
       setActiveModule("Nhật ký NVL");
@@ -798,6 +807,7 @@ export function MaterialDashboard() {
       }
 
       setSelectedOrderCode(selectedOrderSummary.code);
+      setSelectedItemSku(selectedOrderSummary.sku || null);
       pushAudit("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`);
       await createAuditLog("reopen_production_order", `Mở lại LSX ${selectedOrderSummary.code} để cập nhật phát sinh mới`, selectedOrderMovements[0]?.id);
     } catch (error) {

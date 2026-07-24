@@ -36,7 +36,7 @@ type ProductionOrderDetailDrawerProps = {
   parentOrder: OrderSummary | null;
   childOrders: OrderSummary[];
   onClose: () => void;
-  onSelectOrder: (code: string) => void;
+  onSelectOrder: (code: string, itemSku?: string) => void;
   onOpenMovementForStage: (stageCode: string) => void;
   onViewMovements: () => void;
   onSaveEdit: () => void;
@@ -129,7 +129,7 @@ export function ProductionOrderDetailDrawer({
                           <button
                             type="button"
                             className="font-semibold text-jade underline hover:text-jade/80"
-                            onClick={() => onSelectOrder(parentOrder.code)}
+                            onClick={() => onSelectOrder(parentOrder.code, parentOrder.sku)}
                           >
                             {parentOrder.code}
                           </button>
@@ -146,7 +146,7 @@ export function ProductionOrderDetailDrawer({
                               <button
                                 type="button"
                                 className="font-semibold text-jade underline hover:text-jade/80"
-                                onClick={() => onSelectOrder(child.code)}
+                                onClick={() => onSelectOrder(child.code, child.sku)}
                               >
                                 {child.code}
                               </button>

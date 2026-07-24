@@ -39,6 +39,7 @@ export type ProductionOrdersDeps = {
   setProductionHeaders: Dispatch<SetStateAction<ProductionOrderHeader[]>>;
   setOrders: Dispatch<SetStateAction<ProductionOrder[]>>;
   setSelectedOrderCode: (code: string | null) => void;
+  setSelectedItemSku: (sku: string | null) => void;
   setRecentCreatedOrderCode: (code: string | null) => void;
   isProductionFormOpen: boolean;
   setIsProductionFormOpen: (open: boolean) => void;
@@ -58,6 +59,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     setProductionHeaders,
     setOrders,
     setSelectedOrderCode,
+    setSelectedItemSku,
     setRecentCreatedOrderCode,
     isProductionFormOpen,
     setIsProductionFormOpen,
@@ -362,6 +364,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       }
       setProductionHeaderDraftCache(nextHeaderDraftCache);
       setSelectedOrderCode(nextHeader.code);
+      setSelectedItemSku(nextHeader.sku || null);
       setRecentCreatedOrderCode(nextHeader.code);
       setProductionHeaderDraft(createEmptyProductionOrderHeaderDraft());
       setIsProductionFormOpen(false);
@@ -432,29 +435,32 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
           return [{ ...nextHeader, id: saved.id }, ...withoutOld];
         });
         setOrders((current) =>
-          current.map((order) =>
-            order.code === editingProductionCode
-              ? {
+          current.map((order) => {
+            if (order.code !== editingProductionCode) return order;
+            const movementItemSku = order.itemSku || order.sku;
+            const matchingItem = items.find((item) => item.sku === movementItemSku) ?? (items.length === 1 ? items[0] : undefined);
+            return {
                   ...order,
                   code: nextHeader.code,
-                  sku: nextHeader.sku,
-                  productName: nextHeader.productName,
+                  sku: matchingItem?.sku ?? order.sku,
+                  itemSku: matchingItem?.sku ?? order.itemSku,
+                  productName: matchingItem?.productName ?? order.productName,
                   destination: nextHeader.destination,
                   orderDate: nextHeader.orderDate,
                   documentNo: nextHeader.documentNo,
                   documentInNo: nextHeader.documentInNo,
                   documentLineNo: nextHeader.documentLineNo,
                   movementType: nextHeader.movementType,
-                  qtyPiece: nextHeader.qtyPiece,
+                  qtyPiece: Number(matchingItem?.quantityPiece ?? order.qtyPiece ?? nextHeader.qtyPiece),
                   occurredDate: nextHeader.occurredDate || nextHeader.plannedDate || order.occurredDate,
-                  stage: nextHeader.plannedStage || order.stage,
-                  worker: nextHeader.plannedWorker || order.worker,
-                  material: nextHeader.plannedMaterial || order.material,
+                  stage: order.stage || nextHeader.plannedStage,
+                  worker: order.worker || nextHeader.plannedWorker,
+                  material: order.material || matchingItem?.plannedMaterial || nextHeader.plannedMaterial,
                   issued: nextHeader.issued || order.issued,
                   returned: nextHeader.returned || order.returned,
                   powder: nextHeader.powder,
                   transferred: nextHeader.transferred,
-                  goldAge: nextHeader.plannedGoldAge || order.goldAge,
+                  goldAge: matchingItem?.plannedGoldAge || nextHeader.plannedGoldAge || order.goldAge,
                   lossPeriod: nextHeader.lossPeriod || order.lossPeriod,
                   nxtPeriod: nextHeader.nxtPeriod || order.nxtPeriod,
                   sourceMaterialName: nextHeader.sourceMaterialName || order.sourceMaterialName,
@@ -462,18 +468,18 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
                   importSource: nextHeader.importSource || order.importSource,
                   exportSource: nextHeader.exportSource || order.exportSource,
                   nxtLinkCode: nextHeader.nxtLinkCode || order.nxtLinkCode,
-                  materialType: nextHeader.plannedMaterialType || order.materialType,
+                  materialType: matchingItem?.plannedMaterialType || nextHeader.plannedMaterialType || order.materialType,
                   convertedIssueWeight: nextHeader.convertedIssueWeight || order.convertedIssueWeight,
                   convertedReturnWeight: nextHeader.convertedReturnWeight || order.convertedReturnWeight,
                   loss: Math.max(0, Number(((nextHeader.issued || order.issued) - (nextHeader.returned || order.returned) - (nextHeader.transferred || 0)).toFixed(4))),
                   status: nextHeader.status
-                }
-              : order
-          )
+                };
+          })
         );
       }
       setProductionHeaderDraftCache(nextHeaderDraftCache);
       setSelectedOrderCode(nextHeader.code);
+      setSelectedItemSku(nextHeader.sku || null);
       // Thoat khoi che do sua sau khi luu thanh cong, quay lai xem thong tin
       // (da cap nhat) o dang chi doc - truoc day giu nguyen editingProductionCode
       // nen form sua "khong dong lai" du da luu xong.
