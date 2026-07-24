@@ -396,7 +396,12 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     await createProductionOrderFromHeader();
   }
 
-  async function updateProductionOrderFromHeader(draftOverride?: HeaderDraft) {
+  // exitEditMode: mac dinh true (luu tu form/sidebar sua binh thuong ->
+  // thoat che do sua, quay lai xem chi doc). Truyen false cho cac hanh
+  // dong "quick update" (VD doi Trang thai LSX 1-cham) de KHONG tat/bat
+  // lai che do sua - tranh sidebar bi nhap nhay chuyen qua lai giua giao
+  // dien sua va giao dien chi doc trong luc cho Supabase phan hoi.
+  async function updateProductionOrderFromHeader(draftOverride?: HeaderDraft, exitEditMode = true) {
     if (!editingProductionCode) return;
 
     const effectiveDraft = draftOverride ?? productionHeaderDraft;
@@ -487,11 +492,13 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
       setProductionHeaderDraftCache(nextHeaderDraftCache);
       setSelectedOrderCode(nextHeader.code);
       setSelectedItemSku(nextHeader.sku || null);
-      // Thoat khoi che do sua sau khi luu thanh cong, quay lai xem thong tin
-      // (da cap nhat) o dang chi doc - truoc day giu nguyen editingProductionCode
-      // nen form sua "khong dong lai" du da luu xong.
-      setEditingProductionCode(null);
-      setIsProductionFormOpen(false);
+      if (exitEditMode) {
+        // Thoat khoi che do sua sau khi luu thanh cong, quay lai xem thong tin
+        // (da cap nhat) o dang chi doc - truoc day giu nguyen editingProductionCode
+        // nen form sua "khong dong lai" du da luu xong.
+        setEditingProductionCode(null);
+        setIsProductionFormOpen(false);
+      }
       pushAudit("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`);
       await createAuditLog("update_production_order", `Cập nhật LSX ${editingProductionCode} -> ${nextHeader.code}`, saved.id);
     } catch (error) {
@@ -505,11 +512,9 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
   // setState chua kip render lai truoc khi goi ham luu.
   async function quickUpdateDeliveryStatus(status: string) {
     if (!editingProductionCode) return;
-    const code = editingProductionCode;
     const nextDraft = { ...productionHeaderDraft, deliveryStatus: status };
     setProductionHeaderDraft(nextDraft);
-    await updateProductionOrderFromHeader(nextDraft);
-    setEditingProductionCode(code);
+    await updateProductionOrderFromHeader(nextDraft, false);
   }
 
   return {

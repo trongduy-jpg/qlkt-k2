@@ -23,7 +23,6 @@ import {
   buildLossReportRows,
   buildOrderSummaries,
   buildStageOptionsForDropdown,
-  orderLineKey,
   selectMovementsForOrder
 } from "@/lib/production-summary";
 import {
@@ -87,7 +86,7 @@ import {
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { loadAppUsers } from "@/lib/auth-service";
 import { getModuleFromPath, getPathForModule } from "@/lib/navigation";
-import { buildMovementDraftFromSummary, buildSeedMovementFromSummary } from "@/lib/use-cases/material-movement-drafts";
+import { buildSeedMovementFromSummary } from "@/lib/use-cases/material-movement-drafts";
 
 function normalizeStageCode(stage: string) {
   return normalizeProductionStageCode(stage);
@@ -280,13 +279,11 @@ export function MaterialDashboard() {
   // chi tiet, dong/mo lai LSX, xem NK NVL cua don do) da tach ra hook rieng.
   const {
     selectedOrderSummary,
-    selectedOrderMovements,
     childOrdersOfSelected,
     selectedOrderMovementStats,
     selectedOrderDetail,
     parentOrderOfSelected,
     isEditingSelectedOrder,
-    selectedOrderStageProgress,
     selectProductionOrder,
     viewSelectedOrderMovements,
     closeSelectedProductionOrder,
@@ -298,7 +295,6 @@ export function MaterialDashboard() {
     setProductionHeaders,
     orderSummaries,
     filteredOrderSummaries,
-    stageOptionsForDropdown,
     selectedOrderCode,
     setSelectedOrderCode,
     selectedItemSku,
@@ -525,41 +521,6 @@ export function MaterialDashboard() {
       />
     );
   }
-  function prepareMovementForSummary(summary: OrderSummary | null, stageOverride?: string) {
-    if (!summary) return;
-    const lineKey = orderLineKey(summary.code, summary.sku);
-    const cachedDraft = movementDraftCache[lineKey] ?? movementDraftCache[summary.code];
-    const latestMovement =
-      selectedOrderMovements[0] ??
-      orders.find((order) => order.code === summary.code && (order.itemSku || order.sku) === summary.sku);
-    const headerFallback = productionHeaders.find((header) => header.code === summary.code);
-
-    setDraft((current) => {
-      return buildMovementDraftFromSummary({
-        summary,
-        currentDraft: current,
-        cachedDraft,
-        latestMovement,
-        header: headerFallback,
-        stageOverride,
-        stageMovements: selectedOrderMovements
-      });
-    });
-    setSelectedOrderCode(summary.code);
-    setSelectedItemSku(summary.sku || null);
-    setQuery(summary.code);
-    setStatus("Tất cả");
-    setEditingMovementId(null);
-    setMovementFormTab(stageOverride ? "stage" : "info");
-    setIsMovementFormOpen(true);
-    setActiveModule("Nhật ký NVL");
-    setRemoteError(null);
-  }
-
-  function openMovementForStage(stageCode: string) {
-    prepareMovementForSummary(selectedOrderSummary, stageCode);
-  }
-
   async function recordStageEntry(input: {
     stage: string;
     worker: string;
@@ -728,12 +689,10 @@ export function MaterialDashboard() {
             summary={selectedOrderSummary}
             editForm={renderInlineProductionEditForm()}
             movementStats={selectedOrderMovementStats}
-            stageProgress={selectedOrderStageProgress}
             parentOrder={parentOrderOfSelected}
             childOrders={childOrdersOfSelected}
             onClose={() => setIsProductionDetailOpen(false)}
             onSelectOrder={selectProductionOrder}
-            onOpenMovementForStage={openMovementForStage}
             onViewMovements={viewSelectedOrderMovements}
             onSaveEdit={saveProductionHeader}
             onCloseOrder={closeSelectedProductionOrder}

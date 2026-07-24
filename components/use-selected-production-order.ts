@@ -3,13 +3,7 @@
 import { useEffect, useMemo } from "react";
 import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
-import {
-  buildStageProgress,
-  computeMovementTotals,
-  selectMovementsForOrder,
-  type StageOption,
-  type StageProgressItem
-} from "@/lib/production-summary";
+import { computeMovementTotals, selectMovementsForOrder } from "@/lib/production-summary";
 import { buildSelectedOrderDetail, type SelectedOrderDetail } from "@/lib/production-workflow";
 import { isClosedStatus } from "@/lib/production-helpers";
 import {
@@ -30,7 +24,6 @@ export type UseSelectedProductionOrderDeps = {
   setProductionHeaders: (updater: (current: ProductionOrderHeader[]) => ProductionOrderHeader[]) => void;
   orderSummaries: OrderSummary[];
   filteredOrderSummaries: OrderSummary[];
-  stageOptionsForDropdown: StageOption[];
   selectedOrderCode: string | null;
   setSelectedOrderCode: (code: string | null) => void;
   selectedItemSku: string | null;
@@ -63,7 +56,6 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
     setProductionHeaders,
     orderSummaries,
     filteredOrderSummaries,
-    stageOptionsForDropdown,
     selectedOrderCode,
     setSelectedOrderCode,
     selectedItemSku,
@@ -139,11 +131,6 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
   }, [orderSummaries, selectedOrderDetail]);
 
   const isEditingSelectedOrder = Boolean(selectedOrderSummary && editingProductionCode === selectedOrderSummary.code);
-
-  const selectedOrderStageProgress: StageProgressItem[] = useMemo(
-    () => buildStageProgress(stageOptionsForDropdown, selectedOrderMovements),
-    [stageOptionsForDropdown, selectedOrderMovements]
-  );
 
   function selectProductionOrder(code: string, itemSku?: string) {
     setSelectedOrderCode(code);
@@ -269,7 +256,6 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
     selectedOrderDetail,
     parentOrderOfSelected,
     isEditingSelectedOrder,
-    selectedOrderStageProgress,
     selectProductionOrder,
     viewSelectedOrderMovements,
     closeSelectedProductionOrder,
