@@ -51,6 +51,8 @@ export function ProductionOrderDetailDrawer({
 }: ProductionOrderDetailDrawerProps) {
   if (!detail || !summary) return null;
 
+  const isClosedSelected = isClosedStatus(summary.status);
+
   return (
     <>
       {isOpen ? <div className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-sm" onClick={onClose} /> : null}
@@ -65,7 +67,9 @@ export function ProductionOrderDetailDrawer({
             <h3 className="font-display mt-1 text-2xl font-semibold text-ink">{summary.code}</h3>
             <p className="mt-1 text-sm text-zinc-600">
               {isEditing
-                ? "Chỉnh sửa thông tin gốc của LSX, sau đó lưu để đồng bộ lại danh sách."
+                ? isClosedSelected
+                  ? "LSX đã chốt, các trường bên dưới đang bị khoá để bảo vệ số liệu."
+                  : "Chỉnh sửa thông tin gốc của LSX, sau đó lưu để đồng bộ lại danh sách."
                 : "Panel này chỉ giữ thông tin phục vụ quyết định và thao tác tiếp theo."}
             </p>
           </div>
@@ -81,7 +85,7 @@ export function ProductionOrderDetailDrawer({
         </div>
 
         {isEditing ? (
-          <div className="shrink-0 border-b border-line bg-paper px-5 py-3">
+          <fieldset disabled={isClosedSelected} className="m-0 min-w-0 shrink-0 border-b border-line bg-paper px-5 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Trạng thái LSX</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {productionOrderDeliveryStatusOptions.map((option) => {
@@ -90,7 +94,7 @@ export function ProductionOrderDetailDrawer({
                   <button
                     key={option.value}
                     type="button"
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition-colors ${
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
                       isActive
                         ? (deliveryStatusClass[option.value] ?? "bg-ink text-white ring-ink")
                         : "bg-white text-zinc-600 ring-line hover:bg-paper"
@@ -103,12 +107,12 @@ export function ProductionOrderDetailDrawer({
                 );
               })}
             </div>
-          </div>
+          </fieldset>
         ) : null}
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
           {isEditing ? (
-            editForm
+            <fieldset disabled={isClosedSelected} className="m-0 min-w-0 border-0 p-0">{editForm}</fieldset>
           ) : (
             <div className="space-y-4">
               <div className="rounded-lg border border-line bg-white p-4 shadow-sm">
@@ -228,7 +232,16 @@ export function ProductionOrderDetailDrawer({
         </div>
 
         <div className="shrink-0 space-y-2 border-t border-line bg-white px-5 py-4">
-          {isEditing ? (
+          {isEditing && isClosedSelected ? (
+            <button
+              className="w-full rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800"
+              type="button"
+              onClick={onReopenOrder}
+              title="Mở lại LSX để chỉnh sửa thông tin gốc khi có phát sinh mới"
+            >
+              Mở lại LSX
+            </button>
+          ) : isEditing ? (
             <div className="grid gap-2 sm:grid-cols-2">
               <button
                 className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"

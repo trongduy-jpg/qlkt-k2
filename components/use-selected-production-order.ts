@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
 import { selectMovementsForOrder } from "@/lib/production-summary";
@@ -83,8 +83,23 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
     return filteredOrderSummaries.find((item) => item.code === selectedOrderCode) ?? filteredOrderSummaries[0] ?? null;
   }, [filteredOrderSummaries, selectedOrderCode, selectedItemSku]);
 
+  // Chi khoi tao che do sua/xem 1 LAN cho moi lan mo panel voi 1 don cu
+  // the (theo code+sku) - dung lastInitKeyRef de nhan biet "vua mo panel
+  // cho don nay" khac voi "dang mo san, chi co status doi" (VD nguoi dung
+  // vua bam Chot LSX ngay trong form dang sua). Neu khong co "chan" nay,
+  // hieu ung se chay lai moi khi status doi va tu dong dong form sua ngay
+  // sau khi chot xong - gay cam giac giao dien "nhay" sang layout xem
+  // khac ngoai y muon cua nguoi dung.
+  const lastInitKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!isProductionDetailOpen || !selectedOrderSummary) return;
+    if (!isProductionDetailOpen || !selectedOrderSummary) {
+      lastInitKeyRef.current = null;
+      return;
+    }
+
+    const key = `${selectedOrderSummary.code}::${selectedOrderSummary.sku}`;
+    if (lastInitKeyRef.current === key) return;
+    lastInitKeyRef.current = key;
 
     if (isClosedStatus(selectedOrderSummary.status)) {
       setEditingProductionCode(null);
@@ -94,7 +109,7 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
     setEditingProductionCode(selectedOrderSummary.code);
     setProductionHeaderDraft(buildProductionHeaderDraftFromSummary(selectedOrderSummary));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isProductionDetailOpen, selectedOrderSummary?.code, selectedOrderSummary?.sku, selectedOrderSummary?.status]);
+  }, [isProductionDetailOpen, selectedOrderSummary?.code, selectedOrderSummary?.sku]);
 
   const selectedOrderMovements = useMemo(
     () => selectMovementsForOrder(orders, selectedOrderSummary?.code, selectedOrderSummary?.sku),
