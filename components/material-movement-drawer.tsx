@@ -626,7 +626,15 @@ export function MaterialMovementDrawer({
                                     <button
                                       type="button"
                                       className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-jade/50 bg-white px-3 py-3 text-sm font-semibold text-jade hover:bg-jade/5"
-                                      onClick={() => setIsAddingNewWorker(true)}
+                                      onClick={() => {
+                                        // Neu drawer dang mo tu 1 dong tho co san (Sua NVL), draft/
+                                        // editingMovementId luc nay van con tro toi dong tho DO - phai
+                                        // reset ve trong (giong het luc bam vao tab khau) truoc khi mo
+                                        // khoi "Tho moi", neu khong luu se UPDATE de len dong tho cu
+                                        // thay vi tao dong moi, lam mat du lieu tho truoc do.
+                                        onSelectStage(activeStageCode);
+                                        setIsAddingNewWorker(true);
+                                      }}
                                     >
                                       <Plus size={15} />
                                       Thêm thợ mới cho khâu này
