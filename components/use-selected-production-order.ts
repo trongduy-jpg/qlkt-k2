@@ -3,7 +3,7 @@
 import { useEffect, useMemo } from "react";
 import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
-import { computeMovementTotals, selectMovementsForOrder } from "@/lib/production-summary";
+import { selectMovementsForOrder } from "@/lib/production-summary";
 import { buildSelectedOrderDetail, type SelectedOrderDetail } from "@/lib/production-workflow";
 import { isClosedStatus } from "@/lib/production-helpers";
 import {
@@ -116,8 +116,6 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
       return true;
     });
   }, [orderSummaries, selectedOrderSummary]);
-
-  const selectedOrderMovementStats = useMemo(() => computeMovementTotals(selectedOrderMovements), [selectedOrderMovements]);
 
   const selectedOrderDetail: SelectedOrderDetail | null = useMemo(
     () => buildSelectedOrderDetail(selectedOrderSummary, selectedOrderMovements, productionHeaders),
@@ -252,7 +250,6 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
     selectedOrderSummary,
     selectedOrderMovements,
     childOrdersOfSelected,
-    selectedOrderMovementStats,
     selectedOrderDetail,
     parentOrderOfSelected,
     isEditingSelectedOrder,

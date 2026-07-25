@@ -280,7 +280,6 @@ export function MaterialDashboard() {
   const {
     selectedOrderSummary,
     childOrdersOfSelected,
-    selectedOrderMovementStats,
     selectedOrderDetail,
     parentOrderOfSelected,
     isEditingSelectedOrder,
@@ -687,7 +686,6 @@ export function MaterialDashboard() {
             detail={selectedOrderDetail}
             summary={selectedOrderSummary}
             editForm={renderInlineProductionEditForm()}
-            movementStats={selectedOrderMovementStats}
             parentOrder={parentOrderOfSelected}
             childOrders={childOrdersOfSelected}
             onClose={() => setIsProductionDetailOpen(false)}

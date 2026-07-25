@@ -4,13 +4,11 @@ import type { ReactNode } from "react";
 import { Link2, X } from "lucide-react";
 import {
   DetailGroup,
-  DetailInlineList,
-  InfoMetric
+  DetailInlineList
 } from "@/components/production-ui";
 import { formatDisplayDate } from "@/lib/production-business-rules";
 import {
   deliveryStatusClass,
-  formatGram,
   isClosedStatus,
   statusClass
 } from "@/lib/production-helpers";
@@ -18,20 +16,12 @@ import { productionOrderDeliveryStatusOptions } from "@/lib/production-journal-o
 import type { OrderSummary } from "@/lib/production-types";
 import type { SelectedOrderDetail } from "@/lib/production-workflow";
 
-type MovementStats = {
-  issued: number;
-  returned: number;
-  powder: number;
-  loss: number;
-};
-
 type ProductionOrderDetailDrawerProps = {
   isOpen: boolean;
   isEditing: boolean;
   detail: SelectedOrderDetail | null;
   summary: OrderSummary | null;
   editForm: ReactNode;
-  movementStats: MovementStats;
   parentOrder: OrderSummary | null;
   childOrders: OrderSummary[];
   onClose: () => void;
@@ -49,7 +39,6 @@ export function ProductionOrderDetailDrawer({
   detail,
   summary,
   editForm,
-  movementStats,
   parentOrder,
   childOrders,
   onClose,
@@ -180,13 +169,6 @@ export function ProductionOrderDetailDrawer({
                     </div>
                   ) : null}
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <InfoMetric label="Tổng xuất" value={formatGram(movementStats.issued)} />
-                <InfoMetric label="Tổng nhập" value={formatGram(movementStats.returned)} />
-                <InfoMetric label="Bột" value={formatGram(movementStats.powder)} />
-                <InfoMetric label="Hao hụt" value={formatGram(movementStats.loss)} />
               </div>
 
               <div className="grid gap-3 xl:grid-cols-2">
