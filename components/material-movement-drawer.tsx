@@ -225,11 +225,11 @@ export function MaterialMovementDrawer({
                 </span>
               ) : null}
             </div>
-            <p className="mt-1.5 text-xs leading-5 text-zinc-500">
-              {isEditing
-                ? "Thông tin gốc của LSX đã khoá, sửa tại màn Lệnh sản xuất nếu cần."
-                : "Ưu tiên nhập theo thứ tự từ trên xuống để tránh ghi nhầm giao dịch."}
-            </p>
+            {isEditing ? (
+              <p className="mt-1.5 text-xs leading-5 text-zinc-500">
+                Thông tin gốc của LSX đã khoá, sửa tại màn Lệnh sản xuất nếu cần.
+              </p>
+            ) : null}
           </div>
 
           <div className="inline-flex flex-wrap gap-1 rounded-full border border-line bg-paper p-1">
@@ -266,11 +266,7 @@ export function MaterialMovementDrawer({
                       onChange={(event) => onDraftChange("code", event.target.value)}
                     />
                   </FieldShell>
-                  <FieldShell
-                    label="Mã hàng"
-                    required
-                    hint={itemsForDraft.length > 0 ? "LSX này có nhiều Mã hàng, chọn đúng Mã hàng cần ghi nhận." : undefined}
-                  >
+                  <FieldShell label="Mã hàng" required>
                     {itemsForDraft.length > 0 ? (
                       <SelectControl
                         value={draft.itemSku || draft.sku}
@@ -295,7 +291,7 @@ export function MaterialMovementDrawer({
                   </FieldShell>
                 </div>
                 <div className={`mt-3 ${balancedTwoColumnGrid}`}>
-                  <FieldShell label="Loại NVL" hint="Nhóm nguyên liệu/BTP/bột/phụ kiện.">
+                  <FieldShell label="Loại NVL">
                     <SearchableSelect
                       value={draft.materialType ?? ""}
                       onChange={(value) => onDraftChange("materialType", value)}
@@ -362,7 +358,7 @@ export function MaterialMovementDrawer({
                   ? "Nhập Mã LSX ở tab Thông tin trước rồi mới ghi nhận khâu."
                   : requiresItemSelection
                     ? "LSX này có nhiều Mã hàng — chọn đúng Mã hàng cần ghi nhận trước."
-                    : "Bấm vào từng khâu để mở và điền Thợ/Xuất/Nhập; điền xong bấm Lưu để đóng khâu rồi chuyển sang khâu kế."
+                    : undefined
               }
             >
               {!draft.code.trim() ? (
@@ -436,7 +432,7 @@ export function MaterialMovementDrawer({
                           </span>
                           <div className="min-w-0 flex-1">
                             <p className={`truncate text-sm font-semibold ${active || done ? "text-ink" : "text-zinc-600"}`}>
-                              {item.label}
+                              {item.value}
                             </p>
                             <p className="text-[11px] text-zinc-400">{single ? "1 thợ" : "Nhiều thợ"}</p>
                           </div>
