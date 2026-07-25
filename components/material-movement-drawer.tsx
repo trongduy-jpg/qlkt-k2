@@ -254,7 +254,7 @@ export function MaterialMovementDrawer({
             <>
               <DrawerSection
                 title="Thông tin LSX"
-                note={isEditing ? "Mã LSX đã khoá; các trường còn lại vẫn sửa được và áp dụng cho cả lệnh." : "Nhóm nhận diện đơn và sản phẩm đang thao tác."}
+                note={isEditing ? "Mã LSX đã khoá; các trường còn lại vẫn sửa được và áp dụng cho cả lệnh." : undefined}
               >
                 <div className={balancedTwoColumnGrid}>
                   <FieldShell label="Mã LSX" required>
@@ -315,7 +315,7 @@ export function MaterialMovementDrawer({
                 </div>
               </DrawerSection>
 
-              <DrawerSection title="Thông tin chứng từ" note="Phục vụ đối chiếu ngày nghiệp vụ và số chứng từ nhập/xuất.">
+              <DrawerSection title="Thông tin chứng từ">
                 <div className={balancedTwoColumnGrid}>
                   <FieldShell label="Ngày nghiệp vụ" hint="Ngày phát sinh xuất/nhập NVL." required>
                     <DateInput
@@ -489,7 +489,7 @@ export function MaterialMovementDrawer({
                                   </p>
                                 </div>
                                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                                  Mỗi thợ là 1 khối riêng. Sửa trực tiếp trong khối rồi bấm nút &quot;Lưu&quot; ở dưới đáy để lưu tất cả — không cần nút lưu riêng cho từng thợ. Muốn thêm nhiều thợ liên tiếp thì điền khối &quot;Thợ mới&quot; rồi bấm &quot;Thêm thợ vào khâu&quot;.
+                                  Mỗi thợ là 1 khối riêng, bấm &quot;Lưu&quot; ở dưới đáy để lưu tất cả.
                                 </p>
 
                                 <div className="mt-3 grid gap-2">
@@ -623,9 +623,6 @@ export function MaterialMovementDrawer({
                                             Không thể lưu: trạng thái &quot;Xác định&quot; chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến. Đổi lại &quot;Trạng thái tính hao&quot; để tiếp tục lưu.
                                           </div>
                                         ) : null}
-                                        <p className="mt-3 text-xs leading-5 text-zinc-500">
-                                          Điền xong thợ này thì bấm &quot;Lưu&quot; ở dưới đáy để lưu cùng các thợ khác. Chỉ bấm &quot;Thêm thợ&quot; ở trên nếu muốn nhập tiếp 1 thợ khác ngay bây giờ.
-                                        </p>
                                       </div>
                                     </div>
                                   ) : (
@@ -656,7 +653,7 @@ export function MaterialMovementDrawer({
 
         <div className="shrink-0 border-t border-line bg-white/95 px-5 py-3 shadow-[0_-10px_30px_rgba(15,23,42,0.06)]">
           <p className="text-xs leading-5 text-zinc-500">
-            Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Mỗi khâu có mục &quot;Nâng cao&quot; riêng cho NXT/hao hụt; nút lưu luôn ở dưới đáy.
+            Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc.
           </p>
           {isMultiWorkerStageActive && dirtyRowMovements.length > 0 ? (
             <div className="mt-1 rounded-md border border-jade/30 bg-jade/10 px-3 py-2 text-xs font-medium text-emerald-800">
@@ -727,7 +724,7 @@ function StageEntryFields({
 }) {
   return (
     <>
-      <FieldShell label="Thợ phụ trách" hint="Danh sách thợ được lọc theo công đoạn nếu có dữ liệu." required>
+      <FieldShell label="Thợ phụ trách" required>
         <SelectControl value={values.worker} onChange={(value) => onFieldChange("worker", value)}>
           <option value="">Chọn thợ</option>
           {workerOptionsForDraft.map((worker) => (
@@ -813,7 +810,7 @@ function StageEntryFields({
                 ))}
               </SelectControl>
             </FieldShell>
-            <FieldShell label="Mã nối NXT" hint="Gõ để tìm nhanh trong danh sách.">
+            <FieldShell label="Mã nối NXT">
               <SearchableSelect
                 value={values.nxtLinkCode ?? ""}
                 onChange={(value) => onFieldChange("nxtLinkCode", value)}
