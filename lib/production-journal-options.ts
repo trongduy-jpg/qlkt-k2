@@ -2,7 +2,21 @@ export type SelectOption = {
   value: string;
   label: string;
   hint?: string;
+  // Chi dung de HIEN THI trong dropdown (VD "24K" thay vi "NL24K – Nguyen
+  // lieu Vang 24K") - "label" day du van giu nguyen de tim kiem/tooltip.
+  displayLabel?: string;
 };
+
+// Rut gon label day du ve tu cuoi cung (thuong la tuoi vang/ham luong,
+// VD "NL24K – Nguyen lieu Vang 24K" -> "24K") de dropdown gon hon, khong
+// anh huong den tim kiem/tooltip vi cac cho do van dung "label" day du.
+function withShortDisplayLabels(options: SelectOption[]): SelectOption[] {
+  return options.map((option) => {
+    const parts = option.label.trim().split(/\s+/);
+    const shortLabel = parts[parts.length - 1] || option.label;
+    return { ...option, displayLabel: shortLabel };
+  });
+}
 
 export const journalDestinations: SelectOption[] = [
   { value: "NKBC", label: "NKBC – NK Bạc/CĐ" },
@@ -226,7 +240,7 @@ export function groupNxtLinkOptions(options: SelectOption[]): Array<{ label: str
   const order: string[] = [];
   const groups = new Map<string, SelectOption[]>();
 
-  for (const option of options) {
+  for (const option of withShortDisplayLabels(options)) {
     const match = NXT_GROUP_PREFIXES.find((item) => option.value.toUpperCase().startsWith(item.prefix));
     const groupLabel = match?.label ?? "Khác";
     if (!groups.has(groupLabel)) {
@@ -250,8 +264,34 @@ export const materialTypeOptions: SelectOption[] = [
   { value: "BOT24K", label: "BOT24K – Bột 24K" },
   { value: "PK18K", label: "PK18K – Phụ kiện 18K" },
   { value: "BTPDAY18K", label: "BTPDAY18K – BTP dây 18K" },
-  { value: "BTPDAYBAC92.5", label: "BTPDAYBAC92.5 – BTP dây bạc" }
+  { value: "BTPDAYBAC92.5", label: "BTPDAYBAC92.5 – BTP dây Bạc 92.5" }
 ];
+
+const MATERIAL_TYPE_GROUP_RULES: Array<{ test: (value: string) => boolean; label: string }> = [
+  { test: (value) => value.includes("BAC"), label: "Bạc" },
+  { test: (value) => value.startsWith("BOT"), label: "Bột" },
+  { test: (value) => value.startsWith("PK"), label: "Phụ kiện" },
+  { test: (value) => value.startsWith("BTPDAY"), label: "BTP dây" },
+  { test: (value) => value.startsWith("NL"), label: "Vàng" }
+];
+
+export function groupMaterialTypeOptions(options: SelectOption[]): Array<{ label: string; options: SelectOption[] }> {
+  const order: string[] = [];
+  const groups = new Map<string, SelectOption[]>();
+
+  for (const option of withShortDisplayLabels(options)) {
+    const upperValue = option.value.toUpperCase();
+    const rule = MATERIAL_TYPE_GROUP_RULES.find((item) => item.test(upperValue));
+    const groupLabel = rule?.label ?? "Khác";
+    if (!groups.has(groupLabel)) {
+      groups.set(groupLabel, []);
+      order.push(groupLabel);
+    }
+    groups.get(groupLabel)!.push(option);
+  }
+
+  return order.map((label) => ({ label, options: groups.get(label)! }));
+}
 
 export const materialMetalOptions: SelectOption[] = [
   { value: "AU", label: "AU – Vàng" },

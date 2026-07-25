@@ -19,6 +19,7 @@ import {
   normalizeStageCode
 } from "@/lib/production-business-rules";
 import {
+  groupMaterialTypeOptions,
   groupNxtLinkOptions,
   journalDestinations,
   materialTypeOptions,
@@ -295,7 +296,7 @@ export function MaterialMovementDrawer({
                     <SearchableSelect
                       value={draft.materialType ?? ""}
                       onChange={(value) => onDraftChange("materialType", value)}
-                      groups={[{ options: getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions) }]}
+                      groups={groupMaterialTypeOptions(getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions))}
                       placeholder="Chọn loại NVL"
                       clearLabel="Chọn loại NVL"
                     />
@@ -765,13 +766,14 @@ function StageEntryFields({
       </div>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
-        <FieldShell label="Loại vàng" hint="Loại vàng/NVL đang xử lý ở khâu này.">
-          <SelectControl value={values.materialType ?? ""} onChange={(value) => onFieldChange("materialType", value)}>
-            <option value="">Chọn loại vàng</option>
-            {getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions).map((option) => (
-              <option key={option.value} value={option.value} title={option.label}>{option.label}</option>
-            ))}
-          </SelectControl>
+        <FieldShell label="Loại vàng">
+          <SearchableSelect
+            value={values.materialType ?? ""}
+            onChange={(value) => onFieldChange("materialType", value)}
+            groups={groupMaterialTypeOptions(getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions))}
+            placeholder="Chọn loại vàng"
+            clearLabel="Chọn loại vàng"
+          />
         </FieldShell>
         <FieldShell label="Trạng thái tính hao" required>
           <SelectControl value={values.status} onChange={(value) => onFieldChange("status", value as Status)}>

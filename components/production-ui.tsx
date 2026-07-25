@@ -224,8 +224,8 @@ export function SearchableSelect({
           if (event.key === "Escape") close();
         }}
       >
-        <span className={`truncate ${selectedOption ? "text-ink" : "text-zinc-400"}`}>
-          {selectedOption?.label ?? placeholder}
+        <span className={`truncate ${selectedOption ? "text-ink" : "text-zinc-400"}`} title={selectedOption?.label}>
+          {selectedOption?.displayLabel ?? selectedOption?.label ?? placeholder}
         </span>
         <ChevronDown className={`size-4 shrink-0 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
@@ -288,7 +288,7 @@ export function SearchableSelect({
                             title={option.label}
                             onClick={() => selectValue(option.value)}
                           >
-                            <span className="truncate">{option.label}</span>
+                            <span className="truncate">{option.displayLabel ?? option.label}</span>
                             {isSelected ? <Check className="size-4 shrink-0" /> : null}
                           </button>
                         );
