@@ -467,8 +467,8 @@ export function MaterialMovementDrawer({
                                   activeStageCode={activeStageCode}
                                   nangCaoLabel={
                                     isEditing && draft.worker
-                                      ? `Nâng cao — NXT / hao hụt của thợ "${draft.worker}"`
-                                      : "Nâng cao — NXT / hao hụt cho lượt nhập này"
+                                      ? `NXT / hao hụt của thợ "${draft.worker}"`
+                                      : "NXT / hao hụt cho lượt nhập này"
                                   }
                                 />
                                 {isDraftDirectChargeInvalid ? (
@@ -557,7 +557,7 @@ export function MaterialMovementDrawer({
                                               workerOptionsForDraft={workerOptionsForDraft}
                                               getDynamicOptions={getDynamicOptions}
                                               activeStageCode={activeStageCode}
-                                              nangCaoLabel={`Nâng cao — NXT / hao hụt của thợ "${values.worker || "này"}"`}
+                                              nangCaoLabel={`NXT / hao hụt của thợ "${values.worker || "này"}"`}
                                             />
                                           </div>
                                         ) : null}
@@ -612,7 +612,7 @@ export function MaterialMovementDrawer({
                                           workerOptionsForDraft={workerOptionsForDraft}
                                           getDynamicOptions={getDynamicOptions}
                                           activeStageCode={activeStageCode}
-                                          nangCaoLabel={draft.worker ? `Nâng cao — NXT / hao hụt của thợ "${draft.worker}"` : "Nâng cao — NXT / hao hụt cho thợ mới"}
+                                          nangCaoLabel={draft.worker ? `NXT / hao hụt của thợ "${draft.worker}"` : "NXT / hao hụt cho thợ mới"}
                                         />
                                         {isDraftDirectChargeInvalid ? (
                                           <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">

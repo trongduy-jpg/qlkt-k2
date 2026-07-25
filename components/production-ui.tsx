@@ -67,12 +67,12 @@ export function FieldShell({
 }) {
   return (
     <div className="grid min-w-0 gap-1.5 text-sm">
-      <span className="min-h-4 text-xs font-semibold uppercase leading-4 tracking-wide text-zinc-500">
+      <span className="min-h-4 select-none text-xs font-semibold uppercase leading-4 tracking-wide text-zinc-500">
         {label}
         {required ? <span className="ml-1 text-rose-500">*</span> : null}
       </span>
       {children}
-      {hint ? <span className="text-xs leading-5 text-zinc-500">{hint}</span> : null}
+      {hint ? <span className="select-none text-xs leading-5 text-zinc-500">{hint}</span> : null}
     </div>
   );
 }
