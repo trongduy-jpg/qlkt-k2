@@ -575,9 +575,20 @@ export function MaterialMovementDrawer({
                                         </span>
                                         Thợ mới{draft.worker ? ` · ${draft.worker}` : ""}
                                       </span>
-                                      <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold uppercase text-jade ring-1 ring-jade/40">
-                                        Đang nhập
-                                      </span>
+                                      {/* Nut "them thi lien tiep" luon la hanh dong PHU, khong duoc to
+                                          lon/dam hon nut "Luu" chinh o footer - de o day, kieu nho/vien
+                                          (khong to mau den), rieng biet voi footer thay vi mot nut lon
+                                          full-width canh tranh voi nut Luu chinh. */}
+                                      <button
+                                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-jade/50 bg-white px-2.5 py-1 text-[11px] font-semibold text-jade hover:bg-jade/10 disabled:cursor-not-allowed disabled:border-line disabled:text-zinc-400"
+                                        type="button"
+                                        onClick={() => onSave("keepStage")}
+                                        disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
+                                        title="Lưu thợ này rồi mở 1 khối trống cho thợ tiếp theo của cùng khâu."
+                                      >
+                                        <Plus size={12} />
+                                        Thêm thợ
+                                      </button>
                                     </div>
                                     <div className="border-t border-jade/30 px-3 py-3">
                                       <StageEntryFields
@@ -593,16 +604,9 @@ export function MaterialMovementDrawer({
                                           Không thể lưu: trạng thái &quot;Xác định&quot; chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến. Đổi lại &quot;Trạng thái tính hao&quot; để tiếp tục lưu.
                                         </div>
                                       ) : null}
-                                      <button
-                                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
-                                        type="button"
-                                        onClick={() => onSave("keepStage")}
-                                        disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
-                                        title="Lưu thợ này rồi mở 1 khối trống cho thợ tiếp theo của cùng khâu."
-                                      >
-                                        <Plus size={15} />
-                                        Thêm thợ vào khâu
-                                      </button>
+                                      <p className="mt-3 text-xs leading-5 text-zinc-500">
+                                        Điền xong thợ này thì bấm &quot;Lưu&quot; ở dưới đáy để lưu cùng các thợ khác. Chỉ bấm &quot;Thêm thợ&quot; ở trên nếu muốn nhập tiếp 1 thợ khác ngay bây giờ.
+                                      </p>
                                     </div>
                                   </div>
                                 </div>
