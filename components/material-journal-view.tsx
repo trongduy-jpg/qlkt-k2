@@ -2,7 +2,7 @@
 
 import { Plus } from "lucide-react";
 import type { ProductionOrder } from "@/lib/domain/production";
-import { formatDisplayDate, getStageLabel, normalizeStageCode } from "@/lib/production-business-rules";
+import { formatDisplayDate, normalizeStageCode } from "@/lib/production-business-rules";
 import { isClosedStatus, statusClass, statusOptions } from "@/lib/production-helpers";
 import type { StageOption } from "@/lib/production-summary";
 import type { StageWorkerAggregate } from "@/lib/production-workflow";
@@ -133,9 +133,7 @@ export function MaterialJournalView({
                   <td className="px-3 py-3 text-zinc-700">{order.material}</td>
                   <td className="px-3 py-3">
                     {stageIndex >= 0 ? (
-                      <div className="font-semibold text-sky-700">
-                        [{stageIndex + 1}] {getStageLabel(stageCode)}
-                      </div>
+                      <div className="font-semibold text-sky-700">[{stageIndex + 1}] {stageCode}</div>
                     ) : (
                       <div className="font-medium text-zinc-400">Chưa bắt đầu</div>
                     )}

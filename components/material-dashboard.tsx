@@ -767,8 +767,8 @@ export function MaterialDashboard() {
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="mt-0.5 text-brass" size={18} />
                   <div>
-                    <h3 className="text-base font-bold text-ink">C&#7843;nh b&#225;o v&#7853;n h&#224;nh</h3>
-                    <p className="mt-1 text-sm text-zinc-600">{alerts.length} c&#7843;nh b&#225;o c&#7847;n ki&#7875;m tra. M&#7863;c &#273;&#7883;nh thu g&#7885;n &#273;&#7875; kh&#244;ng l&#224;m nhi&#7877;u m&#224;n h&#236;nh nh&#7853;t k&#253;.</p>
+                    <h3 className="text-base font-bold text-ink">Cảnh báo vận hành</h3>
+                    <p className="mt-1 text-sm text-zinc-600">{alerts.length} cảnh báo cần kiểm tra.</p>
                   </div>
                 </div>
                 <button
