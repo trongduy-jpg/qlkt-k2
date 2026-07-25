@@ -1,11 +1,18 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { useState } from "react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import type { ProductionOrder } from "@/lib/domain/production";
 import { formatDisplayDate, normalizeStageCode } from "@/lib/production-business-rules";
 import { isClosedStatus, statusClass, statusOptions } from "@/lib/production-helpers";
 import { orderRowKey, type StageOption } from "@/lib/production-summary";
+import { ALL_LOSS_PERIODS_FILTER, ALL_NXT_PERIODS_FILTER, ALL_STAGES_FILTER } from "@/lib/production-workflow";
 import type { StageWorkerAggregate } from "@/lib/production-workflow";
+
+function formatPeriodLabel(period: string) {
+  const [year, month] = period.split("-");
+  return year && month ? `Tháng ${month}/${year}` : period;
+}
 
 type MaterialJournalViewProps = {
   isVisible: boolean;
@@ -24,12 +31,20 @@ type MaterialJournalViewProps = {
   plannedQtyByRowKey: Map<string, number>;
   query: string;
   status: (typeof statusOptions)[number];
+  stageFilter: string;
+  nxtPeriodFilter: string;
+  nxtPeriodOptions: string[];
+  lossPeriodFilter: string;
+  lossPeriodOptions: string[];
   recentCreatedOrderCode: string | null;
   recentlySavedMovementId: string | null;
   onAddMovement: () => void;
   onEditMovement: (order: ProductionOrder) => void;
   onQueryChange: (value: string) => void;
   onStatusChange: (value: (typeof statusOptions)[number]) => void;
+  onStageFilterChange: (value: string) => void;
+  onNxtPeriodFilterChange: (value: string) => void;
+  onLossPeriodFilterChange: (value: string) => void;
 };
 
 export function MaterialJournalView({
@@ -40,13 +55,23 @@ export function MaterialJournalView({
   plannedQtyByRowKey,
   query,
   status,
+  stageFilter,
+  nxtPeriodFilter,
+  nxtPeriodOptions,
+  lossPeriodFilter,
+  lossPeriodOptions,
   recentCreatedOrderCode,
   recentlySavedMovementId,
   onAddMovement,
   onEditMovement,
   onQueryChange,
+  onStageFilterChange,
+  onNxtPeriodFilterChange,
+  onLossPeriodFilterChange,
   onStatusChange
 }: MaterialJournalViewProps) {
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
@@ -70,7 +95,7 @@ export function MaterialJournalView({
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={status}
             onChange={(event) => onStatusChange(event.target.value as (typeof statusOptions)[number])}
-            aria-label="Lọc theo trạng thái vận hành"
+            aria-label="Lọc theo trạng thái tính hao"
           >
             {statusOptions.map((item) => (
               <option key={item} value={item}>
@@ -78,8 +103,60 @@ export function MaterialJournalView({
               </option>
             ))}
           </select>
+          <button
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper"
+            type="button"
+            onClick={() => setIsFilterExpanded((current) => !current)}
+          >
+            <SlidersHorizontal size={16} />
+            Lọc thêm
+          </button>
         </div>
       </div>
+
+      {isFilterExpanded ? (
+        <div className="mt-3 grid gap-2 rounded-md border border-line bg-paper p-3 md:grid-cols-3">
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={stageFilter}
+            onChange={(event) => onStageFilterChange(event.target.value)}
+            aria-label="Lọc theo công đoạn"
+          >
+            <option value={ALL_STAGES_FILTER}>{ALL_STAGES_FILTER}</option>
+            {stageOptionsForDropdown.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={nxtPeriodFilter}
+            onChange={(event) => onNxtPeriodFilterChange(event.target.value)}
+            aria-label="Lọc theo tháng NXT"
+          >
+            <option value={ALL_NXT_PERIODS_FILTER}>{ALL_NXT_PERIODS_FILTER}</option>
+            {nxtPeriodOptions.map((period) => (
+              <option key={period} value={period}>
+                {formatPeriodLabel(period)}
+              </option>
+            ))}
+          </select>
+          <select
+            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            value={lossPeriodFilter}
+            onChange={(event) => onLossPeriodFilterChange(event.target.value)}
+            aria-label="Lọc theo tháng hao"
+          >
+            <option value={ALL_LOSS_PERIODS_FILTER}>{ALL_LOSS_PERIODS_FILTER}</option>
+            {lossPeriodOptions.map((period) => (
+              <option key={period} value={period}>
+                {formatPeriodLabel(period)}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
 
       <div className="mt-4 overflow-x-auto">
         <div className="mb-3 flex items-center justify-between">

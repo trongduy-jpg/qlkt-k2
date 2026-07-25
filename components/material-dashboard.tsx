@@ -29,6 +29,10 @@ import {
 import {
   ALL_CODE_MONTHS_FILTER,
   ALL_DESTINATIONS_FILTER,
+  ALL_LOSS_PERIODS_FILTER,
+  ALL_NXT_PERIODS_FILTER,
+  ALL_STAGES_FILTER,
+  buildJournalPeriodOptions,
   buildOrderCodeMonthOptions,
   buildProductionOverview,
   buildStageWorkerAggregates,
@@ -108,6 +112,9 @@ export function MaterialDashboard() {
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<(typeof statusOptions)[number]>("Tất cả");
+  const [journalStageFilter, setJournalStageFilter] = useState(ALL_STAGES_FILTER);
+  const [journalNxtPeriodFilter, setJournalNxtPeriodFilter] = useState(ALL_NXT_PERIODS_FILTER);
+  const [journalLossPeriodFilter, setJournalLossPeriodFilter] = useState(ALL_LOSS_PERIODS_FILTER);
   const [productionDeliveryStatus, setProductionDeliveryStatus] = useState("Tất cả trạng thái LSX");
   const [productionSalesType, setProductionSalesType] = useState("Tất cả phân loại KH");
   const [productionCustomerQuery, setProductionCustomerQuery] = useState("");
@@ -211,8 +218,23 @@ export function MaterialDashboard() {
   // roi moi loc theo tu khoa/trang thai tren dong dai dien.
   const filteredOrders = useMemo(() => {
     const currentStageRows = pickCurrentStagePerOrder(orders, mainJournalStageCodes);
-    return filterJournalOrders(currentStageRows, { query, status });
-  }, [orders, query, status]);
+    return filterJournalOrders(currentStageRows, {
+      query,
+      status,
+      stage: journalStageFilter,
+      nxtPeriod: journalNxtPeriodFilter,
+      lossPeriod: journalLossPeriodFilter
+    });
+  }, [orders, query, status, journalStageFilter, journalNxtPeriodFilter, journalLossPeriodFilter]);
+
+  const journalNxtPeriodOptions = useMemo(
+    () => buildJournalPeriodOptions(orders, (order) => order.nxtPeriod),
+    [orders]
+  );
+  const journalLossPeriodOptions = useMemo(
+    () => buildJournalPeriodOptions(orders, (order) => order.lossPeriod),
+    [orders]
+  );
 
   // Xuat/Nhap/Hao hut tong hop cho TAT CA tho cung khau cua dong dai dien -
   // tranh bang chi hien so lieu cua 1 tho bat ky khi khau co nhieu tho.
@@ -727,12 +749,20 @@ export function MaterialDashboard() {
               stageOptionsForDropdown={stageOptionsForDropdown}
               query={query}
               status={status}
+              stageFilter={journalStageFilter}
+              nxtPeriodFilter={journalNxtPeriodFilter}
+              nxtPeriodOptions={journalNxtPeriodOptions}
+              lossPeriodFilter={journalLossPeriodFilter}
+              lossPeriodOptions={journalLossPeriodOptions}
               recentCreatedOrderCode={recentCreatedOrderCode}
               recentlySavedMovementId={savedMovementNotice?.id ?? null}
               onAddMovement={openEmptyMovementForm}
               onEditMovement={openMovementForEdit}
               onQueryChange={setQuery}
               onStatusChange={(nextStatus) => setStatus(nextStatus)}
+              onStageFilterChange={setJournalStageFilter}
+              onNxtPeriodFilterChange={setJournalNxtPeriodFilter}
+              onLossPeriodFilterChange={setJournalLossPeriodFilter}
             />
 
             <MaterialMovementDrawer

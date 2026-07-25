@@ -6,6 +6,9 @@ import { orderLineKey } from "@/lib/production-summary";
 
 export const ALL_DESTINATIONS_FILTER = "Tất cả cửa hàng";
 export const ALL_CODE_MONTHS_FILTER = "Tất cả tháng";
+export const ALL_STAGES_FILTER = "Tất cả công đoạn";
+export const ALL_NXT_PERIODS_FILTER = "Tất cả tháng NXT";
+export const ALL_LOSS_PERIODS_FILTER = "Tất cả tháng hao";
 
 export type ProductionSummaryFilters = {
   deliveryStatus: string;
@@ -20,7 +23,21 @@ export type ProductionSummaryFilters = {
 export type JournalOrderFilters = {
   query: string;
   status: Status | "Tất cả";
+  stage?: string;
+  nxtPeriod?: string;
+  lossPeriod?: string;
 };
+
+// Danh sach cac gia tri thang (YYYY-MM) khac nhau, khong rong, dang co
+// trong tap giao dich - dung cho dropdown loc "Thang NXT"/"Thang hao".
+export function buildJournalPeriodOptions(orders: ProductionOrder[], pickPeriod: (order: ProductionOrder) => string | undefined): string[] {
+  const periods = new Set<string>();
+  for (const order of orders) {
+    const period = pickPeriod(order);
+    if (period) periods.add(period);
+  }
+  return Array.from(periods).sort((a, b) => b.localeCompare(a));
+}
 
 export type ProductionOverview = {
   total: number;
@@ -188,8 +205,20 @@ export function filterJournalOrders(orders: ProductionOrder[], filters: JournalO
 
   return orders.filter((order) => {
     const matchStatus = filters.status === "Tất cả" || order.status === filters.status;
+    const matchStage =
+      !filters.stage || filters.stage === ALL_STAGES_FILTER || normalizeStageCode(order.stage) === filters.stage;
+    const matchNxtPeriod =
+      !filters.nxtPeriod || filters.nxtPeriod === ALL_NXT_PERIODS_FILTER || order.nxtPeriod === filters.nxtPeriod;
+    const matchLossPeriod =
+      !filters.lossPeriod || filters.lossPeriod === ALL_LOSS_PERIODS_FILTER || order.lossPeriod === filters.lossPeriod;
     const searchable = `${order.code} ${order.sku} ${order.productName || ""} ${order.material} ${order.worker} ${order.stage}`.toLowerCase();
-    return matchStatus && (!normalizedQuery || searchable.includes(normalizedQuery));
+    return (
+      matchStatus &&
+      matchStage &&
+      matchNxtPeriod &&
+      matchLossPeriod &&
+      (!normalizedQuery || searchable.includes(normalizedQuery))
+    );
   });
 }
 

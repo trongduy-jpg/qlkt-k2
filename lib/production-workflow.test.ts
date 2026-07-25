@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ProductionOrder } from "./domain/production";
 import type { OrderSummary, ProductionOrderHeader } from "./production-types";
 import {
+  buildJournalPeriodOptions,
   buildProductionOverview,
   buildSelectedOrderDetail,
   buildStageWorkerAggregates,
@@ -231,6 +232,32 @@ describe("filterJournalOrders", () => {
 
     expect(filterJournalOrders(rows, { query: "bc925", status: "Tất cả" }).map((item) => item.code)).toEqual(["DHAG-2"]);
     expect(filterJournalOrders(rows, { query: "", status: "Đang xử lý" }).map((item) => item.code)).toEqual(["DHAG-1"]);
+  });
+
+  it("loc theo cong doan, thang NXT va thang hao", () => {
+    const rows = [
+      makeMovement({ code: "DHAG-1", stage: "CKE", nxtPeriod: "2026-07", lossPeriod: "2026-06" }),
+      makeMovement({ code: "DHAG-2", stage: "NAU", nxtPeriod: "2026-08", lossPeriod: "2026-07" })
+    ];
+
+    expect(filterJournalOrders(rows, { query: "", status: "Tất cả", stage: "CKE" }).map((item) => item.code)).toEqual(["DHAG-1"]);
+    expect(filterJournalOrders(rows, { query: "", status: "Tất cả", nxtPeriod: "2026-08" }).map((item) => item.code)).toEqual(["DHAG-2"]);
+    expect(filterJournalOrders(rows, { query: "", status: "Tất cả", lossPeriod: "2026-06" }).map((item) => item.code)).toEqual(["DHAG-1"]);
+    expect(
+      filterJournalOrders(rows, { query: "", status: "Tất cả", stage: "Tất cả công đoạn" }).map((item) => item.code)
+    ).toEqual(["DHAG-1", "DHAG-2"]);
+  });
+});
+
+describe("buildJournalPeriodOptions", () => {
+  it("lay danh sach thang khac nhau, khong rong, sap xep giam dan", () => {
+    const rows = [
+      makeMovement({ id: "a", nxtPeriod: "2026-06" }),
+      makeMovement({ id: "b", nxtPeriod: "2026-08" }),
+      makeMovement({ id: "c", nxtPeriod: "2026-06" }),
+      makeMovement({ id: "d", nxtPeriod: undefined })
+    ];
+    expect(buildJournalPeriodOptions(rows, (order) => order.nxtPeriod)).toEqual(["2026-08", "2026-06"]);
   });
 });
 
