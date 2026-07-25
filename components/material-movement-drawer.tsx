@@ -468,9 +468,18 @@ export function MaterialMovementDrawer({
 
                             <details className="mt-3 rounded-md border border-line bg-paper/50">
                               <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                                Nâng cao — NXT / hao hụt của khâu này
+                                {isEditing && draft.worker
+                                  ? `Nâng cao — NXT / hao hụt của thợ "${draft.worker}"`
+                                  : "Nâng cao — NXT / hao hụt cho lượt nhập này"}
                               </summary>
                               <div className="border-t border-line/70 p-3">
+                                {!single ? (
+                                  <p className="mb-3 text-xs leading-5 text-zinc-500">
+                                    Mỗi thợ trong khâu này có NXT/hao hụt riêng - các trường bên dưới chỉ áp dụng cho
+                                    {draft.worker ? ` thợ "${draft.worker}"` : " thợ đang nhập ở trên"}, không dùng chung cho cả khâu.
+                                    Muốn sửa của thợ khác, bấm sửa (biểu tượng bút) ở dòng thợ đó trong danh sách bên dưới.
+                                  </p>
+                                ) : null}
                                 <div className={balancedTwoColumnGrid}>
                                   <FieldShell label="Tuổi vàng" required>
                                     <SelectControl value={String(draft.goldAge ?? "")} onChange={(value) => onDraftChange("goldAge", Number(value))}>
