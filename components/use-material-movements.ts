@@ -357,6 +357,7 @@ export function useMaterialMovements({
         ...current,
         id: "",
         stage: stageCode,
+        stageStatus: existing?.stageStatus ?? "Đang thực hiện",
         worker: "",
         qtyPiece: 0,
         issued: 0,
