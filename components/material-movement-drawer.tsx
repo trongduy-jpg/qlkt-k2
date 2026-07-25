@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, ChevronDown, Pencil, Plus, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, ChevronDown, Plus, Trash2, X } from "lucide-react";
 import {
   DateInput,
   DrawerSection,
@@ -11,7 +12,7 @@ import {
 } from "@/components/production-ui";
 import type { ProductionOrder, Status } from "@/lib/domain/production";
 import type { ProductionOrderItem, WorkerMaster } from "@/lib/material-service";
-import { formatGram, isClosedStatus } from "@/lib/production-helpers";
+import { isClosedStatus } from "@/lib/production-helpers";
 import {
   getStageLabel,
   isSingleWorkerStage,
@@ -32,6 +33,8 @@ import {
 import type { StageOption } from "@/lib/production-summary";
 
 type MovementFormTab = "info" | "stage";
+
+const balancedTwoColumnGrid = "grid gap-3 md:grid-cols-2";
 
 // Mau nhan trang thai cong doan hien o ben phai moi dong khau trong accordion.
 function stageStatusPillClass(status?: string) {
@@ -69,7 +72,7 @@ type MaterialMovementDrawerProps = {
   onSelectStage: (stageCode: string) => void;
   onSave: (resetMode?: "close" | "clearStage" | "keepStage") => void;
   onRemoveMovement: (id: string) => void;
-  onEditStageMovement: (order: ProductionOrder) => void;
+  onUpdateStageMovement: (order: ProductionOrder) => void;
   onSelectItem: (item: { sku: string; productName?: string }) => void;
 };
 
@@ -93,20 +96,46 @@ export function MaterialMovementDrawer({
   onSelectStage,
   onSave,
   onRemoveMovement,
-  onEditStageMovement,
+  onUpdateStageMovement,
   onSelectItem
 }: MaterialMovementDrawerProps) {
+  // Moi tho da ghi nhan trong khau nhieu tho gio la 1 khoi nhap lieu day du,
+  // sua truc tiep tai cho (khong con "bien mat" khoi khu vuc nhap khi luu) -
+  // rowEdits giu cac thay doi CHUA luu cua tung dong, tach biet voi draft
+  // (draft chi con dung cho "them tho moi"). Reset moi khi doi khau/Ma hang
+  // dang xem de tranh dinh du lieu cua khau truoc sang.
+  const [rowEdits, setRowEdits] = useState<Record<string, Partial<ProductionOrder>>>({});
+  const activeStageCodeForReset = normalizeStageCode(draft.stage);
+  useEffect(() => {
+    setRowEdits({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, draft.code, draft.itemSku || draft.sku, activeStageCodeForReset]);
+
   if (!isOpen) return null;
 
   const isEditing = Boolean(editingMovementId);
   const activeStageCode = normalizeStageCode(draft.stage);
-  const balancedTwoColumnGrid = "grid gap-3 md:grid-cols-2";
   // Ma hang dang duoc chon de ghi nhan cong doan. Neu LSX co danh sach Ma
   // hang chinh thuc (tao qua man Lenh san xuat), bat buoc chon truoc khi
   // hien accordion khau; neu chua co danh sach (VD ghi giao dich truoc khi
   // tao LSX) thi dung tam Ma hang go tay o tab Thong tin nhu truoc.
   const selectedItemSku = draft.itemSku || draft.sku;
   const requiresItemSelection = itemsForDraft.length > 0 && !selectedItemSku.trim();
+
+  function updateRowEdit<K extends keyof ProductionOrder>(movementId: string, key: K, value: ProductionOrder[K]) {
+    setRowEdits((current) => ({ ...current, [movementId]: { ...current[movementId], [key]: value } }));
+  }
+
+  function saveRowEdit(movement: ProductionOrder) {
+    const edits = rowEdits[movement.id];
+    if (!edits) return;
+    onUpdateStageMovement({ ...movement, ...edits });
+    setRowEdits((current) => {
+      const next = { ...current };
+      delete next[movement.id];
+      return next;
+    });
+  }
 
   return (
     <div>
@@ -477,7 +506,7 @@ export function MaterialMovementDrawer({
                                   <p className="mb-3 text-xs leading-5 text-zinc-500">
                                     Mỗi thợ trong khâu này có NXT/hao hụt riêng - các trường bên dưới chỉ áp dụng cho
                                     {draft.worker ? ` thợ "${draft.worker}"` : " thợ đang nhập ở trên"}, không dùng chung cho cả khâu.
-                                    Muốn sửa của thợ khác, bấm sửa (biểu tượng bút) ở dòng thợ đó trong danh sách bên dưới.
+                                    Muốn sửa của thợ khác, cuộn xuống danh sách &quot;Thợ đã ghi nhận&quot; bên dưới và sửa trực tiếp trong khối của thợ đó.
                                   </p>
                                 ) : null}
                                 <div className={balancedTwoColumnGrid}>
@@ -561,67 +590,87 @@ export function MaterialMovementDrawer({
                             </details>
 
                             {single ? null : (
-                              <div className="mt-3 rounded-md border border-dashed border-line bg-white p-3">
-                                <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                                  Thợ đã ghi nhận cho khâu này ({currentDrawerStageMovements.length})
-                                </p>
-                                {currentDrawerStageMovements.length > 0 ? (
-                                  <div className="mt-2 grid gap-1.5">
-                                    {currentDrawerStageMovements.map((movement) => {
-                                      const isBeingEdited = movement.id === editingMovementId;
-                                      return (
-                                        <div
-                                          key={movement.id}
-                                          className={`flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-xs ${
-                                            isBeingEdited ? "border-jade bg-jade/10" : "border-line bg-paper"
-                                          }`}
-                                        >
-                                          <span className="font-medium text-zinc-800">
-                                            {movement.worker || "(chưa có thợ)"}
-                                            {isBeingEdited ? <span className="ml-1.5 text-[10px] font-semibold uppercase text-jade">Đang sửa</span> : null}
-                                          </span>
-                                          <div className="flex flex-wrap items-center gap-3 text-zinc-600">
-                                            <span>Xuất {formatGram(movement.issued)}</span>
-                                            <span>Nhập {formatGram(movement.returned)}</span>
-                                            <button
-                                              className="inline-flex size-6 items-center justify-center rounded-md border border-line bg-white text-zinc-600 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50"
-                                              type="button"
-                                              title="Sửa thông tin thợ này"
-                                              aria-label="Sửa thông tin thợ này"
-                                              disabled={isBeingEdited}
-                                              onClick={() => onEditStageMovement(movement)}
-                                            >
-                                              <Pencil size={12} />
-                                            </button>
-                                            <button
-                                              className="inline-flex size-6 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                              type="button"
-                                              title="Xóa thợ này khỏi khâu"
-                                              aria-label="Xóa thợ này khỏi khâu"
-                                              disabled={isClosedStatus(movement.status)}
-                                              onClick={() => onRemoveMovement(movement.id)}
-                                            >
-                                              <Trash2 size={12} />
-                                            </button>
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                ) : (
-                                  <p className="mt-1 text-xs text-zinc-400">Chưa có thợ nào. Điền Thợ/Xuất/Nhập ở trên rồi bấm &quot;Thêm thợ vào khâu&quot;.</p>
-                                )}
+                              <>
                                 <button
-                                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
                                   type="button"
                                   onClick={() => onSave("keepStage")}
                                   disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
-                                  title="Lưu thợ đang nhập rồi để trống cho thợ tiếp theo của cùng khâu. Đánh dấu hoàn thành khâu ở ô Trạng thái công đoạn phía trên."
+                                  title="Lưu thợ đang nhập rồi mở thêm 1 khối nhập mới cho thợ tiếp theo của cùng khâu. Đánh dấu hoàn thành khâu ở ô Trạng thái công đoạn phía trên."
                                 >
                                   <Plus size={15} />
                                   Thêm thợ vào khâu
                                 </button>
-                              </div>
+
+                                <div className="mt-4 border-t border-dashed border-line pt-3">
+                                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                                    Thợ đã ghi nhận cho khâu này ({currentDrawerStageMovements.length})
+                                  </p>
+                                  <p className="mt-1 text-xs leading-5 text-zinc-500">
+                                    Mỗi thợ giữ nguyên khối nhập liệu đầy đủ của mình - sửa trực tiếp bên dưới rồi bấm &quot;Cập nhật thợ này&quot;, không bị thu gọn về 1 dòng tóm tắt.
+                                  </p>
+                                  {currentDrawerStageMovements.length > 0 ? (
+                                    <div className="mt-3 grid gap-3">
+                                      {currentDrawerStageMovements.map((movement) => {
+                                        const edits = rowEdits[movement.id];
+                                        const values = edits ? { ...movement, ...edits } : movement;
+                                        const isDirty = Boolean(edits && Object.keys(edits).length > 0);
+                                        const rowClosed = isClosedStatus(movement.status);
+                                        return (
+                                          <div
+                                            key={movement.id}
+                                            className={`rounded-lg border p-3 ${isDirty ? "border-jade bg-jade/5" : "border-line bg-white"}`}
+                                          >
+                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                              <span className="text-sm font-semibold text-ink">
+                                                {movement.worker || "(chưa có thợ)"}
+                                                {isDirty ? (
+                                                  <span className="ml-1.5 rounded-full bg-jade px-2 py-0.5 text-[10px] font-semibold uppercase text-white">
+                                                    Có thay đổi chưa lưu
+                                                  </span>
+                                                ) : null}
+                                              </span>
+                                              <button
+                                                className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                                type="button"
+                                                title="Xóa thợ này khỏi khâu"
+                                                aria-label="Xóa thợ này khỏi khâu"
+                                                disabled={rowClosed}
+                                                onClick={() => onRemoveMovement(movement.id)}
+                                              >
+                                                <Trash2 size={13} />
+                                              </button>
+                                            </div>
+
+                                            <div className="mt-3">
+                                              <StageEntryFields
+                                                values={values}
+                                                onFieldChange={(key, value) => updateRowEdit(movement.id, key, value)}
+                                                workerOptionsForDraft={workerOptionsForDraft}
+                                                getDynamicOptions={getDynamicOptions}
+                                                activeStageCode={activeStageCode}
+                                                nangCaoLabel={`Nâng cao — NXT / hao hụt của thợ "${values.worker || "này"}"`}
+                                              />
+                                            </div>
+
+                                            <button
+                                              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                                              type="button"
+                                              onClick={() => saveRowEdit(movement)}
+                                              disabled={!isDirty || rowClosed}
+                                            >
+                                              <Check size={15} />
+                                              Cập nhật thợ này
+                                            </button>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  ) : (
+                                    <p className="mt-2 text-xs text-zinc-400">Chưa có thợ nào. Điền Thợ/Xuất/Nhập ở trên rồi bấm &quot;Thêm thợ vào khâu&quot;.</p>
+                                  )}
+                                </div>
+                              </>
                             )}
                           </div>
                         ) : null}
@@ -680,5 +729,186 @@ export function MaterialMovementDrawer({
         </div>
       </section>
     </div>
+  );
+}
+
+// Bo field nhap 1 "luot ghi nhan" (Tho/Xuat/Nhap/Loai vang/Trang thai/Dien
+// giai/Nang cao NXT-hao hut) - dung chung cho ca khoi "them tho moi" (bound
+// voi draft) va tung khoi "tho da ghi nhan" (bound voi gia tri rieng cua
+// dong do), tranh dinh nghia lai giong het nhau o 2 noi.
+function StageEntryFields({
+  values,
+  onFieldChange,
+  workerOptionsForDraft,
+  getDynamicOptions,
+  activeStageCode,
+  nangCaoLabel
+}: {
+  values: ProductionOrder;
+  onFieldChange: <K extends keyof ProductionOrder>(key: K, value: ProductionOrder[K]) => void;
+  workerOptionsForDraft: WorkerMaster[];
+  getDynamicOptions: (listKey: string, staticFallback: SelectOption[]) => SelectOption[];
+  activeStageCode: string;
+  nangCaoLabel: string;
+}) {
+  return (
+    <>
+      <FieldShell label="Thợ phụ trách" hint="Danh sách thợ được lọc theo công đoạn nếu có dữ liệu." required>
+        <SelectControl value={values.worker} onChange={(value) => onFieldChange("worker", value)}>
+          <option value="">Chọn thợ</option>
+          {workerOptionsForDraft.map((worker) => (
+            <option key={worker.id} value={worker.full_name}>{worker.full_name}</option>
+          ))}
+        </SelectControl>
+      </FieldShell>
+
+      <div className={`mt-3 grid gap-3 ${activeStageCode === "DKB" ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        {activeStageCode === "DKB" ? (
+          <FieldShell label="Số lượng viên/sợi">
+            <input
+              className={fieldControlClass}
+              min="0"
+              type="number"
+              placeholder="0"
+              value={values.qtyPiece || ""}
+              onChange={(event) => onFieldChange("qtyPiece", Number(event.target.value))}
+            />
+          </FieldShell>
+        ) : null}
+        <FieldShell label="Xuất gram">
+          <input
+            className={fieldControlClass}
+            min="0"
+            type="number"
+            placeholder="0.00"
+            value={values.issued || ""}
+            onChange={(event) => onFieldChange("issued", Number(event.target.value))}
+          />
+        </FieldShell>
+        <FieldShell label="Nhập gram">
+          <input
+            className={fieldControlClass}
+            min="0"
+            type="number"
+            placeholder="0.00"
+            value={values.returned || ""}
+            onChange={(event) => onFieldChange("returned", Number(event.target.value))}
+          />
+        </FieldShell>
+      </div>
+
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <FieldShell label="Loại vàng" hint="Loại vàng/NVL đang xử lý ở khâu này.">
+          <SelectControl value={values.materialType ?? ""} onChange={(value) => onFieldChange("materialType", value)}>
+            <option value="">Chọn loại vàng</option>
+            {getDynamicOptions("nk_nvl_loai_nvl", materialTypeOptions).map((option) => (
+              <option key={option.value} value={option.value} title={option.label}>{option.label}</option>
+            ))}
+          </SelectControl>
+        </FieldShell>
+        <FieldShell label="Trạng thái tính hao" required>
+          <SelectControl value={values.status} onChange={(value) => onFieldChange("status", value as Status)}>
+            {movementLossStatusOptions.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </SelectControl>
+        </FieldShell>
+      </div>
+      <div className="mt-3">
+        <FieldShell label="Diễn giải giao dịch">
+          <input
+            className={fieldControlClass}
+            placeholder="VD: Xuất cán kéo"
+            value={values.sourceMaterialName ?? ""}
+            onChange={(event) => onFieldChange("sourceMaterialName", event.target.value)}
+          />
+        </FieldShell>
+      </div>
+
+      <details className="mt-3 rounded-md border border-line bg-paper/50">
+        <summary className="cursor-pointer select-none px-3 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          {nangCaoLabel}
+        </summary>
+        <div className="border-t border-line/70 p-3">
+          <div className={balancedTwoColumnGrid}>
+            <FieldShell label="Tuổi vàng" required>
+              <SelectControl value={String(values.goldAge ?? "")} onChange={(value) => onFieldChange("goldAge", Number(value))}>
+                <option value="">Chọn tuổi vàng</option>
+                {getDynamicOptions("tuoi_vang", movementGoldAgeOptions).map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+            <FieldShell label="Mã nối NXT" hint="Gõ để tìm nhanh trong danh sách.">
+              <SearchableSelect
+                value={values.nxtLinkCode ?? ""}
+                onChange={(value) => onFieldChange("nxtLinkCode", value)}
+                groups={groupNxtLinkOptions(getDynamicOptions("nguon_nvl", sourceMaterialOptions))}
+                placeholder="Chọn mã nối"
+                clearLabel="Chọn mã nối"
+              />
+            </FieldShell>
+          </div>
+          <div className={`mt-3 ${balancedTwoColumnGrid}`}>
+            <FieldShell label="Nguồn nhập">
+              <SelectControl value={values.importSource ?? ""} onChange={(value) => onFieldChange("importSource", value)}>
+                <option value="">Chọn nguồn nhập</option>
+                {getDynamicOptions("nguon_nhap", movementImportSourceOptions).map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+            <FieldShell label="Nguồn xuất">
+              <SelectControl value={values.exportSource ?? ""} onChange={(value) => onFieldChange("exportSource", value)}>
+                <option value="">Chọn nguồn xuất</option>
+                {getDynamicOptions("nguon_xuat", movementExportSourceOptions).map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </SelectControl>
+            </FieldShell>
+          </div>
+          <div className={`mt-3 ${balancedTwoColumnGrid}`}>
+            <FieldShell label="TL quy KCP xuất" hint="Tự tính = Xuất × tuổi vàng của khâu này; sửa lại nếu cần.">
+              <input
+                className={fieldControlClass}
+                type="number"
+                step="0.0001"
+                placeholder="0.0000"
+                value={values.convertedIssueWeight || ""}
+                onChange={(event) => onFieldChange("convertedIssueWeight", Number(event.target.value))}
+              />
+            </FieldShell>
+            <FieldShell label="TL quy KCP nhập" hint="Tự tính = Nhập × tuổi vàng của khâu này; sửa lại nếu cần.">
+              <input
+                className={fieldControlClass}
+                type="number"
+                step="0.0001"
+                placeholder="0.0000"
+                value={values.convertedReturnWeight || ""}
+                onChange={(event) => onFieldChange("convertedReturnWeight", Number(event.target.value))}
+              />
+            </FieldShell>
+          </div>
+          <div className={`mt-3 ${balancedTwoColumnGrid}`}>
+            <FieldShell label="Tháng tính hao" hint="Kỳ dùng để quyết toán hao hụt.">
+              <input
+                className={fieldControlClass}
+                type="month"
+                value={values.lossPeriod ?? ""}
+                onChange={(event) => onFieldChange("lossPeriod", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="Tháng NXT" hint="Kỳ dùng cho báo cáo nhập xuất tồn.">
+              <input
+                className={fieldControlClass}
+                type="month"
+                value={values.nxtPeriod ?? ""}
+                onChange={(event) => onFieldChange("nxtPeriod", event.target.value)}
+              />
+            </FieldShell>
+          </div>
+        </div>
+      </details>
+    </>
   );
 }

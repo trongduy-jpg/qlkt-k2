@@ -124,23 +124,26 @@ export function useMaterialMovements({
     setRemoteError(null);
   }
 
-  function addOrder(resetMode: "close" | "clearStage" | "keepStage" = "close") {
-    void addOrderAsync(resetMode);
-  }
-
-  async function addOrderAsync(resetMode: "close" | "clearStage" | "keepStage" = "close") {
-    const missingFields = validateMovementDraft(draft);
+  // Loi chung cho ca luong "luu draft dang soan" (addOrderAsync) va luong
+  // "cap nhat truc tiep 1 dong tho da ghi nhan" (updateStageMovementFields) -
+  // tach ra de 2 luong dung chung dung 1 bo validate/business-rules/persist,
+  // tranh copy-paste va lech logic giua 2 noi.
+  async function persistMovement(
+    inputOrder: ProductionOrder,
+    effectiveEditingIdOverride: string | null
+  ): Promise<ProductionOrder | null> {
+    const missingFields = validateMovementDraft(inputOrder);
     if (missingFields.length > 0) {
       setRemoteError(`Chưa thể lưu giao dịch. Vui lòng bổ sung: ${missingFields.join(", ")}.`);
-      return;
+      return null;
     }
-    const normalizedDraft = applyProductionBusinessRules(draft, orders);
+    const normalizedDraft = applyProductionBusinessRules(inputOrder, orders);
 
     if (shouldForceDirectCharge(normalizedDraft.stage, normalizedDraft.status, stageRules)) {
       const detail = "Trạng thái Xác định chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến.";
       pushAudit("blocked_direct_charge_stage", detail);
       setRemoteError(detail);
-      return;
+      return null;
     }
 
     if (isLargeWeightMovement(normalizedDraft)) {
@@ -149,7 +152,7 @@ export function useMaterialMovements({
 
     const normalizedStageCode = normalizeStageCode(normalizedDraft.stage);
     const normalizedItemSku = (normalizedDraft.itemSku || normalizedDraft.sku).trim();
-    const existingStageMovement = isSingleWorkerStage(normalizedStageCode)
+    const existingStageMovement = !effectiveEditingIdOverride && isSingleWorkerStage(normalizedStageCode)
       ? orders.find(
           (order) =>
             order.code === normalizedDraft.code.trim() &&
@@ -157,7 +160,7 @@ export function useMaterialMovements({
             normalizeStageCode(order.stage) === normalizedStageCode
         )
       : undefined;
-    const effectiveEditingId = editingMovementId || existingStageMovement?.id || null;
+    const effectiveEditingId = effectiveEditingIdOverride || existingStageMovement?.id || null;
 
     const nextOrder = {
       ...normalizedDraft,
@@ -212,42 +215,62 @@ export function useMaterialMovements({
         });
       }
 
-      if (resetMode === "close") {
-        setDraft(createEmptyOrder());
-        setEditingMovementId(null);
-        setIsMovementFormOpen(false);
-        setActiveModule("Nhật ký NVL");
-      } else if (resetMode === "keepStage") {
-        setEditingMovementId(null);
-        setDraft((current) => ({
-          ...current,
-          id: "",
-          worker: "",
-          qtyPiece: 0,
-          issued: 0,
-          returned: 0,
-          transferred: 0,
-          loss: 0,
-          sourceMaterialName: ""
-        }));
-      } else {
-        setEditingMovementId(null);
-        setDraft((current) => ({
-          ...current,
-          id: "",
-          stage: "",
-          worker: "",
-          qtyPiece: 0,
-          issued: 0,
-          returned: 0,
-          transferred: 0,
-          loss: 0,
-          sourceMaterialName: ""
-        }));
-      }
+      return savedOrder;
     } catch (error) {
-      setRemoteError(error instanceof Error ? error.message : editingMovementId ? "Không cập nhật được giao dịch" : "Không thêm được giao dịch");
+      setRemoteError(error instanceof Error ? error.message : effectiveEditingId ? "Không cập nhật được giao dịch" : "Không thêm được giao dịch");
+      return null;
     }
+  }
+
+  function addOrder(resetMode: "close" | "clearStage" | "keepStage" = "close") {
+    void addOrderAsync(resetMode);
+  }
+
+  async function addOrderAsync(resetMode: "close" | "clearStage" | "keepStage" = "close") {
+    const savedOrder = await persistMovement(draft, editingMovementId);
+    if (!savedOrder) return;
+
+    if (resetMode === "close") {
+      setDraft(createEmptyOrder());
+      setEditingMovementId(null);
+      setIsMovementFormOpen(false);
+      setActiveModule("Nhật ký NVL");
+    } else if (resetMode === "keepStage") {
+      setEditingMovementId(null);
+      setDraft((current) => ({
+        ...current,
+        id: "",
+        worker: "",
+        qtyPiece: 0,
+        issued: 0,
+        returned: 0,
+        transferred: 0,
+        loss: 0,
+        sourceMaterialName: ""
+      }));
+    } else {
+      setEditingMovementId(null);
+      setDraft((current) => ({
+        ...current,
+        id: "",
+        stage: "",
+        worker: "",
+        qtyPiece: 0,
+        issued: 0,
+        returned: 0,
+        transferred: 0,
+        loss: 0,
+        sourceMaterialName: ""
+      }));
+    }
+  }
+
+  // Cap nhat truc tiep 1 dong tho da ghi nhan (khau nhieu tho) - moi tho
+  // giu nguyen 1 khoi nhap lieu day du, sua xong bam "Cap nhat" ngay tren
+  // dong do, KHONG anh huong den draft dang soan cho tho moi (khong dung
+  // chung 1 state nhu truoc, tranh du lieu "bien mat" khoi khu vuc nhap).
+  async function updateStageMovementFields(order: ProductionOrder) {
+    await persistMovement(order, order.id);
   }
 
   function removeOrder(id: string) {
@@ -335,14 +358,6 @@ export function useMaterialMovements({
     setRemoteError(null);
   }
 
-  // Sua 1 dong cu the trong danh sach "Tho da ghi nhan cho khau nay" (khau
-  // nhieu tho) - thay vi luon tao dong moi khi bam lai tab khau, cho phep
-  // gan dung vao dong da chon de cap nhat, dam bao khong tao trung dong.
-  function switchToMovement(order: ProductionOrder) {
-    attachToExistingMovement(order);
-    setRemoteError(null);
-  }
-
   // Chon Ma hang dang cap nhat trong LSX (1 LSX co the co nhieu Ma hang,
   // moi Ma hang 1 tien trinh cong doan rieng). Reset lai draft nhu chuyen
   // sang mot LSX/khau moi, vi doi Ma hang = doi hoan toan tien trinh dang xem.
@@ -383,12 +398,12 @@ export function useMaterialMovements({
     updateDraft,
     addOrder,
     addOrderAsync,
+    updateStageMovementFields,
     removeOrder,
     openMovementForEdit,
     closeMovementForm,
     openEmptyMovementForm,
     selectStageTab,
-    switchToMovement,
     selectItemForDraft,
     savedMovementNotice,
     dismissSavedMovementNotice
