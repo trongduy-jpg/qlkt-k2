@@ -105,9 +105,16 @@ export function MaterialMovementDrawer({
   // (draft chi con dung cho "them tho moi"). Reset moi khi doi khau/Ma hang
   // dang xem de tranh dinh du lieu cua khau truoc sang.
   const [rowEdits, setRowEdits] = useState<Record<string, Partial<ProductionOrder>>>({});
+  // Moi khoi tho thu gon mac dinh (chi hien 1 dong tom tat) de khau nhieu
+  // tho khong keo dai qua muc khi cuon - bam vao dong tom tat de mo/dong.
+  // Khac voi truoc day: du gap lai, DU LIEU van con nguyen trong state
+  // (khong mat/reset), chi la tam thoi khong hien full form - dung "an di"
+  // chu khong "xoa di".
+  const [expandedRowIds, setExpandedRowIds] = useState<Record<string, boolean>>({});
   const activeStageCodeForReset = normalizeStageCode(draft.stage);
   useEffect(() => {
     setRowEdits({});
+    setExpandedRowIds({});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, draft.code, draft.itemSku || draft.sku, activeStageCodeForReset]);
 
@@ -135,6 +142,10 @@ export function MaterialMovementDrawer({
       delete next[movement.id];
       return next;
     });
+  }
+
+  function toggleRowExpanded(movementId: string) {
+    setExpandedRowIds((current) => ({ ...current, [movementId]: !current[movementId] }));
   }
 
   return (
@@ -607,21 +618,35 @@ export function MaterialMovementDrawer({
                                     Thợ đã ghi nhận cho khâu này ({currentDrawerStageMovements.length})
                                   </p>
                                   <p className="mt-1 text-xs leading-5 text-zinc-500">
-                                    Mỗi thợ giữ nguyên khối nhập liệu đầy đủ của mình - sửa trực tiếp bên dưới rồi bấm &quot;Cập nhật thợ này&quot;, không bị thu gọn về 1 dòng tóm tắt.
+                                    Mỗi thợ giữ nguyên toàn bộ dữ liệu của mình dù thu gọn hay mở rộng - bấm vào dòng để mở/đóng, sửa xong bấm &quot;Cập nhật thợ này&quot;.
                                   </p>
                                   {currentDrawerStageMovements.length > 0 ? (
-                                    <div className="mt-3 grid gap-3">
+                                    <div className="mt-3 grid gap-2">
                                       {currentDrawerStageMovements.map((movement) => {
                                         const edits = rowEdits[movement.id];
                                         const values = edits ? { ...movement, ...edits } : movement;
                                         const isDirty = Boolean(edits && Object.keys(edits).length > 0);
                                         const rowClosed = isClosedStatus(movement.status);
+                                        // Dong co thay doi chua luu luon mo, tranh nguoi dung vo tinh thu
+                                        // gon lam "mat dau" phan dang sua dang lam.
+                                        const isExpanded = isDirty || Boolean(expandedRowIds[movement.id]);
                                         return (
                                           <div
                                             key={movement.id}
-                                            className={`rounded-lg border p-3 ${isDirty ? "border-jade bg-jade/5" : "border-line bg-white"}`}
+                                            className={`overflow-hidden rounded-lg border ${isDirty ? "border-jade bg-jade/5" : "border-line bg-white"}`}
                                           >
-                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <div
+                                              role="button"
+                                              tabIndex={0}
+                                              onClick={() => toggleRowExpanded(movement.id)}
+                                              onKeyDown={(event) => {
+                                                if (event.key === "Enter" || event.key === " ") {
+                                                  event.preventDefault();
+                                                  toggleRowExpanded(movement.id);
+                                                }
+                                              }}
+                                              className="flex cursor-pointer flex-wrap items-center justify-between gap-2 px-3 py-2.5"
+                                            >
                                               <span className="text-sm font-semibold text-ink">
                                                 {movement.worker || "(chưa có thợ)"}
                                                 {isDirty ? (
@@ -630,38 +655,52 @@ export function MaterialMovementDrawer({
                                                   </span>
                                                 ) : null}
                                               </span>
-                                              <button
-                                                className="inline-flex size-7 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-                                                type="button"
-                                                title="Xóa thợ này khỏi khâu"
-                                                aria-label="Xóa thợ này khỏi khâu"
-                                                disabled={rowClosed}
-                                                onClick={() => onRemoveMovement(movement.id)}
-                                              >
-                                                <Trash2 size={13} />
-                                              </button>
+                                              <div className="flex items-center gap-3">
+                                                {!isExpanded ? (
+                                                  <span className="flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+                                                    <span>Xuất {values.issued || 0}g</span>
+                                                    <span>Nhập {values.returned || 0}g</span>
+                                                  </span>
+                                                ) : null}
+                                                <button
+                                                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                                  type="button"
+                                                  title="Xóa thợ này khỏi khâu"
+                                                  aria-label="Xóa thợ này khỏi khâu"
+                                                  disabled={rowClosed}
+                                                  onClick={(event) => {
+                                                    event.stopPropagation();
+                                                    onRemoveMovement(movement.id);
+                                                  }}
+                                                >
+                                                  <Trash2 size={13} />
+                                                </button>
+                                                <ChevronDown className={`size-4 shrink-0 text-zinc-400 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                                              </div>
                                             </div>
 
-                                            <div className="mt-3">
-                                              <StageEntryFields
-                                                values={values}
-                                                onFieldChange={(key, value) => updateRowEdit(movement.id, key, value)}
-                                                workerOptionsForDraft={workerOptionsForDraft}
-                                                getDynamicOptions={getDynamicOptions}
-                                                activeStageCode={activeStageCode}
-                                                nangCaoLabel={`Nâng cao — NXT / hao hụt của thợ "${values.worker || "này"}"`}
-                                              />
-                                            </div>
+                                            {isExpanded ? (
+                                              <div className="border-t border-line/70 px-3 py-3">
+                                                <StageEntryFields
+                                                  values={values}
+                                                  onFieldChange={(key, value) => updateRowEdit(movement.id, key, value)}
+                                                  workerOptionsForDraft={workerOptionsForDraft}
+                                                  getDynamicOptions={getDynamicOptions}
+                                                  activeStageCode={activeStageCode}
+                                                  nangCaoLabel={`Nâng cao — NXT / hao hụt của thợ "${values.worker || "này"}"`}
+                                                />
 
-                                            <button
-                                              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
-                                              type="button"
-                                              onClick={() => saveRowEdit(movement)}
-                                              disabled={!isDirty || rowClosed}
-                                            >
-                                              <Check size={15} />
-                                              Cập nhật thợ này
-                                            </button>
+                                                <button
+                                                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
+                                                  type="button"
+                                                  onClick={() => saveRowEdit(movement)}
+                                                  disabled={!isDirty || rowClosed}
+                                                >
+                                                  <Check size={15} />
+                                                  Cập nhật thợ này
+                                                </button>
+                                              </div>
+                                            ) : null}
                                           </div>
                                         );
                                       })}
