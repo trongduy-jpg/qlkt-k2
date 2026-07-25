@@ -121,7 +121,7 @@ describe("filterProductionSummaries", () => {
 
     const result = filterProductionSummaries(rows, {
       deliveryStatus: "Tất cả trạng thái LSX",
-      salesType: "Tất cả SR/KH",
+      salesType: "Tất cả phân loại KH",
       deadlineFilter: "Quá hạn",
       destination: "Tất cả cửa hàng",
       codeMonth: "Tất cả tháng",
@@ -141,7 +141,7 @@ describe("filterProductionSummaries", () => {
 
     const byDestination = filterProductionSummaries(rows, {
       deliveryStatus: "Tất cả trạng thái LSX",
-      salesType: "Tất cả SR/KH",
+      salesType: "Tất cả phân loại KH",
       deadlineFilter: "Tất cả deadline",
       destination: "CH1",
       codeMonth: "Tất cả tháng",
@@ -151,7 +151,7 @@ describe("filterProductionSummaries", () => {
 
     const byMonth = filterProductionSummaries(rows, {
       deliveryStatus: "Tất cả trạng thái LSX",
-      salesType: "Tất cả SR/KH",
+      salesType: "Tất cả phân loại KH",
       deadlineFilter: "Tất cả deadline",
       destination: "Tất cả cửa hàng",
       codeMonth: "2026-07",

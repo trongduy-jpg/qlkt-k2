@@ -143,7 +143,9 @@ export function ProductionItemsEditor({
                   <SelectControl value={item.plannedMaterial ?? ""} onChange={(value) => updateItem(index, { plannedMaterial: value })}>
                     <option value="">Chọn NVL</option>
                     {materials.map((material) => (
-                      <option key={material.id} value={material.name}>{material.code} - {material.name}</option>
+                      <option key={material.id} value={material.name} title={`${material.code} - ${material.name}`}>
+                        {material.code}
+                      </option>
                     ))}
                   </SelectControl>
                 </FieldShell>

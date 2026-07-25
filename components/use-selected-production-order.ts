@@ -196,11 +196,12 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
         await reloadOperationalData();
       }
 
+      // Giu nguyen man hinh Lenh san xuat va panel dang mo sau khi chot -
+      // KHONG tu chuyen sang Nhat ky NVL nua, chi can hien trang thai "Da
+      // chot" ngay tren panel nay (tranh cam giac giao dien "nhay" sang
+      // man khac ngoai y muon cua nguoi dung).
       setSelectedOrderCode(selectedOrderSummary.code);
       setSelectedItemSku(selectedOrderSummary.sku || null);
-      setQuery(selectedOrderSummary.code);
-      setStatus("Tất cả");
-      setActiveModule("Nhật ký NVL");
       pushAudit("close_production_order", `Chốt LSX ${selectedOrderSummary.code} - Mã hàng ${targetSku}`);
       await createAuditLog("close_production_order", `Chốt LSX ${selectedOrderSummary.code}`, selectedOrderMovements[0]?.id);
     } catch (error) {

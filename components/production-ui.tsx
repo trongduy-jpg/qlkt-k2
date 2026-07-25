@@ -217,7 +217,7 @@ export function SearchableSelect({
           className="h-full w-full min-w-0 flex-1 truncate rounded-md bg-transparent pl-3 pr-1 text-sm text-ink outline-none placeholder:text-zinc-400"
           placeholder={isOpen ? "Gõ để tìm kiếm..." : selectedOption ? undefined : placeholder}
           value={isOpen ? query : (selectedOption?.displayLabel ?? selectedOption?.label ?? "")}
-          title={selectedOption?.label}
+          title={selectedOption?.hint ?? selectedOption?.label}
           onFocus={() => {
             setQuery("");
             openPanel();
@@ -289,7 +289,7 @@ export function SearchableSelect({
                             className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-jade/10 ${
                               isSelected ? "bg-jade/10 font-medium text-jade" : "text-ink"
                             }`}
-                            title={option.label}
+                            title={option.hint ?? option.label}
                             onClick={() => selectValue(option.value)}
                           >
                             <span className="truncate">{option.displayLabel ?? option.label}</span>

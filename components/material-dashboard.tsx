@@ -108,7 +108,7 @@ export function MaterialDashboard() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<(typeof statusOptions)[number]>("Tất cả");
   const [productionDeliveryStatus, setProductionDeliveryStatus] = useState("Tất cả trạng thái LSX");
-  const [productionSalesType, setProductionSalesType] = useState("Tất cả SR/KH");
+  const [productionSalesType, setProductionSalesType] = useState("Tất cả phân loại KH");
   const [productionCustomerQuery, setProductionCustomerQuery] = useState("");
   const [productionDeadlineFilter, setProductionDeadlineFilter] = useState("Tất cả deadline");
   const [productionDestinationFilter, setProductionDestinationFilter] = useState(ALL_DESTINATIONS_FILTER);

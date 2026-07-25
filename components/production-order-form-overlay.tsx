@@ -170,7 +170,7 @@ function OrderIdentitySection({
           </FieldShell>
         </div>
         <div className="col-span-12 md:col-span-4 xl:col-span-2">
-          <FieldShell label="SR/KH">
+          <FieldShell label="Phân loại KH">
             <SelectControl value={draft.salesType} onChange={(value) => onDraftChange("salesType", value)}>
               {productionOrderSalesTypeOptions.map((item) => (
                 <option key={item.value} value={item.value}>{item.label}</option>

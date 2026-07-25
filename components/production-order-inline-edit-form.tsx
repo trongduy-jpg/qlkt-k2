@@ -59,7 +59,7 @@ export function ProductionOrderInlineEditForm({
               onChange={(event) => onDraftChange("customerName", event.target.value)}
             />
           </FieldShell>
-          <FieldShell label="SR/KH">
+          <FieldShell label="Phân loại KH">
             <SelectControl value={draft.salesType} onChange={(value) => onDraftChange("salesType", value)}>
               {productionOrderSalesTypeOptions.map((item) => (
                 <option key={item.value} value={item.value}>{item.label}</option>

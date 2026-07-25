@@ -75,7 +75,7 @@ export function filterProductionSummaries(summaries: OrderSummary[], filters: Pr
 
   return summaries.filter((summary) => {
     const matchDeliveryStatus = filters.deliveryStatus === "Tất cả trạng thái LSX" || summary.deliveryStatus === filters.deliveryStatus;
-    const matchSalesType = filters.salesType === "Tất cả SR/KH" || summary.salesType === filters.salesType;
+    const matchSalesType = filters.salesType === "Tất cả phân loại KH" || summary.salesType === filters.salesType;
     const matchDestination = filters.destination === ALL_DESTINATIONS_FILTER || summary.destination === filters.destination;
     const matchCodeMonth = filters.codeMonth === ALL_CODE_MONTHS_FILTER || extractOrderCodeMonth(summary.code) === filters.codeMonth;
     const matchQuery =

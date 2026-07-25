@@ -173,9 +173,9 @@ export function ProductionOrdersView({
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={productionSalesType}
             onChange={(event) => onSalesTypeChange(event.target.value)}
-            aria-label="Lọc theo SR/KH"
+            aria-label="Lọc theo phân loại KH"
           >
-            <option>Tất cả SR/KH</option>
+            <option>Tất cả phân loại KH</option>
             {productionOrderSalesTypeOptions.map((item) => (
               <option key={item.value} value={item.value}>
                 {item.label}
@@ -220,7 +220,7 @@ export function ProductionOrdersView({
                   <th className="px-3 py-3">Mã hàng / Mã LSX</th>
                   <th className="px-3 py-3">Tên hàng</th>
                   <th className="px-3 py-3">Khách hàng</th>
-                  <th className="px-3 py-3">SR/KH</th>
+                  <th className="px-3 py-3">Phân loại KH</th>
                   <th className="px-3 py-3">Deadline đơn hàng</th>
                   <th className="px-3 py-3 text-right">Số lượng</th>
                   <th

@@ -178,7 +178,7 @@ export function ProductionOrderDetailDrawer({
                     ["Khách hàng", detail.customerName || "-"],
                     ["Mã hàng", detail.sku || "-"],
                     ["Số lượng", detail.qtyPiece !== null ? String(detail.qtyPiece) : "-"],
-                    ["SR/KH", detail.salesType || "-"]
+                    ["Phân loại KH", detail.salesType || "-"]
                   ]}
                 />
 
