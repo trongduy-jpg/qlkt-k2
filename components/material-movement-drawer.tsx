@@ -113,10 +113,15 @@ export function MaterialMovementDrawer({
   // (khong mat/reset), chi la tam thoi khong hien full form - dung "an di"
   // chu khong "xoa di".
   const [expandedRowIds, setExpandedRowIds] = useState<Record<string, boolean>>({});
+  // Khoi "Tho moi" (them tho tiep theo cho khau nhieu tho) khong tu dong
+  // hien/mo rong san - chi hien khi nguoi dung bam "+ Them tho moi", tranh
+  // cam giac "nhay truoc" 1 form day du du chua ai yeu cau them.
+  const [isAddingNewWorker, setIsAddingNewWorker] = useState(false);
   const activeStageCodeForReset = normalizeStageCode(draft.stage);
   useEffect(() => {
     setRowEdits({});
     setExpandedRowIds({});
+    setIsAddingNewWorker(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, draft.code, draft.itemSku || draft.sku, activeStageCodeForReset]);
 
@@ -564,51 +569,75 @@ export function MaterialMovementDrawer({
                                     );
                                   })}
 
-                                  {/* Khoi "Thợ mới" luon o cuoi, luon mo - bind voi draft. Sau khi
-                                      bam "Thêm thợ vào khâu" (keepStage) se luu roi reset ve trong,
-                                      hien nhu 1 khoi trong moi cho thợ tiep theo. */}
-                                  <div className="overflow-hidden rounded-lg border border-jade bg-jade/5">
-                                    <div className="flex items-center justify-between gap-2 px-3 py-2.5">
-                                      <span className="flex items-center gap-2 text-sm font-semibold text-ink">
-                                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jade text-[11px] font-bold text-white">
-                                          {currentDrawerStageMovements.length + 1}
+                                  {/* Khoi "Thợ mới" KHONG tu dong hien/mo rong - chi xuat hien khi
+                                      bam "+ Thêm thợ mới" (isAddingNewWorker), tranh cam giac "nhay
+                                      truoc" 1 form day du du chua ai yeu cau. Sau khi bam "Thêm thợ"
+                                      (keepStage) se luu roi reset draft ve trong, giu form mo cho
+                                      thợ tiep theo. */}
+                                  {isAddingNewWorker ? (
+                                    <div className="overflow-hidden rounded-lg border border-jade bg-jade/5">
+                                      <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+                                        <span className="flex items-center gap-2 text-sm font-semibold text-ink">
+                                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jade text-[11px] font-bold text-white">
+                                            {currentDrawerStageMovements.length + 1}
+                                          </span>
+                                          Thợ mới{draft.worker ? ` · ${draft.worker}` : ""}
                                         </span>
-                                        Thợ mới{draft.worker ? ` · ${draft.worker}` : ""}
-                                      </span>
-                                      {/* Nut "them thi lien tiep" luon la hanh dong PHU, khong duoc to
-                                          lon/dam hon nut "Luu" chinh o footer - de o day, kieu nho/vien
-                                          (khong to mau den), rieng biet voi footer thay vi mot nut lon
-                                          full-width canh tranh voi nut Luu chinh. */}
-                                      <button
-                                        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-jade/50 bg-white px-2.5 py-1 text-[11px] font-semibold text-jade hover:bg-jade/10 disabled:cursor-not-allowed disabled:border-line disabled:text-zinc-400"
-                                        type="button"
-                                        onClick={() => onSave("keepStage")}
-                                        disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
-                                        title="Lưu thợ này rồi mở 1 khối trống cho thợ tiếp theo của cùng khâu."
-                                      >
-                                        <Plus size={12} />
-                                        Thêm thợ
-                                      </button>
-                                    </div>
-                                    <div className="border-t border-jade/30 px-3 py-3">
-                                      <StageEntryFields
-                                        values={draft}
-                                        onFieldChange={onDraftChange}
-                                        workerOptionsForDraft={workerOptionsForDraft}
-                                        getDynamicOptions={getDynamicOptions}
-                                        activeStageCode={activeStageCode}
-                                        nangCaoLabel={draft.worker ? `Nâng cao — NXT / hao hụt của thợ "${draft.worker}"` : "Nâng cao — NXT / hao hụt cho thợ mới"}
-                                      />
-                                      {isDraftDirectChargeInvalid ? (
-                                        <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
-                                          Không thể lưu: trạng thái &quot;Xác định&quot; chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến. Đổi lại &quot;Trạng thái tính hao&quot; để tiếp tục lưu.
+                                        <div className="flex shrink-0 items-center gap-1.5">
+                                          {/* Nut "them tiep lien tiep" luon la hanh dong PHU, khong duoc to
+                                              lon/dam hon nut "Luu" chinh o footer - de o day, kieu nho/vien
+                                              (khong to mau den), rieng biet voi footer thay vi mot nut lon
+                                              full-width canh tranh voi nut Luu chinh. */}
+                                          <button
+                                            className="inline-flex items-center gap-1 rounded-full border border-jade/50 bg-white px-2.5 py-1 text-[11px] font-semibold text-jade hover:bg-jade/10 disabled:cursor-not-allowed disabled:border-line disabled:text-zinc-400"
+                                            type="button"
+                                            onClick={() => onSave("keepStage")}
+                                            disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
+                                            title="Lưu thợ này rồi mở 1 khối trống cho thợ tiếp theo của cùng khâu."
+                                          >
+                                            <Plus size={12} />
+                                            Thêm thợ
+                                          </button>
+                                          <button
+                                            className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-zinc-500 hover:bg-paper"
+                                            type="button"
+                                            title="Đóng khối này (chưa lưu thì dữ liệu vừa nhập sẽ mất)"
+                                            aria-label="Đóng khối thợ mới"
+                                            onClick={() => setIsAddingNewWorker(false)}
+                                          >
+                                            <X size={13} />
+                                          </button>
                                         </div>
-                                      ) : null}
-                                      <p className="mt-3 text-xs leading-5 text-zinc-500">
-                                        Điền xong thợ này thì bấm &quot;Lưu&quot; ở dưới đáy để lưu cùng các thợ khác. Chỉ bấm &quot;Thêm thợ&quot; ở trên nếu muốn nhập tiếp 1 thợ khác ngay bây giờ.
-                                      </p>
+                                      </div>
+                                      <div className="border-t border-jade/30 px-3 py-3">
+                                        <StageEntryFields
+                                          values={draft}
+                                          onFieldChange={onDraftChange}
+                                          workerOptionsForDraft={workerOptionsForDraft}
+                                          getDynamicOptions={getDynamicOptions}
+                                          activeStageCode={activeStageCode}
+                                          nangCaoLabel={draft.worker ? `Nâng cao — NXT / hao hụt của thợ "${draft.worker}"` : "Nâng cao — NXT / hao hụt cho thợ mới"}
+                                        />
+                                        {isDraftDirectChargeInvalid ? (
+                                          <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
+                                            Không thể lưu: trạng thái &quot;Xác định&quot; chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến. Đổi lại &quot;Trạng thái tính hao&quot; để tiếp tục lưu.
+                                          </div>
+                                        ) : null}
+                                        <p className="mt-3 text-xs leading-5 text-zinc-500">
+                                          Điền xong thợ này thì bấm &quot;Lưu&quot; ở dưới đáy để lưu cùng các thợ khác. Chỉ bấm &quot;Thêm thợ&quot; ở trên nếu muốn nhập tiếp 1 thợ khác ngay bây giờ.
+                                        </p>
+                                      </div>
                                     </div>
-                                  </div>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-jade/50 bg-white px-3 py-3 text-sm font-semibold text-jade hover:bg-jade/5"
+                                      onClick={() => setIsAddingNewWorker(true)}
+                                    >
+                                      <Plus size={15} />
+                                      Thêm thợ mới cho khâu này
+                                    </button>
+                                  )}
                                 </div>
                               </>
                             )}

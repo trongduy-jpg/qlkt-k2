@@ -237,17 +237,34 @@ export function useMaterialMovements({
       setActiveModule("Nhật ký NVL");
     } else if (resetMode === "keepStage") {
       setEditingMovementId(null);
-      setDraft((current) => ({
-        ...current,
-        id: "",
-        worker: "",
-        qtyPiece: 0,
-        issued: 0,
-        returned: 0,
-        transferred: 0,
-        loss: 0,
-        sourceMaterialName: ""
-      }));
+      // Khoi "Tho moi" cho tho tiep theo phai trong hoan toan - khong chi
+      // reset Tho/Xuat/Nhap ma con ca Loai vang/Trang thai tinh hao/Nang
+      // cao (NXT/hao hut), neu khong se de lai du lieu cua tho VUA luu,
+      // gay nham la mac dinh "dien san" cho tho ke tiep.
+      setDraft((current) => {
+        const occurredDate = current.occurredDate || toIsoDate();
+        return {
+          ...current,
+          id: "",
+          worker: "",
+          qtyPiece: 0,
+          issued: 0,
+          returned: 0,
+          transferred: 0,
+          loss: 0,
+          sourceMaterialName: "",
+          materialType: "",
+          status: "Treo nợ",
+          goldAge: 0.75,
+          nxtLinkCode: "",
+          importSource: "",
+          exportSource: "",
+          convertedIssueWeight: 0,
+          convertedReturnWeight: 0,
+          lossPeriod: getCarryOverLossPeriod(occurredDate, "Treo nợ"),
+          nxtPeriod: toMonthCode(occurredDate)
+        };
+      });
     } else {
       setEditingMovementId(null);
       setDraft((current) => ({
@@ -332,13 +349,15 @@ export function useMaterialMovements({
     if (existing && isSingleWorkerStage(stageCode)) {
       attachToExistingMovement(existing);
     } else {
-      const suggestedWorker = workers.find((item) => item.stages.includes(stageCode));
+      // Khong tu goi y san 1 tho (truoc day lay tho dau tien co lam khau
+      // nay) - de trong de nguoi dung tu chon, tranh dien san du lieu
+      // ma khong ai thuc su chon.
       setEditingMovementId(null);
       setDraft((current) => ({
         ...current,
         id: "",
         stage: stageCode,
-        worker: suggestedWorker?.full_name ?? "",
+        worker: "",
         qtyPiece: 0,
         issued: 0,
         returned: 0,
