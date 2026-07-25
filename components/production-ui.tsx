@@ -309,11 +309,20 @@ export function SearchableSelect({
   );
 }
 
-export function InfoMetric({ label, value }: { label: string; value: string }) {
+export function InfoMetric({
+  label,
+  value,
+  tone
+}: {
+  label: string;
+  value: string;
+  tone?: "good" | "bad";
+}) {
+  const toneClass = tone === "bad" ? "text-red-700" : tone === "good" ? "text-emerald-700" : "text-ink";
   return (
     <div className="rounded-lg border border-line bg-white px-3 py-3 shadow-sm">
       <p className="text-xs uppercase tracking-wide text-zinc-500">{label}</p>
-      <p className="mt-1 text-lg font-bold text-ink">{value}</p>
+      <p className={`mt-1 text-lg font-bold ${toneClass}`}>{value}</p>
     </div>
   );
 }

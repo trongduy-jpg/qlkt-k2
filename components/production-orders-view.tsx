@@ -1,6 +1,8 @@
 "use client";
 
-import { Link2, Plus } from "lucide-react";
+import { useState } from "react";
+import { Link2, Plus, Search, SlidersHorizontal } from "lucide-react";
+import { InfoMetric } from "@/components/production-ui";
 import type { OrderSummary } from "@/lib/production-types";
 import type { ProductionOverview } from "@/lib/production-workflow";
 import { orderRowKey } from "@/lib/production-summary";
@@ -83,6 +85,17 @@ export function ProductionOrdersView({
   onShowAllOrders,
   onSelectOrder
 }: ProductionOrdersViewProps) {
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+
+  function clearFilters() {
+    onDeliveryStatusChange("Tất cả trạng thái LSX");
+    onDestinationFilterChange(ALL_DESTINATIONS_FILTER);
+    onCodeMonthFilterChange(ALL_CODE_MONTHS_FILTER);
+    onSalesTypeChange("Tất cả phân loại KH");
+    onDeadlineFilterChange("Tất cả deadline");
+    onCustomerQueryChange("");
+  }
+
   return (
     <section className={`${isVisible ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div className="flex flex-col gap-4">
@@ -112,21 +125,16 @@ export function ProductionOrdersView({
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          <div className="rounded-md border border-line bg-paper px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tổng LSX</p>
-            <p className="mt-2 text-2xl font-bold text-ink">{productionOverview.total}</p>
-          </div>
-          <div className="rounded-md border border-sky-200 bg-sky-50/70 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">Đang xử lý</p>
-            <p className="mt-2 text-2xl font-bold text-sky-900">{productionOverview.inProgressCount}</p>
-          </div>
-          <div className="rounded-md border border-rose-200 bg-rose-50/70 px-4 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">Quá hạn deadline</p>
-            <p className="mt-2 text-2xl font-bold text-rose-900">{productionOverview.overdueCount}</p>
-          </div>
+          <InfoMetric label="Tổng LSX" value={String(productionOverview.total)} />
+          <InfoMetric label="Đang xử lý" value={String(productionOverview.inProgressCount)} />
+          <InfoMetric
+            label="Quá hạn deadline"
+            value={String(productionOverview.overdueCount)}
+            tone={productionOverview.overdueCount > 0 ? "bad" : undefined}
+          />
         </div>
 
-        <div className="grid gap-3 rounded-md border border-line bg-paper p-3 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={productionDeliveryStatus}
@@ -141,67 +149,92 @@ export function ProductionOrdersView({
               </option>
             ))}
           </select>
-          <select
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-            value={productionDestinationFilter}
-            onChange={(event) => onDestinationFilterChange(event.target.value)}
-            title="Lọc theo cửa hàng"
-            aria-label="Lọc theo cửa hàng"
+
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={16} />
+            <input
+              className="h-10 w-full rounded-md border border-line bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 sm:w-64"
+              placeholder="Tìm LSX, mã hàng, khách hàng..."
+              value={productionCustomerQuery}
+              onChange={(event) => onCustomerQueryChange(event.target.value)}
+              aria-label="Tìm kiếm LSX, mã hàng, khách hàng"
+            />
+          </div>
+
+          <button
+            className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper"
+            type="button"
+            onClick={() => setIsFilterExpanded((current) => !current)}
           >
-            <option value={ALL_DESTINATIONS_FILTER}>{ALL_DESTINATIONS_FILTER}</option>
-            {productionOrderDestinations.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-          <select
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-            value={productionCodeMonthFilter}
-            onChange={(event) => onCodeMonthFilterChange(event.target.value)}
-            title="Lọc theo tháng (dựa vào Mã LSX)"
-            aria-label="Lọc theo tháng"
-          >
-            <option value={ALL_CODE_MONTHS_FILTER}>{ALL_CODE_MONTHS_FILTER}</option>
-            {productionCodeMonthOptions.map((codeMonth) => (
-              <option key={codeMonth} value={codeMonth}>
-                {formatCodeMonthLabel(codeMonth)}
-              </option>
-            ))}
-          </select>
-          <select
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-            value={productionSalesType}
-            onChange={(event) => onSalesTypeChange(event.target.value)}
-            aria-label="Lọc theo phân loại KH"
-          >
-            <option>Tất cả phân loại KH</option>
-            {productionOrderSalesTypeOptions.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-          <select
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-            value={productionDeadlineFilter}
-            onChange={(event) => onDeadlineFilterChange(event.target.value)}
-            aria-label="Lọc theo deadline"
-          >
-            <option>Tất cả deadline</option>
-            <option>Quá hạn</option>
-            <option>Hôm nay</option>
-            <option>7 ngày tới</option>
-            <option>Chưa có deadline</option>
-          </select>
-          <input
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
-            placeholder="Tìm LSX, mã hàng, khách hàng..."
-            value={productionCustomerQuery}
-            onChange={(event) => onCustomerQueryChange(event.target.value)}
-            aria-label="Tìm kiếm LSX, mã hàng, khách hàng"
-          />
+            <SlidersHorizontal size={16} />
+            Lọc thêm
+          </button>
         </div>
+
+        {isFilterExpanded ? (
+          <div className="grid gap-2 rounded-md border border-line bg-paper p-3 md:grid-cols-4">
+            <select
+              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+              value={productionDestinationFilter}
+              onChange={(event) => onDestinationFilterChange(event.target.value)}
+              title="Lọc theo cửa hàng"
+              aria-label="Lọc theo cửa hàng"
+            >
+              <option value={ALL_DESTINATIONS_FILTER}>{ALL_DESTINATIONS_FILTER}</option>
+              {productionOrderDestinations.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <select
+              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+              value={productionCodeMonthFilter}
+              onChange={(event) => onCodeMonthFilterChange(event.target.value)}
+              title="Lọc theo tháng (dựa vào Mã LSX)"
+              aria-label="Lọc theo tháng"
+            >
+              <option value={ALL_CODE_MONTHS_FILTER}>{ALL_CODE_MONTHS_FILTER}</option>
+              {productionCodeMonthOptions.map((codeMonth) => (
+                <option key={codeMonth} value={codeMonth}>
+                  {formatCodeMonthLabel(codeMonth)}
+                </option>
+              ))}
+            </select>
+            <select
+              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+              value={productionSalesType}
+              onChange={(event) => onSalesTypeChange(event.target.value)}
+              aria-label="Lọc theo phân loại KH"
+            >
+              <option>Tất cả phân loại KH</option>
+              {productionOrderSalesTypeOptions.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+            <select
+              className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+              value={productionDeadlineFilter}
+              onChange={(event) => onDeadlineFilterChange(event.target.value)}
+              aria-label="Lọc theo deadline"
+            >
+              <option>Tất cả deadline</option>
+              <option>Quá hạn</option>
+              <option>Hôm nay</option>
+              <option>7 ngày tới</option>
+              <option>Chưa có deadline</option>
+            </select>
+            <button
+              className="h-10 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper"
+              type="button"
+              onClick={clearFilters}
+            >
+              Xóa lọc
+            </button>
+          </div>
+        ) : null}
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
