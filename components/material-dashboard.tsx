@@ -730,6 +730,7 @@ export function MaterialDashboard() {
               onDraftChange={updateDraft}
               onSelectStage={selectStageTab}
               onSave={addOrder}
+              onSaveAsync={addOrderAsync}
               onRemoveMovement={removeOrder}
               onUpdateStageMovement={updateStageMovementFields}
               onSelectItem={selectItemForDraft}

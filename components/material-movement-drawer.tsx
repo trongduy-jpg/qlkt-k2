@@ -71,8 +71,9 @@ type MaterialMovementDrawerProps = {
   onDraftChange: <K extends keyof ProductionOrder>(key: K, value: ProductionOrder[K]) => void;
   onSelectStage: (stageCode: string) => void;
   onSave: (resetMode?: "close" | "clearStage" | "keepStage") => void;
+  onSaveAsync: (resetMode?: "close" | "clearStage" | "keepStage") => Promise<void>;
   onRemoveMovement: (id: string) => void;
-  onUpdateStageMovement: (order: ProductionOrder) => void;
+  onUpdateStageMovement: (order: ProductionOrder) => Promise<void>;
   onSelectItem: (item: { sku: string; productName?: string }) => void;
 };
 
@@ -95,6 +96,7 @@ export function MaterialMovementDrawer({
   onDraftChange,
   onSelectStage,
   onSave,
+  onSaveAsync,
   onRemoveMovement,
   onUpdateStageMovement,
   onSelectItem
@@ -129,23 +131,40 @@ export function MaterialMovementDrawer({
   const selectedItemSku = draft.itemSku || draft.sku;
   const requiresItemSelection = itemsForDraft.length > 0 && !selectedItemSku.trim();
 
+  const isMultiWorkerStageActive =
+    movementFormTab === "stage" && Boolean(activeStageCode) && !isSingleWorkerStage(activeStageCode);
+  const dirtyRowMovements = currentDrawerStageMovements.filter(
+    (movement) => rowEdits[movement.id] && Object.keys(rowEdits[movement.id]).length > 0
+  );
+
   function updateRowEdit<K extends keyof ProductionOrder>(movementId: string, key: K, value: ProductionOrder[K]) {
     setRowEdits((current) => ({ ...current, [movementId]: { ...current[movementId], [key]: value } }));
   }
 
-  function saveRowEdit(movement: ProductionOrder) {
-    const edits = rowEdits[movement.id];
-    if (!edits) return;
-    onUpdateStageMovement({ ...movement, ...edits });
-    setRowEdits((current) => {
-      const next = { ...current };
-      delete next[movement.id];
-      return next;
-    });
-  }
-
   function toggleRowExpanded(movementId: string) {
     setExpandedRowIds((current) => ({ ...current, [movementId]: !current[movementId] }));
+  }
+
+  // Nut "Luu" o day (footer) la nut luu DUY NHAT cho khau nhieu tho: luu tat
+  // ca cac khoi tho da sua (dirtyRowMovements) + khoi "Tho moi" dang nhap
+  // (neu da chon tho), roi dong drawer. Bo di nut "Cap nhat tho nay" rieng
+  // cho tung khoi de giao dien gon, dung 1 nut luu chung nhu user yeu cau.
+  async function handleFooterSave() {
+    if (!isMultiWorkerStageActive) {
+      onSave(editingMovementId ? "close" : "clearStage");
+      return;
+    }
+
+    for (const movement of dirtyRowMovements) {
+      await onUpdateStageMovement({ ...movement, ...rowEdits[movement.id] });
+    }
+    setRowEdits({});
+
+    if (draft.worker.trim()) {
+      await onSaveAsync("close");
+    } else {
+      onClose();
+    }
   }
 
   return (
@@ -465,7 +484,7 @@ export function MaterialMovementDrawer({
                                   </p>
                                 </div>
                                 <p className="mt-1 text-xs leading-5 text-zinc-500">
-                                  Mỗi thợ là 1 khối riêng, giữ nguyên toàn bộ dữ liệu. Điền khối &quot;Thợ mới&quot; ở cuối rồi bấm &quot;Thêm thợ vào khâu&quot; để lưu và mở 1 khối trống kế tiếp cho thợ sau.
+                                  Mỗi thợ là 1 khối riêng. Sửa trực tiếp trong khối rồi bấm nút &quot;Lưu&quot; ở dưới đáy để lưu tất cả — không cần nút lưu riêng cho từng thợ. Muốn thêm nhiều thợ liên tiếp thì điền khối &quot;Thợ mới&quot; rồi bấm &quot;Thêm thợ vào khâu&quot;.
                                 </p>
 
                                 <div className="mt-3 grid gap-2">
@@ -539,16 +558,6 @@ export function MaterialMovementDrawer({
                                               activeStageCode={activeStageCode}
                                               nangCaoLabel={`Nâng cao — NXT / hao hụt của thợ "${values.worker || "này"}"`}
                                             />
-
-                                            <button
-                                              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
-                                              type="button"
-                                              onClick={() => saveRowEdit(movement)}
-                                              disabled={!isDirty || rowClosed}
-                                            >
-                                              <Check size={15} />
-                                              Cập nhật thợ này
-                                            </button>
                                           </div>
                                         ) : null}
                                       </div>
@@ -616,6 +625,11 @@ export function MaterialMovementDrawer({
           <p className="text-xs leading-5 text-zinc-500">
             Trường có dấu <span className="font-semibold text-rose-500">*</span> là bắt buộc. Mỗi khâu có mục &quot;Nâng cao&quot; riêng cho NXT/hao hụt; nút lưu luôn ở dưới đáy.
           </p>
+          {isMultiWorkerStageActive && dirtyRowMovements.length > 0 ? (
+            <div className="mt-1 rounded-md border border-jade/30 bg-jade/10 px-3 py-2 text-xs font-medium text-emerald-800">
+              Có {dirtyRowMovements.length} thợ đã sửa chưa lưu. Bấm &quot;Lưu&quot; để lưu tất cả.
+            </div>
+          ) : null}
           {isDraftForClosedOrder ? (
             <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">
               LSX này đã chốt. Bạn vẫn có thể cập nhật NK NVL theo luồng xử lý thực tế.
@@ -630,9 +644,9 @@ export function MaterialMovementDrawer({
             <button
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
               type="button"
-              onClick={() => onSave(isEditing ? "close" : "clearStage")}
+              onClick={handleFooterSave}
               disabled={isDraftDirectChargeInvalid}
-              title={isEditing ? undefined : "Lưu khâu này, drawer vẫn mở để chọn khâu tiếp theo của cùng LSX"}
+              title={isEditing ? undefined : "Lưu toàn bộ thay đổi ở khâu này rồi đóng"}
             >
               {isEditing ? <Check size={16} /> : <Plus size={16} />}
               {isEditing ? "Cập nhật NVL" : "Lưu"}
