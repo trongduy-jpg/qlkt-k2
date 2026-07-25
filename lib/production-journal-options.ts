@@ -33,31 +33,22 @@ export const productionOrderDestinations: SelectOption[] = [
   { value: "PSX L2", label: "PSX L2" }
 ];
 
+// Chi giu cac quy cach 1 loai NVL duy nhat - bo cac ma ghep nhieu loai
+// (VD "18KW/KY", "24K/PT", "PT950-18K") theo yeu cau don gian hoa dropdown.
 export const productionOrderMaterialSpecOptions: SelectOption[] = [
   { value: "18KY", label: "18KY" },
   { value: "18KW", label: "18KW" },
   { value: "18KR", label: "18KR" },
   { value: "18K3M", label: "18K3M" },
-  { value: "18KW/KY", label: "18KW/KY" },
-  { value: "18KW/KR", label: "18KW/KR" },
-  { value: "18KW/KY/KR", label: "18KW/KY/KR" },
-  { value: "18KY/KR", label: "18KY/KR" },
   { value: "14KY", label: "14KY" },
   { value: "14KW", label: "14KW" },
   { value: "14KR", label: "14KR" },
-  { value: "14KW/KY", label: "14KW/KY" },
   { value: "10KY", label: "10KY" },
   { value: "10KW", label: "10KW" },
   { value: "24K", label: "24K" },
   { value: "22K", label: "22K" },
-  { value: "24K/18KY", label: "24K/18KY" },
-  { value: "22K/18KY", label: "22K/18KY" },
   { value: "PT950", label: "PT950" },
   { value: "PT900", label: "PT900" },
-  { value: "PT950-18K", label: "PT950-18K" },
-  { value: "PT/18KW", label: "PT/18KW" },
-  { value: "PT/18KY", label: "PT/18KY" },
-  { value: "24K/PT", label: "24K/PT" },
   { value: "BAC", label: "BAC" },
   { value: "BAC925", label: "BAC925" }
 ];

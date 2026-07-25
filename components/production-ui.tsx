@@ -2,7 +2,7 @@
 
 import { Children, isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Calendar, Check, ChevronDown, Search } from "lucide-react";
+import { Calendar, Check, ChevronDown } from "lucide-react";
 import { hasMeaningfulDisplayValue } from "@/lib/production-helpers";
 import { formatDisplayDate } from "@/lib/production-business-rules";
 import type { SelectOption } from "@/lib/production-journal-options";
@@ -107,8 +107,6 @@ export function SelectControl({
 
 export type SearchableSelectGroup = { label?: string; options: SelectOption[] };
 
-const SEARCH_THRESHOLD = 8;
-
 type PanelCoords = { top: number; left: number; width: number };
 
 // Dropdown tuy bien thay cho <select> goc: <select> de trinh duyet ve popup
@@ -143,13 +141,11 @@ export function SearchableSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [coords, setCoords] = useState<PanelCoords | null>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const allOptions = useMemo(() => groups.flatMap((group) => group.options), [groups]);
   const selectedOption = allOptions.find((option) => option.value === value);
-  const showSearch = allOptions.length > SEARCH_THRESHOLD;
 
   const filteredGroups = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -204,31 +200,55 @@ export function SearchableSelect({
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (isOpen && showSearch) searchInputRef.current?.focus();
-  }, [isOpen, showSearch]);
-
   function selectValue(nextValue: string) {
     onChange(nextValue);
     close();
   }
 
+  // Go truc tiep vao o de tim/loc (khong can bam mo panel truoc) - ca o va
+  // icon deu mo panel khi bam, tranh loi truoc day chi bam trung dung icon
+  // moi mo duoc do dung <button> lam trigger (vung bam qua nho/de bam hut).
   return (
-    <>
-      <button
-        ref={triggerRef}
-        type="button"
-        className={`${fieldControlClass} flex items-center justify-between gap-2 text-left`}
-        onClick={() => (isOpen ? close() : openPanel())}
-        onKeyDown={(event) => {
-          if (event.key === "Escape") close();
-        }}
-      >
-        <span className={`truncate ${selectedOption ? "text-ink" : "text-zinc-400"}`} title={selectedOption?.label}>
-          {selectedOption?.displayLabel ?? selectedOption?.label ?? placeholder}
-        </span>
-        <ChevronDown className={`size-4 shrink-0 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-      </button>
+    <div className="relative">
+      <div className="relative flex h-11 items-center rounded-md border border-line bg-white transition-colors focus-within:border-jade focus-within:ring-2 focus-within:ring-jade/25">
+        <input
+          ref={triggerRef}
+          type="text"
+          className="h-full w-full min-w-0 flex-1 truncate rounded-md bg-transparent pl-3 pr-1 text-sm text-ink outline-none placeholder:text-zinc-400"
+          placeholder={isOpen ? "Gõ để tìm kiếm..." : selectedOption ? undefined : placeholder}
+          value={isOpen ? query : (selectedOption?.displayLabel ?? selectedOption?.label ?? "")}
+          title={selectedOption?.label}
+          onFocus={() => {
+            setQuery("");
+            openPanel();
+          }}
+          onClick={() => {
+            if (!isOpen) openPanel();
+          }}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            if (!isOpen) openPanel();
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") close();
+          }}
+        />
+        <button
+          type="button"
+          tabIndex={-1}
+          className="flex h-full shrink-0 items-center px-3"
+          onClick={() => {
+            if (isOpen) {
+              close();
+            } else {
+              triggerRef.current?.focus();
+              openPanel();
+            }
+          }}
+        >
+          <ChevronDown className={`size-4 shrink-0 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        </button>
+      </div>
 
       {isOpen && coords && typeof document !== "undefined"
         ? createPortal(
@@ -237,22 +257,6 @@ export function SearchableSelect({
               style={{ position: "fixed", top: coords.top, left: coords.left, width: coords.width }}
               className="z-50 overflow-hidden rounded-md border border-line bg-white shadow-lg"
             >
-              {showSearch ? (
-                <div className="relative border-b border-line">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
-                  <input
-                    ref={searchInputRef}
-                    className="h-10 w-full bg-white pl-9 pr-3 text-sm text-ink outline-none placeholder:text-zinc-400"
-                    placeholder="Gõ để tìm kiếm..."
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Escape") close();
-                    }}
-                  />
-                </div>
-              ) : null}
-
               <div className="max-h-64 overflow-y-auto py-1">
                 {clearLabel ? (
                   <button
@@ -301,7 +305,7 @@ export function SearchableSelect({
             document.body
           )
         : null}
-    </>
+    </div>
   );
 }
 
