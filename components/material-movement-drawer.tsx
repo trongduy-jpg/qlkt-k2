@@ -551,18 +551,7 @@ export function MaterialMovementDrawer({
                               </div>
                             </details>
 
-                            {single ? (
-                              <button
-                                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-600"
-                                type="button"
-                                onClick={() => onSave("clearStage")}
-                                disabled={isDraftDirectChargeInvalid || !draft.worker.trim()}
-                                title="Lưu khâu này rồi đóng lại để chọn khâu kế tiếp"
-                              >
-                                <Check size={15} />
-                                Lưu khâu này
-                              </button>
-                            ) : (
+                            {single ? null : (
                               <div className="mt-3 rounded-md border border-dashed border-line bg-white p-3">
                                 <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
                                   Thợ đã ghi nhận cho khâu này ({currentDrawerStageMovements.length})
