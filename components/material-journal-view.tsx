@@ -44,12 +44,7 @@ export function MaterialJournalView({
 }: MaterialJournalViewProps) {
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <p className="text-sm text-zinc-600">
-            Màn này chỉ dùng để tiếp nhận LSX mới và ghi nhận giao dịch NVL phát sinh.
-          </p>
-        </div>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
         <div className="flex flex-wrap gap-2">
           <button
             className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold uppercase tracking-wide text-white"
@@ -85,9 +80,7 @@ export function MaterialJournalView({
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h4 className="text-sm font-bold text-ink">Lịch sử giao dịch NVL</h4>
-            <p className="mt-1 text-xs text-zinc-500">
-              Mỗi dòng chỉ hiện thông tin chung của khâu (đang ở khâu nào). Bấm "Sửa NVL" để xem chi tiết Xuất/Nhập/Hao hụt của từng thợ.
-            </p>
+            <p className="mt-1 text-xs text-zinc-500">Bấm "Sửa NVL" để xem chi tiết Xuất/Nhập/Hao hụt từng thợ.</p>
           </div>
           {orders.length > 0 ? (
             <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">

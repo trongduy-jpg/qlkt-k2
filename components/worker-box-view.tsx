@@ -136,7 +136,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-brass">Báo cáo tồn hộp thợ</p>
-            <h3 className="mt-1 text-lg font-bold text-ink">Đối soát tồn hộp thợ theo kỳ</h3>
+            <h3 className="mt-1 text-lg font-bold text-ink">Đối soát theo kỳ</h3>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -263,7 +263,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
 
         {!useDemoData && lines.length > 0 ? (
           <div className="mt-3 rounded-md border border-dashed border-amber-200 bg-amber-50/60 px-3 py-2 text-sm text-amber-800">
-            Số liệu tự động tổng hợp từ Nhật ký NVL (sổ sách), chưa đối chiếu với tồn thực tế kiểm đếm tại xưởng.
+            Số liệu tự động tổng hợp từ Nhật ký NVL, chưa đối chiếu tồn thực tế tại xưởng.
           </div>
         ) : null}
 

@@ -207,7 +207,7 @@ export function ProductionOrdersView({
           <div className="flex items-center justify-between">
             <div>
               <h4 className="text-sm font-bold text-ink">Danh sách lệnh sản xuất</h4>
-              <p className="mt-1 text-xs text-zinc-500">Mỗi Mã hàng là 1 dòng riêng. Bấm vào dòng để mở chi tiết.</p>
+              <p className="mt-1 text-xs text-zinc-500">Bấm vào dòng để xem chi tiết.</p>
             </div>
             <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
               {filteredOrderSummaries.length} Mã hàng
