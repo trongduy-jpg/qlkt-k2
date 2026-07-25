@@ -133,8 +133,8 @@ export function MaterialJournalView({
                   <td className="px-3 py-3 text-zinc-700">{order.material}</td>
                   <td className="px-3 py-3">
                     {stageIndex >= 0 ? (
-                      <div className="font-medium text-zinc-800">
-                        Khâu {stageIndex + 1}/{stageOptionsForDropdown.length} · {getStageLabel(stageCode)}
+                      <div className="font-semibold text-sky-700">
+                        [{stageIndex + 1}] {getStageLabel(stageCode)}
                       </div>
                     ) : (
                       <div className="font-medium text-zinc-400">Chưa bắt đầu</div>
