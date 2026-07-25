@@ -287,33 +287,50 @@ export type LossReportRow = {
   loss: number;
   convertedLoss: number;
   worker: string;
-  lsxCode: string;
-  sku: string;
   status: Status;
 };
 
+// Gop theo Khau + Tho + Loai vang/NVL + Trang thai: bang hao hut la tong
+// hop CA THANG cho 1 to hop khau/tho/loai NVL, khong con tach rieng theo
+// tung LSX/Ma hang nua (truoc day moi giao dich la 1 dong rieng, de nham
+// nguoi dung tuong day la so lieu cua 1 LSX cu the).
 export function buildLossReportRows(orders: ProductionOrder[]): LossReportRow[] {
-  return orders
-    .map((order) => {
-      const purity = Number(order.goldAge || (order.convertedIssueWeight && order.issued ? order.convertedIssueWeight / order.issued : 1));
-      const convertedLoss = Number((order.loss * purity).toFixed(4));
+  const groups = new Map<string, LossReportRow>();
 
-      return {
-        id: order.id,
-        stage: normalizeStageCode(order.stage),
-        count: 1,
-        material: order.material || "-",
-        issued: order.issued,
-        returned: order.returned,
-        loss: order.loss,
-        convertedLoss,
-        worker: order.worker || "-",
-        lsxCode: order.code || "-",
-        sku: order.sku || "-",
-        status: order.status
-      };
-    })
-    .sort((a, b) => b.loss - a.loss);
+  for (const order of orders) {
+    const stage = normalizeStageCode(order.stage);
+    const material = order.material || "-";
+    const worker = order.worker || "-";
+    const key = `${stage}::${worker}::${material}::${order.status}`;
+
+    const purity = Number(order.goldAge || (order.convertedIssueWeight && order.issued ? order.convertedIssueWeight / order.issued : 1));
+    const convertedLoss = Number((order.loss * purity).toFixed(4));
+
+    const existing = groups.get(key);
+    if (existing) {
+      existing.count += 1;
+      existing.issued += order.issued;
+      existing.returned += order.returned;
+      existing.loss += order.loss;
+      existing.convertedLoss = Number((existing.convertedLoss + convertedLoss).toFixed(4));
+      continue;
+    }
+
+    groups.set(key, {
+      id: key,
+      stage,
+      count: 1,
+      material,
+      issued: order.issued,
+      returned: order.returned,
+      loss: order.loss,
+      convertedLoss,
+      worker,
+      status: order.status
+    });
+  }
+
+  return Array.from(groups.values()).sort((a, b) => b.loss - a.loss);
 }
 
 export type StageProgressItem = {

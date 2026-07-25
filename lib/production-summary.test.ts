@@ -245,12 +245,29 @@ describe("buildDraftStageMovements va buildStageProgress", () => {
 describe("buildLossReportRows", () => {
   it("tinh hao hut quy doi theo tuoi vang va sap xep giam dan theo loss", () => {
     const orders = [
-      makeOrder({ id: "a", loss: 1, goldAge: 0.75 }),
-      makeOrder({ id: "b", loss: 5, goldAge: 0.61 })
+      makeOrder({ id: "a", stage: "CKE", loss: 1, goldAge: 0.75 }),
+      makeOrder({ id: "b", stage: "DAN", loss: 5, goldAge: 0.61 })
     ];
     const rows = buildLossReportRows(orders);
-    expect(rows[0].id).toBe("b");
+    expect(rows[0].stage).toBe("DAN");
     expect(rows[0].convertedLoss).toBeCloseTo(5 * 0.61, 4);
+    expect(rows[1].stage).toBe("CKE");
     expect(rows[1].convertedLoss).toBeCloseTo(1 * 0.75, 4);
+  });
+
+  it("gop cac giao dich cung Khau + Tho + Loai NVL + Trang thai thanh 1 dong tong", () => {
+    const orders = [
+      makeOrder({ id: "a", stage: "CKE", worker: "Nguyen Van An", material: "Vàng 18K", loss: 2, issued: 10, returned: 8, goldAge: 0.75 }),
+      makeOrder({ id: "b", stage: "CKE", worker: "Nguyen Van An", material: "Vàng 18K", loss: 3, issued: 5, returned: 2, goldAge: 0.75 }),
+      makeOrder({ id: "c", stage: "CKE", worker: "Tran Thi Bich", material: "Vàng 18K", loss: 1, issued: 4, returned: 3, goldAge: 0.75 })
+    ];
+    const rows = buildLossReportRows(orders);
+    expect(rows).toHaveLength(2);
+    const merged = rows.find((row) => row.worker === "Nguyen Van An")!;
+    expect(merged.count).toBe(2);
+    expect(merged.issued).toBe(15);
+    expect(merged.returned).toBe(10);
+    expect(merged.loss).toBe(5);
+    expect(merged.convertedLoss).toBeCloseTo(5 * 0.75, 4);
   });
 });
