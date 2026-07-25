@@ -417,13 +417,16 @@ export function MaterialMovementDrawer({
                             <p className="text-[11px] text-zinc-400">{single ? "1 thợ" : "Nhiều thợ"}</p>
                           </div>
                           {active ? (
-                            <div className="w-40 shrink-0" onClick={(event) => event.stopPropagation()}>
-                              <SelectControl value={draft.stageStatus ?? "Đang thực hiện"} onChange={(value) => onDraftChange("stageStatus", value)}>
-                                {movementStageStatusOptions.map((option) => (
-                                  <option key={option.value} value={option.value}>{option.label}</option>
-                                ))}
-                              </SelectControl>
-                            </div>
+                            <select
+                              className="h-9 w-40 shrink-0 cursor-pointer rounded-md border border-line bg-white px-2 text-xs text-ink outline-none focus:border-jade focus:ring-2 focus:ring-jade/25"
+                              value={draft.stageStatus ?? "Đang thực hiện"}
+                              onClick={(event) => event.stopPropagation()}
+                              onChange={(event) => onDraftChange("stageStatus", event.target.value)}
+                            >
+                              {movementStageStatusOptions.map((option) => (
+                                <option key={option.value} value={option.value}>{option.label}</option>
+                              ))}
+                            </select>
                           ) : (
                             <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ${stageStatusPillClass(recorded?.stageStatus)}`}>
                               {recorded?.stageStatus ?? "Chưa nhập"}
@@ -495,6 +498,11 @@ export function MaterialMovementDrawer({
                                 </SelectControl>
                               </FieldShell>
                             </div>
+                            {isDraftDirectChargeInvalid ? (
+                              <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
+                                Không thể lưu: trạng thái &quot;Xác định&quot; chỉ áp dụng cho công đoạn Cán kéo, Đan dây hoặc Biến. Đổi lại &quot;Trạng thái tính hao&quot; ở trên (VD: Treo nợ, Đang xử lý) để tiếp tục lưu.
+                              </div>
+                            ) : null}
                             <div className="mt-3">
                               <FieldShell label="Diễn giải giao dịch">
                                 <input
