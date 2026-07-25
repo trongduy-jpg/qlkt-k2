@@ -30,6 +30,7 @@ import {
   ALL_DESTINATIONS_FILTER,
   buildOrderCodeMonthOptions,
   buildProductionOverview,
+  buildStageWorkerAggregates,
   filterJournalOrders,
   filterProductionSummaries,
   pickCurrentStagePerOrder
@@ -211,6 +212,13 @@ export function MaterialDashboard() {
     const currentStageRows = pickCurrentStagePerOrder(orders, mainJournalStageCodes);
     return filterJournalOrders(currentStageRows, { query, status });
   }, [orders, query, status]);
+
+  // Xuat/Nhap/Hao hut tong hop cho TAT CA tho cung khau cua dong dai dien -
+  // tranh bang chi hien so lieu cua 1 tho bat ky khi khau co nhieu tho.
+  const stageAggregatesByRowId = useMemo(
+    () => buildStageWorkerAggregates(orders, filteredOrders),
+    [orders, filteredOrders]
+  );
 
   const orderSummaries = useMemo(() => buildOrderSummaries(orders, productionHeaders), [orders, productionHeaders]);
 
@@ -701,6 +709,7 @@ export function MaterialDashboard() {
             <MaterialJournalView
               isVisible={isMovement}
               orders={filteredOrders}
+              stageAggregates={stageAggregatesByRowId}
               query={query}
               status={status}
               recentCreatedOrderCode={recentCreatedOrderCode}

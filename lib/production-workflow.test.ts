@@ -4,6 +4,7 @@ import type { OrderSummary, ProductionOrderHeader } from "./production-types";
 import {
   buildProductionOverview,
   buildSelectedOrderDetail,
+  buildStageWorkerAggregates,
   filterJournalOrders,
   filterProductionSummaries,
   pickCurrentStagePerOrder
@@ -182,6 +183,32 @@ describe("pickCurrentStagePerOrder", () => {
       makeMovement({ id: "b", code: "DHAG-1", stage: "GEP", occurredDate: "2026-07-20" })
     ];
     expect(pickCurrentStagePerOrder(rows, STAGE_ORDER).map((item) => item.id)).toEqual(["b"]);
+  });
+});
+
+describe("buildStageWorkerAggregates", () => {
+  it("tinh tong Xuat/Nhap/Hao hut + so tho cua TAT CA tho cung khau, khong chi 1 tho dai dien", () => {
+    const rows = [
+      makeMovement({ id: "a", code: "DHAG-1", stage: "GEP", occurredDate: "2026-07-18", issued: 5, returned: 4, loss: 1 }),
+      makeMovement({ id: "b", code: "DHAG-1", stage: "GEP", occurredDate: "2026-07-20", issued: 3, returned: 2, loss: 1 })
+    ];
+    const representative = pickCurrentStagePerOrder(rows, STAGE_ORDER);
+    expect(representative.map((item) => item.id)).toEqual(["b"]);
+
+    const aggregates = buildStageWorkerAggregates(rows, representative);
+    const aggregate = aggregates.get("b")!;
+    expect(aggregate.workerCount).toBe(2);
+    expect(aggregate.totalIssued).toBe(8);
+    expect(aggregate.totalReturned).toBe(6);
+    expect(aggregate.totalLoss).toBe(2);
+  });
+
+  it("khau chi 1 tho: tong hop bang dung so lieu cua tho do", () => {
+    const rows = [makeMovement({ id: "solo", code: "DHAG-2", stage: "CKE", issued: 7, returned: 5, loss: 2 })];
+    const representative = pickCurrentStagePerOrder(rows, STAGE_ORDER);
+    const aggregate = buildStageWorkerAggregates(rows, representative).get("solo")!;
+    expect(aggregate.workerCount).toBe(1);
+    expect(aggregate.totalIssued).toBe(7);
   });
 
   it("khong gop hai Ma hang khac nhau trong cung LSX vao mot dong NK NVL", () => {

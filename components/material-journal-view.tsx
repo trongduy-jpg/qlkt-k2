@@ -4,10 +4,16 @@ import { Plus } from "lucide-react";
 import type { ProductionOrder } from "@/lib/domain/production";
 import { formatDisplayDate, getStageLabel } from "@/lib/production-business-rules";
 import { formatGram, isClosedStatus, statusClass, statusOptions } from "@/lib/production-helpers";
+import type { StageWorkerAggregate } from "@/lib/production-workflow";
 
 type MaterialJournalViewProps = {
   isVisible: boolean;
   orders: ProductionOrder[];
+  // Tong hop Xuat/Nhap/Hao hut cua TAT CA tho cung khau (keyed theo id cua
+  // dong dai dien) - dung de bang hien thong tin CHUNG cua khau thay vi so
+  // lieu cua 1 tho bat ky khi khau co nhieu tho. Chi tiet tung tho phai mo
+  // sidebar (Sua NVL) moi thay.
+  stageAggregates: Map<string, StageWorkerAggregate>;
   query: string;
   status: (typeof statusOptions)[number];
   recentCreatedOrderCode: string | null;
@@ -21,6 +27,7 @@ type MaterialJournalViewProps = {
 export function MaterialJournalView({
   isVisible,
   orders,
+  stageAggregates,
   query,
   status,
   recentCreatedOrderCode,
@@ -73,7 +80,9 @@ export function MaterialJournalView({
         <div className="mb-3 flex items-center justify-between">
           <div>
             <h4 className="text-sm font-bold text-ink">Lịch sử giao dịch NVL</h4>
-            <p className="mt-1 text-xs text-zinc-500">Bấm "Sửa NVL" để chỉnh sửa một dòng đã ghi nhận.</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              Mỗi dòng chỉ hiện thông tin chung của khâu (đang ở khâu nào, tổng Xuất/Nhập/Hao hụt). Bấm "Sửa NVL" để xem chi tiết từng thợ.
+            </p>
           </div>
           {orders.length > 0 ? (
             <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
@@ -91,17 +100,19 @@ export function MaterialJournalView({
                 <th className="px-3 py-3">Mã LSX</th>
                 <th className="px-3 py-3">Loại NVL</th>
                 <th className="px-3 py-3">NVL</th>
-                <th className="px-3 py-3">Thợ / công đoạn</th>
+                <th className="px-3 py-3">Công đoạn</th>
                 <th className="px-3 py-3 text-right">SL</th>
-                <th className="px-3 py-3 text-right">Xuất</th>
-                <th className="px-3 py-3 text-right">Nhập</th>
-                <th className="px-3 py-3 text-right">Hao hụt</th>
+                <th className="px-3 py-3 text-right" title="Tổng Xuất của tất cả thợ trong khâu này">Xuất</th>
+                <th className="px-3 py-3 text-right" title="Tổng Nhập của tất cả thợ trong khâu này">Nhập</th>
+                <th className="px-3 py-3 text-right" title="Tổng Hao hụt của tất cả thợ trong khâu này">Hao hụt</th>
                 <th className="px-3 py-3">Hao/NXT</th>
                 <th className="px-3 py-3">Trạng thái</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {orders.map((order) => {
+                const aggregate = stageAggregates.get(order.id);
+                return (
                 <tr
                   key={order.id}
                   className={`border-b ${isClosedStatus(order.status) ? "" : "cursor-pointer hover:bg-paper"} ${
@@ -125,18 +136,22 @@ export function MaterialJournalView({
                   <td className="px-3 py-3 text-zinc-700">{order.materialType || "-"}</td>
                   <td className="px-3 py-3 text-zinc-700">{order.material}</td>
                   <td className="px-3 py-3">
-                    <div className="font-medium text-zinc-800">{order.worker}</div>
-                    <div className="text-xs text-zinc-500">{order.stage ? getStageLabel(order.stage) : "-"}</div>
+                    <div className="font-medium text-zinc-800">{order.stage ? getStageLabel(order.stage) : "-"}</div>
+                    {aggregate && aggregate.workerCount > 1 ? (
+                      <div className="text-xs text-zinc-500">{aggregate.workerCount} thợ - xem chi tiết ở Sửa NVL</div>
+                    ) : (
+                      <div className="text-xs text-zinc-500">{order.worker || "Chưa phân công"}</div>
+                    )}
                   </td>
                   <td className="px-3 py-3 text-right text-zinc-700">{order.qtyPiece ?? "-"}</td>
-                  <td className={`px-3 py-3 text-right ${order.issued > 0 ? "text-zinc-700" : "text-zinc-400"}`}>
-                    {formatGram(order.issued)}
+                  <td className={`px-3 py-3 text-right ${(aggregate?.totalIssued ?? order.issued) > 0 ? "text-zinc-700" : "text-zinc-400"}`}>
+                    {formatGram(aggregate?.totalIssued ?? order.issued)}
                   </td>
-                  <td className={`px-3 py-3 text-right ${order.returned > 0 ? "text-zinc-700" : "text-zinc-400"}`}>
-                    {formatGram(order.returned)}
+                  <td className={`px-3 py-3 text-right ${(aggregate?.totalReturned ?? order.returned) > 0 ? "text-zinc-700" : "text-zinc-400"}`}>
+                    {formatGram(aggregate?.totalReturned ?? order.returned)}
                   </td>
-                  <td className={`px-3 py-3 text-right font-semibold ${order.loss > 0 ? "text-ink" : "text-zinc-400"}`}>
-                    {formatGram(order.loss)}
+                  <td className={`px-3 py-3 text-right font-semibold ${(aggregate?.totalLoss ?? order.loss) > 0 ? "text-ink" : "text-zinc-400"}`}>
+                    {formatGram(aggregate?.totalLoss ?? order.loss)}
                   </td>
                   <td className="px-3 py-3 text-xs text-zinc-600">
                     <div>{order.lossPeriod || "-"}</div>
@@ -151,7 +166,8 @@ export function MaterialJournalView({
                     </span>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         ) : (

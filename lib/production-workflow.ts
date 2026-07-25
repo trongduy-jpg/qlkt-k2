@@ -148,6 +148,41 @@ export function pickCurrentStagePerOrder(orders: ProductionOrder[], stageOrder: 
     .map((entry) => entry.order);
 }
 
+export type StageWorkerAggregate = {
+  workerCount: number;
+  totalIssued: number;
+  totalReturned: number;
+  totalLoss: number;
+};
+
+// Bang NK NVL chi hien 1 dong dai dien/khau (pickCurrentStagePerOrder), nhung
+// neu khau do co NHIEU tho thi Xuat/Nhap/Hao hut cua rieng dong dai dien
+// (1 tho bat ky) khong phan anh dung ca khau - de trung, gay hieu nham nhu
+// do la so lieu chung. Ham nay tinh tong hop (so tho + tong xuat/nhap/hao
+// hut cua TAT CA tho cung khau) theo dung dong dai dien, dung de bang hien
+// "thong tin chung cua khau" thay vi so lieu cua 1 tho; chi tiet tung tho
+// rieng le van phai mo sidebar (drawer) moi thay.
+export function buildStageWorkerAggregates(
+  allOrders: ProductionOrder[],
+  representativeRows: ProductionOrder[]
+): Map<string, StageWorkerAggregate> {
+  const result = new Map<string, StageWorkerAggregate>();
+  for (const row of representativeRows) {
+    const stageCode = normalizeStageCode(row.stage);
+    const rowItemSku = row.itemSku || row.sku;
+    const matches = allOrders.filter(
+      (order) => order.code === row.code && (order.itemSku || order.sku) === rowItemSku && normalizeStageCode(order.stage) === stageCode
+    );
+    result.set(row.id, {
+      workerCount: matches.length,
+      totalIssued: matches.reduce((sum, order) => sum + (order.issued || 0), 0),
+      totalReturned: matches.reduce((sum, order) => sum + (order.returned || 0), 0),
+      totalLoss: matches.reduce((sum, order) => sum + (order.loss || 0), 0)
+    });
+  }
+  return result;
+}
+
 export function filterJournalOrders(orders: ProductionOrder[], filters: JournalOrderFilters): ProductionOrder[] {
   const normalizedQuery = filters.query.trim().toLowerCase();
 
