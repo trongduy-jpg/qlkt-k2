@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import type { ProductionOrder } from "@/lib/domain/production";
 import { formatDisplayDate, normalizeStageCode } from "@/lib/production-business-rules";
 import { isClosedStatus, statusClass, statusOptions } from "@/lib/production-helpers";
-import type { StageOption } from "@/lib/production-summary";
+import { orderRowKey, type StageOption } from "@/lib/production-summary";
 import type { StageWorkerAggregate } from "@/lib/production-workflow";
 
 type MaterialJournalViewProps = {
@@ -18,6 +18,10 @@ type MaterialJournalViewProps = {
   // Danh sach 12 khau theo dung thu tu quy trinh - dung tinh "Khau X/12"
   // hien kem ten khau trong cot "Cong doan hien tai".
   stageOptionsForDropdown: StageOption[];
+  // So luong (SL) cua dung Ma hang, keyed theo orderRowKey(code, sku) -
+  // day la So luong nhap o Lenh san xuat, KHONG PHAI order.qtyPiece cua
+  // tung giao dich (truong do chi co gia tri o khau DKB).
+  plannedQtyByRowKey: Map<string, number>;
   query: string;
   status: (typeof statusOptions)[number];
   recentCreatedOrderCode: string | null;
@@ -33,6 +37,7 @@ export function MaterialJournalView({
   orders,
   stageAggregates,
   stageOptionsForDropdown,
+  plannedQtyByRowKey,
   query,
   status,
   recentCreatedOrderCode,
@@ -108,6 +113,7 @@ export function MaterialJournalView({
                 const aggregate = stageAggregates.get(order.id);
                 const stageCode = order.stage ? normalizeStageCode(order.stage) : "";
                 const stageIndex = stageCode ? stageOptionsForDropdown.findIndex((item) => item.value === stageCode) : -1;
+                const plannedQty = plannedQtyByRowKey.get(orderRowKey(order));
                 return (
                 <tr
                   key={order.id}
@@ -143,7 +149,7 @@ export function MaterialJournalView({
                       <div className="text-xs text-zinc-500">{order.worker || "Chưa phân công"}</div>
                     )}
                   </td>
-                  <td className="px-3 py-3 text-right text-zinc-700">{order.qtyPiece ?? "-"}</td>
+                  <td className="px-3 py-3 text-right text-zinc-700">{plannedQty || order.qtyPiece || "-"}</td>
                   <td className="px-3 py-3">
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ring-1 ${statusClass[order.status]}`}

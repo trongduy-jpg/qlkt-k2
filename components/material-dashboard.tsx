@@ -23,6 +23,7 @@ import {
   buildLossReportRows,
   buildOrderSummaries,
   buildStageOptionsForDropdown,
+  orderRowKey,
   selectMovementsForOrder
 } from "@/lib/production-summary";
 import {
@@ -221,6 +222,18 @@ export function MaterialDashboard() {
   );
 
   const orderSummaries = useMemo(() => buildOrderSummaries(orders, productionHeaders), [orders, productionHeaders]);
+
+  // "SL" trong bang NK NVL phai la So luong cua Ma hang (nhap o Lenh san
+  // xuat), khong phai order.qtyPiece cua tung giao dich - truong nay chi
+  // co gia tri o khau DKB ("So luong vien/soi"), con lai luon la 0 va lam
+  // nguoi dung tuong nham la chua nhap SL du da nhap o LSX.
+  const plannedQtyByRowKey = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const summary of orderSummaries) {
+      map.set(orderRowKey(summary), summary.qtyPiece || 0);
+    }
+    return map;
+  }, [orderSummaries]);
 
   // State + handler cua man "Lenh san xuat" (form header LSX) da tach ra hook rieng.
   const {
@@ -709,6 +722,7 @@ export function MaterialDashboard() {
             <MaterialJournalView
               isVisible={isMovement}
               orders={filteredOrders}
+              plannedQtyByRowKey={plannedQtyByRowKey}
               stageAggregates={stageAggregatesByRowId}
               stageOptionsForDropdown={stageOptionsForDropdown}
               query={query}
