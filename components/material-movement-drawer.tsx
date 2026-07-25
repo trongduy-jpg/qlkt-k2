@@ -188,11 +188,18 @@ export function MaterialMovementDrawer({
             <h3 className="font-display mt-1 text-2xl font-semibold text-ink">
               {isEditing ? draft.code || "Giao dịch NVL" : "Giao dịch mới"}
             </h3>
-            <p className="mt-1 text-sm text-zinc-600">
-              {isEditing
-                ? "Chỉnh sửa trực tiếp bên dưới, bấm Cập nhật NVL để lưu."
-                : "Nhập thông tin theo mẫu Nhật ký sản xuất tháng."}
-            </p>
+            {isEditing ? (
+              <p className="mt-1 text-sm text-zinc-600">
+                Mã hàng <span className="font-semibold text-ink">{draft.sku || "Chưa chọn"}</span>
+                {" · "}Công đoạn <span className="font-semibold text-ink">{draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}</span>
+                {" · "}Thợ <span className="font-semibold text-ink">{draft.worker || "(chưa có thợ)"}</span>
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-zinc-600">
+                Mã hàng <span className="font-semibold text-ink">{draft.sku || "Chưa chọn"}</span>
+                {" · "}Công đoạn <span className="font-semibold text-ink">{draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}</span>
+              </p>
+            )}
           </div>
           <button
             className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
@@ -207,31 +214,11 @@ export function MaterialMovementDrawer({
 
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 py-4">
           <div className="grid gap-3">
-          <div className={`rounded-lg border px-3 py-2.5 ${isEditing ? "border-jade/30 bg-jade/10" : "border-line bg-paper/60"}`}>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-              {isEditing ? (
-                <span className="rounded-full bg-jade px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                  Đang sửa dòng này
-                </span>
-              ) : null}
-              <span className="text-zinc-500">
-                Mã hàng <span className="font-semibold text-ink">{draft.sku || "Chưa chọn"}</span>
-              </span>
-              <span className="text-zinc-500">
-                Công đoạn <span className="font-semibold text-ink">{draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}</span>
-              </span>
-              {isEditing ? (
-                <span className="text-zinc-500">
-                  Thợ <span className="font-semibold text-ink">{draft.worker || "(chưa có thợ)"}</span>
-                </span>
-              ) : null}
-            </div>
-            {isEditing ? (
-              <p className="mt-1.5 text-xs leading-5 text-zinc-500">
-                Thông tin gốc của LSX đã khoá, sửa tại màn Lệnh sản xuất nếu cần.
-              </p>
-            ) : null}
-          </div>
+          {isEditing ? (
+            <p className="rounded-md border border-dashed border-line bg-paper/60 px-3 py-2 text-xs leading-5 text-zinc-500">
+              Thông tin gốc của LSX đã khoá, sửa tại màn Lệnh sản xuất nếu cần.
+            </p>
+          ) : null}
 
           <div className="inline-flex flex-wrap gap-1 rounded-full border border-line bg-paper p-1">
             {([
