@@ -176,8 +176,8 @@ export function MaterialMovementDrawer({
               <button
                 key={key}
                 type="button"
-                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-                  movementFormTab === key ? "bg-ink text-white" : "text-zinc-600 hover:bg-white/70 hover:text-ink"
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                  movementFormTab === key ? "bg-ink text-white shadow-sm" : "text-zinc-600 hover:bg-white/70 hover:text-ink"
                 }`}
                 onClick={() => onTabChange(key)}
               >

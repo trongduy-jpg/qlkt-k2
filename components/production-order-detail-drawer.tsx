@@ -122,12 +122,14 @@ export function ProductionOrderDetailDrawer({
             editForm
           ) : (
             <div className="space-y-4">
-              <div className="rounded-md border border-line bg-paper p-4">
+              <div className="rounded-lg border border-line bg-white p-4 shadow-sm">
                 <div className="flex flex-col gap-3">
                   <div>
                     <h4 className="text-xl font-bold text-ink">{detail.code}</h4>
                     <p className="mt-1 text-sm text-zinc-500">{detail.sku}</p>
-                    {detail.productName ? <p className="mt-2 text-sm text-zinc-700">{detail.productName}</p> : null}
+                    {detail.productName && detail.productName !== detail.sku ? (
+                      <p className="mt-2 text-sm text-zinc-700">{detail.productName}</p>
+                    ) : null}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${deliveryStatusClass[detail.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
@@ -136,7 +138,7 @@ export function ProductionOrderDetailDrawer({
                     <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${statusClass[detail.operationalStatus]}`}>
                       Trạng thái vận hành: {detail.operationalStatus}
                     </span>
-                    <span className="rounded-md border border-line bg-white px-2 py-1 text-xs font-semibold text-zinc-600">
+                    <span className="rounded-md border border-line bg-paper px-2 py-1 text-xs font-semibold text-zinc-600">
                       {detail.movementCount} giao dịch
                     </span>
                   </div>
@@ -209,13 +211,8 @@ export function ProductionOrderDetailDrawer({
                 />
               </div>
 
-              <div className="rounded-md border border-line bg-paper p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Vận hành hiện tại</p>
-                  <span className="rounded-full border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-zinc-600">
-                    {detail.movementCount} giao dịch
-                  </span>
-                </div>
+              <div className="rounded-lg border border-line bg-white p-4 shadow-sm">
+                <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Vận hành hiện tại</p>
                 <div className="mt-3">
                   <DetailInlineList
                     items={[
@@ -232,7 +229,7 @@ export function ProductionOrderDetailDrawer({
                 </div>
               </div>
 
-              <div className="rounded-md border border-line bg-paper p-4">
+              <div className="rounded-lg border border-line bg-white p-4 shadow-sm">
                 <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Tiến độ thực</p>
                 <p className="mt-2 text-sm leading-6 text-zinc-700">
                   {detail.actualProgressNote || "Chưa cập nhật diễn giải tiến độ."}

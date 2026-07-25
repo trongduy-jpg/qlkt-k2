@@ -10,8 +10,13 @@ import type { SelectOption } from "@/lib/production-journal-options";
 // Cac primitive giao dien dung chung cho form/panel cua man san xuat.
 // Tach ra khoi material-dashboard.tsx de tai su dung va giam do dai file.
 
+// outline-none + focus-visible:outline-none o day de chan dut diem sang mac
+// dinh cua trinh duyet/OS (thuong la mau xanh duong lac tone voi theme
+// "jade" cua app) khi field nhan focus - buoc moi trang thai focus (chuot
+// hoac ban phim) chi hien dung 1 kieu vien jade nhat quan thay vi lan giua
+// 2 mau khac nhau tuy trinh duyet.
 export const fieldControlClass =
-  "h-11 w-full min-w-0 rounded-md border border-line bg-white px-3 text-sm text-ink outline-none transition-colors placeholder:text-zinc-400 focus:border-jade focus:ring-2 focus:ring-jade/20 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
+  "h-11 w-full min-w-0 rounded-md border border-line bg-white px-3 text-sm text-ink outline-none transition-colors placeholder:text-zinc-400 focus:outline-none focus:border-jade focus:ring-2 focus:ring-jade/25 focus-visible:outline-none focus-visible:border-jade focus-visible:ring-2 focus-visible:ring-jade/25 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
 
 // <input type="date"> hien thi theo dinh dang ngay/thang cua trinh duyet/
 // he dieu hanh (VD Chrome en-US ra mm/dd/yyyy), khong the ep bang CSS/HTML
@@ -302,7 +307,7 @@ export function SearchableSelect({
 
 export function InfoMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-line bg-white px-3 py-3">
+    <div className="rounded-lg border border-line bg-white px-3 py-3 shadow-sm">
       <p className="text-xs uppercase tracking-wide text-zinc-500">{label}</p>
       <p className="mt-1 text-lg font-bold text-ink">{value}</p>
     </div>
@@ -319,7 +324,7 @@ export function DetailGroup({
   const visibleItems = items.filter(([, value]) => hasMeaningfulDisplayValue(value));
 
   return (
-    <div className="rounded-md border border-line bg-white p-4">
+    <div className="rounded-lg border border-line bg-white p-4 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{title}</p>
       {visibleItems.length > 0 ? (
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -355,7 +360,7 @@ export function DetailInlineList({
       {visibleItems.map(([label, value]) => (
         <div
           key={`${label}-${value}`}
-          className="flex items-start justify-between gap-4 rounded-md border border-line bg-white px-3 py-2"
+          className="flex items-start justify-between gap-4 rounded-md border border-line/70 bg-paper px-3 py-2"
         >
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{label}</p>
           <p className="text-right text-sm font-medium text-ink">{value}</p>
