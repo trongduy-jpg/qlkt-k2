@@ -710,6 +710,7 @@ export function MaterialDashboard() {
               isVisible={isMovement}
               orders={filteredOrders}
               stageAggregates={stageAggregatesByRowId}
+              stageOptionsForDropdown={stageOptionsForDropdown}
               query={query}
               status={status}
               recentCreatedOrderCode={recentCreatedOrderCode}
