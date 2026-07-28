@@ -1,27 +1,37 @@
-# AI Workflow Rules
+## Multi-Agent Collaboration
 
-Before editing:
+- Each task has exactly one implementation owner.
+- Claude and Codex must work on separate branches and worktrees.
+- Before editing, read the assigned task and confirm the allowed paths.
+- Do not modify files owned by another active task.
+- Do not work directly on `main` or `develop`.
+- Do not merge or deploy unless explicitly instructed by the user.
+- Commit only changes related to the assigned task.
+- If two tasks require the same file, stop and report the conflict before editing.
 
-1. Read relevant code and tests.
-2. Identify the affected module and layer.
-3. Read only the relevant rule files.
-4. State assumptions when requirements are unclear.
-5. Plan the smallest complete change.
+### Roles
 
-During editing:
+Claude primarily handles:
 
-- follow existing patterns
-- avoid unrelated refactors
-- avoid unnecessary new files
-- add tests with implementation
-- preserve public contracts unless change is required
+- business-rule analysis
+- architecture and domain design
+- complex business logic
+- domain correctness review
 
-After editing:
+Codex primarily handles:
 
-1. Review the diff.
-2. Remove debug code.
-3. Run relevant tests.
-4. Run lint and type checking.
-5. Report files changed, commands run, assumptions, and risks.
+- implementation
+- Supabase and API integration
+- automated tests
+- TypeScript, lint, build, and technical review
 
-Do not invent files, APIs, fields, or business rules without checking the repository.
+### Completion Report
+
+Every agent must report:
+
+- task completed
+- files changed
+- tests and commands executed
+- assumptions
+- known risks
+- commit hash
