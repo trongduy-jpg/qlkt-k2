@@ -5,3 +5,4 @@ node_modules
 tsconfig.tsbuildinfo
 *.log
 CLAUDE.local.md
+*.code-workspace
