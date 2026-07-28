@@ -1,0 +1,7 @@
+{
+  "currentTask": null,
+  "status": "idle",
+  "owner": null,
+  "review": false,
+  "tests": false
+}
