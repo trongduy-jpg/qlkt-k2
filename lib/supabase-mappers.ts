@@ -33,6 +33,14 @@ export type MovementRow = {
   document_line_no?: string | null;
   movement_type?: ProductionOrder["movementType"] | null;
   qty_piece?: number | null;
+  issue_date?: string | null;
+  issue_sku?: string | null;
+  issue_product_name?: string | null;
+  issue_qty_piece?: number | null;
+  return_date?: string | null;
+  return_sku?: string | null;
+  return_product_name?: string | null;
+  return_qty_piece?: number | null;
   item_sku?: string | null;
   stage_status?: string | null;
   issued_gram: number;
@@ -83,6 +91,14 @@ export function movementRowToProductionOrder(row: MovementRow): ProductionOrder 
     documentLineNo: row.document_line_no ?? "",
     movementType: row.movement_type ?? "issue",
     qtyPiece: row.qty_piece ?? 0,
+    issueDate: row.issue_date ?? "",
+    issueSku: row.issue_sku ?? "",
+    issueProductName: row.issue_product_name ?? "",
+    issueQtyPiece: row.issue_qty_piece ?? 0,
+    returnDate: row.return_date ?? "",
+    returnSku: row.return_sku ?? "",
+    returnProductName: row.return_product_name ?? "",
+    returnQtyPiece: row.return_qty_piece ?? 0,
     stageStatus: row.stage_status ?? "Đang thực hiện",
     issued: Number(row.issued_gram),
     returned: Number(row.returned_gram),

@@ -1,22 +1,98 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { Plus, Printer, SlidersHorizontal } from "lucide-react";
+import { MaterialJournalPrintDialog } from "@/components/material-journal-print-dialog";
 import type { ProductionOrder } from "@/lib/domain/production";
 import { formatDisplayDate, normalizeStageCode } from "@/lib/production-business-rules";
 import { isClosedStatus, statusClass, statusOptions } from "@/lib/production-helpers";
+import { formatMaterialTypeLabel } from "@/lib/production-journal-options";
 import { orderRowKey, type StageOption } from "@/lib/production-summary";
 import { ALL_LOSS_PERIODS_FILTER, ALL_NXT_PERIODS_FILTER, ALL_STAGES_FILTER } from "@/lib/production-workflow";
 import type { StageWorkerAggregate } from "@/lib/production-workflow";
 
-function formatPeriodLabel(period: string) {
-  const [year, month] = period.split("-");
-  return year && month ? `Tháng ${month}/${year}` : period;
+// Tach ky "YYYY-MM" thanh 2 dropdown: Nam rieng, Thang rieng (nhan gon "Thang 07").
+// Gia tri thuc te van la "YYYY-MM" (hoac allValue) de khong doi logic loc ben duoi.
+function PeriodYearMonthFilter({
+  options,
+  value,
+  allValue,
+  allLabel,
+  ariaPrefix,
+  onChange
+}: {
+  options: string[];
+  value: string;
+  allValue: string;
+  allLabel: string;
+  ariaPrefix: string;
+  onChange: (value: string) => void;
+}) {
+  const selectClass =
+    "h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30 disabled:bg-paper disabled:text-zinc-400";
+
+  const years = Array.from(new Set(options.map((period) => period.split("-")[0])))
+    .filter(Boolean)
+    .sort((a, b) => b.localeCompare(a));
+
+  const isAll = value === allValue || !value.includes("-");
+  const [selectedYear, selectedMonth] = isAll ? ["", ""] : value.split("-");
+
+  const monthsForYear = options
+    .filter((period) => period.startsWith(`${selectedYear}-`))
+    .map((period) => period.split("-")[1])
+    .sort((a, b) => b.localeCompare(a));
+
+  const handleYearChange = (year: string) => {
+    if (!year) {
+      onChange(allValue);
+      return;
+    }
+    // Doi nam -> giu thang cu neu con du lieu, khong thi lay thang moi nhat cua nam do.
+    const monthsInYear = options
+      .filter((period) => period.startsWith(`${year}-`))
+      .map((period) => period.split("-")[1])
+      .sort((a, b) => b.localeCompare(a));
+    const month = monthsInYear.includes(selectedMonth) ? selectedMonth : monthsInYear[0];
+    onChange(month ? `${year}-${month}` : allValue);
+  };
+
+  return (
+    <div className="flex gap-2">
+      <select
+        className={selectClass}
+        value={selectedYear}
+        onChange={(event) => handleYearChange(event.target.value)}
+        aria-label={`${ariaPrefix} - chọn năm`}
+      >
+        <option value="">{allLabel}</option>
+        {years.map((year) => (
+          <option key={year} value={year}>
+            Năm {year}
+          </option>
+        ))}
+      </select>
+      <select
+        className={selectClass}
+        value={selectedMonth}
+        disabled={isAll}
+        onChange={(event) => onChange(`${selectedYear}-${event.target.value}`)}
+        aria-label={`${ariaPrefix} - chọn tháng`}
+      >
+        {monthsForYear.map((month) => (
+          <option key={month} value={month}>
+            Tháng {month}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 }
 
 type MaterialJournalViewProps = {
   isVisible: boolean;
   orders: ProductionOrder[];
+  allOrders: ProductionOrder[];
   // Tong hop so tho cua TAT CA tho cung khau (keyed theo id cua dong dai
   // dien) - dung de biet khau co nhieu tho hay khong. Chi tiet Xuat/Nhap/
   // Hao hut tung tho phai mo sidebar (Sua NVL) moi thay, khong hien tren
@@ -50,6 +126,7 @@ type MaterialJournalViewProps = {
 export function MaterialJournalView({
   isVisible,
   orders,
+  allOrders,
   stageAggregates,
   stageOptionsForDropdown,
   plannedQtyByRowKey,
@@ -71,11 +148,20 @@ export function MaterialJournalView({
   onStatusChange
 }: MaterialJournalViewProps) {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
 
   return (
     <section className={`${isVisible ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
         <div className="flex flex-wrap gap-2">
+          <button
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper"
+            type="button"
+            onClick={() => setIsPrintDialogOpen(true)}
+          >
+            <Printer size={16} />
+            In PDF
+          </button>
           <button
             className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold uppercase tracking-wide text-white"
             type="button"
@@ -114,6 +200,16 @@ export function MaterialJournalView({
         </div>
       </div>
 
+      <MaterialJournalPrintDialog
+        isOpen={isPrintDialogOpen}
+        rows={orders}
+        allOrders={allOrders}
+        stageOptions={stageOptionsForDropdown}
+        plannedQtyByRowKey={plannedQtyByRowKey}
+        stageAggregates={stageAggregates}
+        onClose={() => setIsPrintDialogOpen(false)}
+      />
+
       {isFilterExpanded ? (
         <div className="mt-3 grid gap-2 rounded-md border border-line bg-paper p-3 md:grid-cols-3">
           <select
@@ -129,47 +225,33 @@ export function MaterialJournalView({
               </option>
             ))}
           </select>
-          <select
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+          <PeriodYearMonthFilter
+            options={nxtPeriodOptions}
             value={nxtPeriodFilter}
-            onChange={(event) => onNxtPeriodFilterChange(event.target.value)}
-            aria-label="Lọc theo tháng NXT"
-          >
-            <option value={ALL_NXT_PERIODS_FILTER}>{ALL_NXT_PERIODS_FILTER}</option>
-            {nxtPeriodOptions.map((period) => (
-              <option key={period} value={period}>
-                {formatPeriodLabel(period)}
-              </option>
-            ))}
-          </select>
-          <select
-            className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
+            allValue={ALL_NXT_PERIODS_FILTER}
+            allLabel={ALL_NXT_PERIODS_FILTER}
+            ariaPrefix="Lọc theo tháng NXT"
+            onChange={onNxtPeriodFilterChange}
+          />
+          <PeriodYearMonthFilter
+            options={lossPeriodOptions}
             value={lossPeriodFilter}
-            onChange={(event) => onLossPeriodFilterChange(event.target.value)}
-            aria-label="Lọc theo tháng hao"
-          >
-            <option value={ALL_LOSS_PERIODS_FILTER}>{ALL_LOSS_PERIODS_FILTER}</option>
-            {lossPeriodOptions.map((period) => (
-              <option key={period} value={period}>
-                {formatPeriodLabel(period)}
-              </option>
-            ))}
-          </select>
+            allValue={ALL_LOSS_PERIODS_FILTER}
+            allLabel={ALL_LOSS_PERIODS_FILTER}
+            ariaPrefix="Lọc theo tháng hao"
+            onChange={onLossPeriodFilterChange}
+          />
         </div>
       ) : null}
 
       <div className="mt-4 overflow-x-auto">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <h4 className="text-sm font-bold text-ink">Lịch sử giao dịch NVL</h4>
-            <p className="mt-1 text-xs text-zinc-500">Bấm "Sửa NVL" để xem chi tiết Xuất/Nhập/Hao hụt từng thợ.</p>
-          </div>
-          {orders.length > 0 ? (
+        {orders.length > 0 ? (
+          <div className="mb-3 flex items-center justify-end">
             <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
               {orders.length} dòng
             </span>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         {orders.length > 0 ? (
           <table className="w-full min-w-[1080px] border-collapse text-sm">
             <thead>
@@ -212,7 +294,7 @@ export function MaterialJournalView({
                   <td className="px-3 py-3 font-semibold text-ink">{order.sku}</td>
                   <td className="px-3 py-3 text-zinc-700">{order.productName || "-"}</td>
                   <td className="px-3 py-3 font-semibold text-ink">{order.code}</td>
-                  <td className="px-3 py-3 text-zinc-700">{order.materialType || "-"}</td>
+                  <td className="px-3 py-3 text-zinc-700">{formatMaterialTypeLabel(order.materialType)}</td>
                   <td className="px-3 py-3 text-zinc-700">{order.material}</td>
                   <td className="px-3 py-3">
                     {stageIndex >= 0 ? (

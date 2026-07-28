@@ -20,6 +20,14 @@ export type ProductionOrder = {
   documentLineNo?: string;
   movementType?: MovementType;
   qtyPiece?: number;
+  issueDate?: string;
+  issueSku?: string;
+  issueProductName?: string;
+  issueQtyPiece?: number;
+  returnDate?: string;
+  returnSku?: string;
+  returnProductName?: string;
+  returnQtyPiece?: number;
   issued: number;
   returned: number;
   powder: number;

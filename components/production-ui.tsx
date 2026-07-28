@@ -66,13 +66,40 @@ export function FieldShell({
   children: ReactNode;
 }) {
   return (
-    <div className="grid min-w-0 gap-1.5 text-sm">
+    <div className="grid min-w-0 content-start gap-1.5 text-sm">
       <span className="min-h-4 select-none text-xs font-semibold uppercase leading-4 tracking-wide text-zinc-500">
         {label}
         {required ? <span className="ml-1 text-rose-500">*</span> : null}
       </span>
       {children}
       {hint ? <span className="select-none text-xs leading-5 text-zinc-500">{hint}</span> : null}
+    </div>
+  );
+}
+
+export function DrawerHeaderMeta({
+  items
+}: {
+  items: Array<{ label: string; value: ReactNode; tone?: "default" | "jade" | "amber" | "sky" }>;
+}) {
+  const toneClass = {
+    default: "border-line bg-paper text-ink",
+    jade: "border-jade/30 bg-jade/5 text-jade",
+    amber: "border-amber-200 bg-amber-50 text-amber-800",
+    sky: "border-sky-200 bg-sky-50 text-sky-700"
+  };
+
+  return (
+    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className={`min-w-0 rounded-md border px-3 py-2 ${toneClass[item.tone ?? "default"]}`}
+        >
+          <div className="text-[10px] font-semibold uppercase tracking-wide opacity-70">{item.label}</div>
+          <div className="mt-0.5 truncate text-sm font-semibold">{item.value || "-"}</div>
+        </div>
+      ))}
     </div>
   );
 }

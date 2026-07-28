@@ -284,6 +284,36 @@ export function groupMaterialTypeOptions(options: SelectOption[]): Array<{ label
   return order.map((label) => ({ label, options: groups.get(label)! }));
 }
 
+function splitOptionLabel(label: string) {
+  return label.split(/\s*(?:-|–|â€“)\s*/).filter(Boolean);
+}
+
+export function formatMaterialTypeLabel(materialType?: string) {
+  if (!materialType) return "-";
+  const normalizedValue = materialType.trim().toUpperCase();
+  if (!normalizedValue) return "-";
+
+  const match = materialTypeOptions.find((option) => option.value.toUpperCase() === normalizedValue);
+  if (match) {
+    const parts = splitOptionLabel(match.label);
+    if (parts.length >= 2) {
+      return parts.slice(1).join(" - ");
+    }
+    return match.label;
+  }
+
+  return materialType;
+}
+
+export function formatGoldAgeLabel(goldAge?: number | string | null) {
+  if (goldAge === null || goldAge === undefined || goldAge === "") return "-";
+  const numericValue = Number(goldAge);
+  if (!Number.isFinite(numericValue) || numericValue <= 0) return "-";
+
+  const match = movementGoldAgeOptions.find((option) => Math.abs(Number(option.value) - numericValue) < 0.001);
+  return match?.label ?? String(goldAge);
+}
+
 export const materialMetalOptions: SelectOption[] = [
   { value: "AU", label: "AU – Vàng" },
   { value: "AG", label: "AG – Bạc" },

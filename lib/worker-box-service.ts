@@ -63,6 +63,27 @@ export function getWorkerBoxPeriod(periodCode: string) {
   return workerBoxPeriods.find((period) => period.code === periodCode) ?? workerBoxPeriods[0] ?? null;
 }
 
+export function parseWorkerBoxPeriodCode(periodCode: string) {
+  const [year = "", month = ""] = periodCode.split("-");
+  return { year, month };
+}
+
+export function formatWorkerBoxMonthLabel(periodCode: string) {
+  const { month } = parseWorkerBoxPeriodCode(periodCode);
+  return month ? `Tháng ${month}` : "Chưa có tháng";
+}
+
+export function formatWorkerBoxYearLabel(periodCode: string) {
+  const { year } = parseWorkerBoxPeriodCode(periodCode);
+  return year ? `Năm ${year}` : "Chưa có năm";
+}
+
+export function formatWorkerBoxPeriodLabel(periodCode: string) {
+  const { year, month } = parseWorkerBoxPeriodCode(periodCode);
+  if (!year || !month) return "Chưa có kỳ báo cáo";
+  return `Tháng ${month}/${year}`;
+}
+
 export function summarizeWorkerBoxLines(lines: WorkerBoxBalanceLine[]): WorkerBoxSummary {
   return lines.reduce(
     (acc, line) => {
@@ -172,10 +193,16 @@ function monthBounds(periodCode: string) {
   };
 }
 
+const MACHINE_POWDER_STAGE_CODES = new Set(["BAO", "KBI"]);
+
+function isMachinePowderStage(stageCode: string) {
+  return MACHINE_POWDER_STAGE_CODES.has(stageCode.toUpperCase());
+}
+
 /**
  * Tong hop tuc thoi tu Nhat ky NVL (material_movements) thanh dang WorkerBoxBalanceLine.
- * Day la so sach tu dong tinh tu giao dich, chua co so lieu doi soat thuc te rieng nen
- * physical* duoc gan bang book* va reviewStatus luon la "pending" (cho doi soat).
+ * Ton so sach duoc tinh theo cong thuc: ton dau ky + nhap trong ky - xuat trong ky.
+ * Cac so lieu doi soat thuc te co the duoc cap nhat o tang UI/luu tru rieng.
  */
 export function buildWorkerBoxLinesFromMovements(
   orders: ProductionOrder[],
@@ -226,8 +253,13 @@ export function buildWorkerBoxLinesFromMovements(
   return Array.from(groups.entries()).map(([key, group]) => {
     const metal = detectMetal(group.materialName);
     const { fromDate, toDate } = monthBounds(group.periodCode);
-    const bookClosingRawGram = Math.max(0, Number((group.issued - group.returned - group.powder).toFixed(4)));
-    const bookClosingConvertedGram = Number((bookClosingRawGram * group.goldAge).toFixed(4));
+    const openingConvertedGram = 0;
+    const importConvertedGram = Number((group.returned * group.goldAge).toFixed(4));
+    const exportConvertedGram = Number((group.issued * group.goldAge).toFixed(4));
+    const bookClosingConvertedGram = Number((openingConvertedGram + importConvertedGram - exportConvertedGram).toFixed(4));
+    const bookClosingRawGram = group.goldAge > 0 ? Number((bookClosingConvertedGram / group.goldAge).toFixed(4)) : 0;
+    const machinePowderRawGram = isMachinePowderStage(group.stageCode) ? group.powder : 0;
+    const machinePowderConvertedGram = Number((machinePowderRawGram * group.goldAge).toFixed(4));
 
     return {
       id: `wb-auto-${key}`,
@@ -251,13 +283,13 @@ export function buildWorkerBoxLinesFromMovements(
       sourceJournalFilter: "",
       openingPowderGram: 0,
       openingRawGram: 0,
-      openingConvertedGram: 0,
+      openingConvertedGram,
       importPowderGram: 0,
       importRawGram: group.returned,
-      importConvertedGram: Number((group.returned * group.goldAge).toFixed(4)),
+      importConvertedGram,
       exportPowderGram: 0,
       exportRawGram: group.issued,
-      exportConvertedGram: Number((group.issued * group.goldAge).toFixed(4)),
+      exportConvertedGram,
       bookClosingPowderGram: group.powder,
       bookClosingRawGram,
       bookClosingConvertedGram,
@@ -268,12 +300,12 @@ export function buildWorkerBoxLinesFromMovements(
       physicalConvertedGram: bookClosingConvertedGram,
       diffRawGram: 0,
       diffConvertedGram: 0,
-      machinePowderRawGram: group.powder,
-      machinePowderConvertedGram: Number((group.powder * group.goldAge).toFixed(4)),
+      machinePowderRawGram,
+      machinePowderConvertedGram,
       reviewLossConvertedGram: 0,
       depositNormConvertedGram: 0,
       riskDiffConvertedGram: 0,
-      reviewStatus: "pending",
+      reviewStatus: "matched",
       comment: "Tự động tổng hợp từ Nhật ký NVL - chưa đối chiếu tồn thực tế.",
       xdcStatus: "pending",
       ndcStatus: "pending"
@@ -287,7 +319,7 @@ export function getPeriodsFromLines(lines: WorkerBoxBalanceLine[]) {
     const sample = lines.find((line) => line.periodCode === code);
     return {
       code,
-      label: `Kỳ ${code}`,
+      label: formatWorkerBoxPeriodLabel(code),
       fromDate: sample?.fromDate ?? `${code}-01`,
       toDate: sample?.toDate ?? `${code}-01`,
       source: "Nhật ký NVL"

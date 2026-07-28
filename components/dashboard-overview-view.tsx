@@ -1,9 +1,27 @@
 "use client";
 
+import { AlertTriangle, ClipboardCheck, Coins, Wallet } from "lucide-react";
+import type { ComponentType } from "react";
 import type { ProductionOrder } from "@/lib/domain/production";
 import type { OrderSummary } from "@/lib/production-types";
 import { statusClass } from "@/lib/production-helpers";
 import { orderRowKey } from "@/lib/production-summary";
+
+// Phan loai KPI theo tu khoa nhan de to mau ngu nghia: cac chi so canh bao
+// (treo no, hao hut vuot, qua han) mang sac ho phach; con lai trung tinh.
+function resolveKpiMeta(label: string): { icon: ComponentType<{ size?: number; className?: string }>; isWarning: boolean } {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("hao hụt") || normalized.includes("vượt")) {
+    return { icon: AlertTriangle, isWarning: true };
+  }
+  if (normalized.includes("treo nợ") || normalized.includes("quá hạn")) {
+    return { icon: Wallet, isWarning: true };
+  }
+  if (normalized.includes("giá")) {
+    return { icon: Coins, isWarning: false };
+  }
+  return { icon: ClipboardCheck, isWarning: false };
+}
 
 type DashboardKpi = {
   label: string;
@@ -41,27 +59,33 @@ export function DashboardOverviewView({
   return (
     <>
       <div className={`${isVisible ? "grid" : "hidden"} gap-4 py-5 sm:grid-cols-2 xl:grid-cols-4`}>
-        {kpis.map((item) => (
-          <article key={item.label} className="rounded-md border border-line bg-white/92 p-4 shadow-sm">
-            <p className="text-sm font-medium text-zinc-600">{item.label}</p>
-            <div className="mt-3 flex items-end gap-2">
-              <strong className="text-2xl font-bold text-ink">{item.value}</strong>
-              <span className="pb-1 text-sm text-zinc-500">{item.unit}</span>
-            </div>
-            <p className="mt-3 text-xs font-medium text-brass">{item.trend}</p>
-          </article>
-        ))}
+        {kpis.map((item) => {
+          const { icon: Icon, isWarning } = resolveKpiMeta(item.label);
+          return (
+            <article
+              key={item.label}
+              className={`rounded-md border p-4 shadow-sm ${
+                isWarning ? "border-amber-200 bg-amber-50/60" : "border-line bg-white/92"
+              }`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-zinc-600">{item.label}</p>
+                <Icon size={18} className={isWarning ? "text-amber-500" : "text-brass"} />
+              </div>
+              <div className="mt-3 flex items-end gap-2">
+                <strong className={`text-2xl font-bold ${isWarning ? "text-amber-900" : "text-ink"}`}>{item.value}</strong>
+                <span className="pb-1 text-sm text-zinc-500">{item.unit}</span>
+              </div>
+              <p className={`mt-3 text-xs font-medium ${isWarning ? "text-amber-700" : "text-zinc-500"}`}>{item.trend}</p>
+            </article>
+          );
+        })}
       </div>
 
       <section className={`${isVisible ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <h3 className="text-base font-bold text-ink">Bảng điều hành hôm nay</h3>
-              <p className="mt-1 text-sm text-zinc-600">
-                Màn này chỉ giữ overview và việc ưu tiên. Các thao tác chi tiết chuyển sang từng phân hệ riêng.
-              </p>
-            </div>
+            <h3 className="text-base font-bold text-ink">Bảng điều hành hôm nay</h3>
             <div className="flex flex-wrap gap-2">
               <button
                 className="inline-flex items-center justify-center rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
@@ -96,10 +120,7 @@ export function DashboardOverviewView({
           <div className="grid gap-3 xl:grid-cols-2">
             <div className="rounded-md border border-line bg-paper p-4">
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h4 className="text-sm font-bold text-ink">Giao dịch NVL gần đây</h4>
-                  <p className="mt-1 text-xs text-zinc-500">Hiển thị nhanh các dòng vừa phát sinh để theo dõi tiến độ.</p>
-                </div>
+                <h4 className="text-sm font-bold text-ink">Giao dịch NVL gần đây</h4>
                 <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
                   {recentOrders.length} dòng
                 </span>
@@ -116,9 +137,6 @@ export function DashboardOverviewView({
                       <p className="truncate font-semibold text-ink">{order.code}</p>
                       <p className="mt-1 truncate text-xs text-zinc-500">{order.material || "-"} · {order.worker || "Chưa phân công"}</p>
                     </div>
-                    <span className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-zinc-600 ring-1 ring-line">
-                      Xem lịch sử
-                    </span>
                   </button>
                 ))}
                 {recentOrders.length === 0 ? (
@@ -131,10 +149,7 @@ export function DashboardOverviewView({
 
             <div className="rounded-md border border-line bg-paper p-4">
               <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h4 className="text-sm font-bold text-ink">LSX cần theo dõi</h4>
-                  <p className="mt-1 text-xs text-zinc-500">Giữ ở mức ngắn gọn để Dashboard không biến thành màn thao tác.</p>
-                </div>
+                <h4 className="text-sm font-bold text-ink">LSX cần theo dõi</h4>
                 <button
                   className="rounded-md border border-line bg-white px-3 py-2 text-xs font-semibold text-ink"
                   type="button"

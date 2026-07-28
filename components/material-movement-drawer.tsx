@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Check, ChevronDown, Plus, Trash2, X } from "lucide-react";
 import {
   DateInput,
+  DrawerHeaderMeta,
   DrawerSection,
   FieldShell,
   SearchableSelect,
@@ -181,25 +182,26 @@ export function MaterialMovementDrawer({
         aria-hidden={!isOpen}
       >
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line bg-white px-5 py-4">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-brass">
               {isEditing ? "Sửa giao dịch NVL" : "Thêm giao dịch NVL"}
             </p>
-            <h3 className="font-display mt-1 text-2xl font-semibold text-ink">
+            <h3 className="font-display mt-1 truncate text-2xl font-semibold text-ink">
               {isEditing ? draft.code || "Giao dịch NVL" : "Giao dịch mới"}
             </h3>
-            {isEditing ? (
-              <p className="mt-1 text-sm text-zinc-600">
-                Mã hàng <span className="font-semibold text-ink">{draft.sku || "Chưa chọn"}</span>
-                {" · "}Công đoạn <span className="font-semibold text-ink">{draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}</span>
-                {" · "}Thợ <span className="font-semibold text-ink">{draft.worker || "(chưa có thợ)"}</span>
-              </p>
-            ) : (
-              <p className="mt-1 text-sm text-zinc-600">
-                Mã hàng <span className="font-semibold text-ink">{draft.sku || "Chưa chọn"}</span>
-                {" · "}Công đoạn <span className="font-semibold text-ink">{draft.stage ? getStageLabel(draft.stage) : "Chưa chọn"}</span>
-              </p>
-            )}
+            <p className="mt-1 text-sm leading-5 text-zinc-600">
+              {isEditing
+                ? "Cập nhật phát sinh NVL theo đúng LSX, mã hàng, công đoạn và thợ phụ trách."
+                : "Tạo phát sinh NVL mới, sau đó hệ thống sẽ đồng bộ về nhật ký và chi tiết LSX."}
+            </p>
+            <DrawerHeaderMeta
+              items={[
+                { label: "Mã hàng", value: selectedItemSku || "Chưa chọn", tone: selectedItemSku ? "default" : "amber" },
+                { label: "Công đoạn", value: draft.stage ? getStageLabel(draft.stage) : "Chưa chọn", tone: draft.stage ? "sky" : "amber" },
+                { label: "Thợ", value: draft.worker || "Chưa chọn", tone: draft.worker ? "default" : "amber" },
+                { label: "Trạng thái", value: draft.status || "Chưa cập nhật", tone: "jade" }
+              ]}
+            />
           </div>
           <button
             className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
@@ -714,6 +716,18 @@ function StageEntryFields({
   activeStageCode: string;
   nangCaoLabel: string;
 }) {
+  const issueSku = values.issueSku || values.itemSku || values.sku;
+  const issueProductName = values.issueProductName || values.productName || "";
+  const issueQtyPiece = values.issueQtyPiece ?? values.qtyPiece ?? 0;
+  const returnSku = values.returnSku || values.itemSku || values.sku;
+  const returnProductName = values.returnProductName || values.productName || "";
+  const returnQtyPiece = values.returnQtyPiece ?? values.qtyPiece ?? 0;
+
+  function updateIssueQty(value: number) {
+    onFieldChange("issueQtyPiece", value);
+    onFieldChange("qtyPiece", value);
+  }
+
   return (
     <>
       <FieldShell label="Thợ phụ trách" required>
@@ -725,39 +739,116 @@ function StageEntryFields({
         </SelectControl>
       </FieldShell>
 
-      <div className={`mt-3 grid gap-3 ${activeStageCode === "DKB" ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
-        {activeStageCode === "DKB" ? (
-          <FieldShell label="Số lượng viên/sợi">
-            <input
-              className={fieldControlClass}
-              min="0"
-              type="number"
-              placeholder="0"
-              value={values.qtyPiece || ""}
-              onChange={(event) => onFieldChange("qtyPiece", Number(event.target.value))}
-            />
-          </FieldShell>
-        ) : null}
-        <FieldShell label="Xuất gram">
-          <input
-            className={fieldControlClass}
-            min="0"
-            type="number"
-            placeholder="0.00"
-            value={values.issued || ""}
-            onChange={(event) => onFieldChange("issued", Number(event.target.value))}
-          />
-        </FieldShell>
-        <FieldShell label="Nhập gram">
-          <input
-            className={fieldControlClass}
-            min="0"
-            type="number"
-            placeholder="0.00"
-            value={values.returned || ""}
-            onChange={(event) => onFieldChange("returned", Number(event.target.value))}
-          />
-        </FieldShell>
+      <div className="mt-3 grid gap-3 xl:grid-cols-2">
+        <div className="rounded-lg border border-line bg-white p-3">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Thông tin xuất</p>
+            <span className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-700">
+              {values.issued || 0}g
+            </span>
+          </div>
+          <div className="grid gap-3">
+            <FieldShell label="Ngày xuất">
+              <DateInput
+                value={values.issueDate || values.occurredDate || ""}
+                onChange={(value) => onFieldChange("issueDate", value)}
+              />
+            </FieldShell>
+            <FieldShell label="Trọng lượng xuất">
+              <input
+                className={fieldControlClass}
+                min="0"
+                type="number"
+                placeholder="0.00"
+                value={values.issued || ""}
+                onChange={(event) => onFieldChange("issued", Number(event.target.value))}
+              />
+            </FieldShell>
+            <FieldShell label="Mã hàng xuất">
+              <input
+                className={fieldControlClass}
+                placeholder="VD: RG750Y"
+                value={issueSku}
+                onChange={(event) => onFieldChange("issueSku", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="Số lượng xuất">
+              <input
+                className={fieldControlClass}
+                min="0"
+                type="number"
+                placeholder="0"
+                value={issueQtyPiece || ""}
+                onChange={(event) => updateIssueQty(Number(event.target.value))}
+              />
+            </FieldShell>
+          </div>
+          <div className="mt-3">
+            <FieldShell label="Tên hàng xuất">
+              <input
+                className={fieldControlClass}
+                placeholder="Tên hàng xuất"
+                value={issueProductName}
+                onChange={(event) => onFieldChange("issueProductName", event.target.value)}
+              />
+            </FieldShell>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-line bg-white p-3">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Thông tin nhập</p>
+            <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] font-semibold text-emerald-700">
+              {values.returned || 0}g
+            </span>
+          </div>
+          <div className="grid gap-3">
+            <FieldShell label="Ngày nhập">
+              <DateInput
+                value={values.returnDate || values.occurredDate || ""}
+                onChange={(value) => onFieldChange("returnDate", value)}
+              />
+            </FieldShell>
+            <FieldShell label="Trọng lượng nhập">
+              <input
+                className={fieldControlClass}
+                min="0"
+                type="number"
+                placeholder="0.00"
+                value={values.returned || ""}
+                onChange={(event) => onFieldChange("returned", Number(event.target.value))}
+              />
+            </FieldShell>
+            <FieldShell label="Mã hàng nhập">
+              <input
+                className={fieldControlClass}
+                placeholder="VD: RG750Y"
+                value={returnSku}
+                onChange={(event) => onFieldChange("returnSku", event.target.value)}
+              />
+            </FieldShell>
+            <FieldShell label="Số lượng nhập">
+              <input
+                className={fieldControlClass}
+                min="0"
+                type="number"
+                placeholder="0"
+                value={returnQtyPiece || ""}
+                onChange={(event) => onFieldChange("returnQtyPiece", Number(event.target.value))}
+              />
+            </FieldShell>
+          </div>
+          <div className="mt-3">
+            <FieldShell label="Tên hàng nhập">
+              <input
+                className={fieldControlClass}
+                placeholder="Tên hàng nhập"
+                value={returnProductName}
+                onChange={(event) => onFieldChange("returnProductName", event.target.value)}
+              />
+            </FieldShell>
+          </div>
+        </div>
       </div>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">

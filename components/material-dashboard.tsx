@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  AlertTriangle,
   CheckCircle2,
   X
 } from "lucide-react";
@@ -63,7 +62,6 @@ import { PriceTableView } from "@/components/price-table-view";
 import { WorkerBoxView } from "@/components/worker-box-view";
 import { buildWorkerBoxLinesFromMovements } from "@/lib/worker-box-service";
 import {
-  alerts,
   kpis,
   priceRows
 } from "@/lib/demo-data";
@@ -157,7 +155,6 @@ export function MaterialDashboard() {
   } = useOperationalData({ movementDraftCache, productionHeaderDraftCache });
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [isProductionFormOpen, setIsProductionFormOpen] = useState(false);
-  const [isAlertPanelOpen, setIsAlertPanelOpen] = useState(false);
   const { appUser, signOut } = useAuth();
 
   // Toan bo state + handler CRUD danh muc nen (Cau hinh) da tach ra hook rieng.
@@ -745,6 +742,7 @@ export function MaterialDashboard() {
             <MaterialJournalView
               isVisible={isMovement}
               orders={filteredOrders}
+              allOrders={orders}
               plannedQtyByRowKey={plannedQtyByRowKey}
               stageAggregates={stageAggregatesByRowId}
               stageOptionsForDropdown={stageOptionsForDropdown}
@@ -806,34 +804,6 @@ export function MaterialDashboard() {
                 </button>
               </div>
             ) : null}
-
-            <section className={`${isMovement ? "block" : "hidden"} rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="mt-0.5 text-brass" size={18} />
-                  <div>
-                    <h3 className="text-base font-bold text-ink">Cảnh báo vận hành</h3>
-                    <p className="mt-1 text-sm text-zinc-600">{alerts.length} cảnh báo cần kiểm tra.</p>
-                  </div>
-                </div>
-                <button
-                  className="rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
-                  type="button"
-                  onClick={() => setIsAlertPanelOpen((current) => !current)}
-                >
-                  {isAlertPanelOpen ? "Thu gọn" : "Xem cảnh báo"}
-                </button>
-              </div>
-              {isAlertPanelOpen ? (
-                <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  {alerts.map((alert) => (
-                    <div key={alert} className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
-                      {alert}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </section>
           </div>
 
           <StageEntryView

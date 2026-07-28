@@ -46,6 +46,14 @@ export function buildMovementDraftFromSummary({
     movementType: summary.movementType ?? baseDraft.movementType,
     qtyPiece: pickNumber(baseDraft.qtyPiece, summary.qtyPiece),
     occurredDate: pickText(baseDraft.occurredDate, summary.occurredDate, summary.plannedDate),
+    issueDate: pickText(baseDraft.issueDate, baseDraft.occurredDate, summary.occurredDate, summary.plannedDate),
+    issueSku: pickText(baseDraft.issueSku, baseDraft.itemSku, summary.sku),
+    issueProductName: pickText(baseDraft.issueProductName, baseDraft.productName, summary.productName),
+    issueQtyPiece: pickNumber(baseDraft.issueQtyPiece, baseDraft.qtyPiece, summary.qtyPiece),
+    returnDate: pickText(baseDraft.returnDate, baseDraft.occurredDate, summary.occurredDate, summary.plannedDate),
+    returnSku: pickText(baseDraft.returnSku, baseDraft.itemSku, summary.sku),
+    returnProductName: pickText(baseDraft.returnProductName, baseDraft.productName, summary.productName),
+    returnQtyPiece: pickNumber(baseDraft.returnQtyPiece, baseDraft.qtyPiece, summary.qtyPiece),
     // Khong fallback ve summary.plannedStage o day: gia tri do co the chi
     // la "du kien" mac dinh cua LSX (chua ai chon), khong phai tien do
     // that. Neu baseDraft.stage rong (chua co giao dich thuc), de trong
@@ -94,6 +102,14 @@ export function buildSeedMovementFromSummary(
     movementType: summary.movementType ?? baseDraft.movementType,
     qtyPiece: pickNumber(summary.qtyPiece, header?.qtyPiece, baseDraft.qtyPiece),
     occurredDate: pickText(summary.occurredDate, summary.plannedDate, header?.occurredDate, header?.plannedDate, baseDraft.occurredDate),
+    issueDate: pickText(baseDraft.issueDate, summary.occurredDate, summary.plannedDate, header?.occurredDate, header?.plannedDate),
+    issueSku: pickText(baseDraft.issueSku, summary.sku, header?.sku),
+    issueProductName: pickText(baseDraft.issueProductName, summary.productName, header?.productName),
+    issueQtyPiece: pickNumber(baseDraft.issueQtyPiece, summary.qtyPiece, header?.qtyPiece),
+    returnDate: pickText(baseDraft.returnDate, summary.occurredDate, summary.plannedDate, header?.occurredDate, header?.plannedDate),
+    returnSku: pickText(baseDraft.returnSku, summary.sku, header?.sku),
+    returnProductName: pickText(baseDraft.returnProductName, summary.productName, header?.productName),
+    returnQtyPiece: pickNumber(baseDraft.returnQtyPiece, summary.qtyPiece, header?.qtyPiece),
     // Khong dung summary.plannedStage/header.plannedStage lam mac dinh -
     // do la gia tri "du kien" ngam dinh ngay khi tao LSX (VD "CKE"), chua
     // ai thuc su chon. Ban ghi seed nay chi la placeholder de LSX xuat

@@ -63,6 +63,7 @@ export type SelectedOrderDetail = {
   stage: string;
   worker: string;
   plannedMaterial: string;
+  plannedMaterialType: string;
   materialSpec: string;
   goldAgeValue: number;
   actualProgressNote: string;
@@ -278,6 +279,7 @@ export function buildSelectedOrderDetail(
     stage: pickText(latestMovement?.stage, movementStages[0], summary.plannedStage, matchingHeader?.plannedStage),
     worker: pickText(latestMovement?.worker, movementWorkers[0], summary.plannedWorker, matchingHeader?.plannedWorker),
     plannedMaterial: pickText(latestMovement?.material, movementMaterials[0], summary.plannedMaterial, matchingItem?.plannedMaterial, matchingHeader?.plannedMaterial),
+    plannedMaterialType: pickText(latestMovement?.materialType, summary.plannedMaterialType, matchingItem?.plannedMaterialType, matchingHeader?.plannedMaterialType),
     materialSpec: pickText(summary.materialSpec, matchingItem?.materialSpec, matchingHeader?.materialSpec),
     goldAgeValue: pickNumber(latestMovement?.goldAge, summary.plannedGoldAge, matchingItem?.plannedGoldAge, matchingHeader?.plannedGoldAge),
     actualProgressNote: pickText(summary.actualProgressNote, matchingHeader?.actualProgressNote),

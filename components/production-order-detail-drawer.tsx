@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Link2, X } from "lucide-react";
 import {
+  DrawerHeaderMeta,
   DetailGroup,
   DetailInlineList
 } from "@/components/production-ui";
@@ -12,7 +13,11 @@ import {
   isClosedStatus,
   statusClass
 } from "@/lib/production-helpers";
-import { productionOrderDeliveryStatusOptions } from "@/lib/production-journal-options";
+import {
+  formatGoldAgeLabel,
+  formatMaterialTypeLabel,
+  productionOrderDeliveryStatusOptions
+} from "@/lib/production-journal-options";
 import type { OrderSummary } from "@/lib/production-types";
 import type { SelectedOrderDetail } from "@/lib/production-workflow";
 
@@ -61,17 +66,33 @@ export function ProductionOrderDetailDrawer({
           isOpen ? "translate-x-0" : "pointer-events-none translate-x-full"
         }`}
       >
-        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line px-5 py-4">
-          <div>
+        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line bg-white px-5 py-4">
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-wide text-brass">Chi tiết LSX</p>
-            <h3 className="font-display mt-1 text-2xl font-semibold text-ink">{summary.code}</h3>
-            <p className="mt-1 text-sm text-zinc-600">
+            <h3 className="font-display mt-1 truncate text-2xl font-semibold text-ink">{summary.code}</h3>
+            <p className="mt-1 text-sm leading-5 text-zinc-600">
               {isEditing
                 ? isClosedSelected
                   ? "LSX đã chốt, các trường bên dưới đang bị khoá để bảo vệ số liệu."
                   : "Chỉnh sửa thông tin gốc của LSX, sau đó lưu để đồng bộ lại danh sách."
-                : "Panel này chỉ giữ thông tin phục vụ quyết định và thao tác tiếp theo."}
+                : detail.productName || "Chọn thao tác tiếp theo cho LSX đang xem."}
             </p>
+            <DrawerHeaderMeta
+              items={[
+                { label: "Mã hàng", value: detail.sku || "Chưa cập nhật" },
+                { label: "Công đoạn", value: detail.stage || "Chưa có công đoạn", tone: detail.stage ? "sky" : "amber" },
+                { label: "Thợ", value: detail.worker || "Chưa phân công", tone: detail.worker ? "default" : "amber" },
+                { label: "Giao dịch", value: `${detail.movementCount} dòng`, tone: detail.movementCount > 0 ? "jade" : "default" }
+              ]}
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${deliveryStatusClass[detail.deliveryStatus || ""] ?? "bg-zinc-100 text-zinc-700 ring-zinc-200"}`}>
+                LSX: {detail.deliveryStatus || "-"}
+              </span>
+              <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${statusClass[detail.operationalStatus]}`}>
+                Vận hành: {detail.operationalStatus}
+              </span>
+            </div>
           </div>
           <button
             className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-white text-zinc-700 hover:bg-paper"
@@ -206,8 +227,8 @@ export function ProductionOrderDetailDrawer({
                       ["Công đoạn", detail.stage || "-"],
                       ["Thợ", detail.worker || "Chưa phân công"],
                       ["NVL dự kiến", detail.plannedMaterial || "-"],
-                      ["Loại nguyên liệu", detail.materialSpec || "-"],
-                      ["Tuổi vàng", detail.goldAgeValue > 0 ? String(detail.goldAgeValue) : "-"],
+                      ["Loại nguyên liệu", formatMaterialTypeLabel(detail.plannedMaterialType)],
+                      ["Tuổi vàng", formatGoldAgeLabel(detail.goldAgeValue)],
                       ["NVL đã phát sinh", detail.movementMaterials.length ? detail.movementMaterials.join(", ") : "Chưa có"],
                       ["Thợ đã nhận", detail.movementWorkers.length ? detail.movementWorkers.join(", ") : "Chưa có"]
                     ]}
