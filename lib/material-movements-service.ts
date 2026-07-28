@@ -359,14 +359,26 @@ export async function updateMaterialMovement(order: ProductionOrder): Promise<Pr
     upsertWorker(order.worker, order.stage)
   ]);
 
-  const fullRow = buildMovementRow(order, { orderId, materialId, workerId, note: "Updated from QLKT K2 demo" });
+  const rowParams = { orderId, materialId, workerId, note: "Updated from QLKT K2 demo" };
+  const fullRow = buildMovementRow(order, rowParams);
 
-  const { data, error } = await supabase
+  let updateResult = await supabase
     .from("material_movements")
     .update(fullRow)
     .eq("id", order.id)
     .select(MOVEMENT_SELECT_COLUMNS)
     .single();
+
+  if (isMissingColumnError(updateResult.error?.message)) {
+    updateResult = await supabase
+      .from("material_movements")
+      .update(buildMovementRowBaseOnly(order, rowParams))
+      .eq("id", order.id)
+      .select(MOVEMENT_SELECT_COLUMNS_FALLBACK)
+      .single();
+  }
+
+  const { data, error } = updateResult;
 
   if (error || !data) throw new Error(`Cannot update material movement: ${error?.message ?? "unknown error"}`);
 
