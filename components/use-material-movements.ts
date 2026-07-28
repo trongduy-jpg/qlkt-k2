@@ -306,7 +306,14 @@ export function useMaterialMovements({
       try {
         await deleteMaterialMovement(id);
       } catch (error) {
-        if (target) {
+        const errorMessage = error instanceof Error ? error.message : "Không xóa được giao dịch";
+        if (isSupabaseConfigured) {
+          try {
+            await reloadOperationalData();
+          } catch {
+            // Keep the original delete failure visible even if the follow-up re-sync fails.
+          }
+        } else if (target) {
           setOrders((current) => {
             if (current.some((order) => order.id === id)) return current;
             const restoredOrders = [...current];
@@ -314,7 +321,7 @@ export function useMaterialMovements({
             return restoredOrders;
           });
         }
-        setRemoteError(error instanceof Error ? error.message : "Không xóa được giao dịch");
+        setRemoteError(errorMessage);
         return;
       }
 
