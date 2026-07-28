@@ -124,6 +124,10 @@ export type ProductionOrderItem = {
   // 1 LSX co the co nhieu Ma hang, moi Ma hang chot/mo lai doc lap, khong
   // con dung chung 1 status cua ca header (production_orders.status) nua.
   status?: Status;
+  // Trang thai LSX (Chua Hoan Tat/Hoan tat/Chua giao du/Ngung San Xuat) cua
+  // RIENG Ma hang nay - cung ly do nhu status o tren: 1 LSX co the co nhieu
+  // Ma hang, tien do giao hang cua tung Ma hang co the khac nhau.
+  deliveryStatus?: string;
 };
 
 export type ProductionOrderItemRecord = ProductionOrderItem & {

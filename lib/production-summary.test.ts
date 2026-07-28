@@ -198,6 +198,37 @@ describe("buildOrderSummaries", () => {
     expect(summaries).toHaveLength(1);
     expect(summaries[0].status).toBe("Đã chốt");
   });
+
+  it("doi Trang thai LSX cua 1 Ma hang khong lam Ma hang khac cung LSX bi doi theo", () => {
+    const header = makeHeader({
+      code: "DHAG-26083",
+      deliveryStatus: "Chưa Hoàn Tất",
+      items: [
+        { sku: "RG006", productName: "Nhẫn F", quantityPiece: 5, deliveryStatus: "Hoàn tất" },
+        { sku: "RG007", productName: "Nhẫn G", quantityPiece: 7 }
+      ]
+    });
+
+    const summaries = buildOrderSummaries([], [header]);
+    expect(summaries).toHaveLength(2);
+
+    const done = summaries.find((item) => item.sku === "RG006")!;
+    const stillPending = summaries.find((item) => item.sku === "RG007")!;
+    expect(done.deliveryStatus).toBe("Hoàn tất");
+    expect(stillPending.deliveryStatus).toBe("Chưa Hoàn Tất");
+  });
+
+  it("Ma hang chua co deliveryStatus rieng (du lieu cu truoc migration 0026) fallback ve deliveryStatus cua header", () => {
+    const header = makeHeader({
+      code: "DHAG-26084",
+      deliveryStatus: "Hoàn tất",
+      items: [{ sku: "RG008", productName: "Nhẫn H", quantityPiece: 1 }]
+    });
+
+    const summaries = buildOrderSummaries([], [header]);
+    expect(summaries).toHaveLength(1);
+    expect(summaries[0].deliveryStatus).toBe("Hoàn tất");
+  });
 });
 
 describe("buildDraftStageMovements va buildStageProgress", () => {

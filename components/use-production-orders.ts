@@ -19,7 +19,8 @@ import {
   createAuditLog,
   createProductionOrderHeader,
   replaceProductionOrderItems,
-  updateProductionOrderHeader
+  updateProductionOrderHeader,
+  updateProductionOrderItemDeliveryStatus
 } from "@/lib/material-service";
 import { isSupabaseConfigured } from "@/lib/supabase";
 
@@ -38,6 +39,9 @@ export type ProductionOrdersDeps = {
   setProductionHeaderDraftCache: Dispatch<SetStateAction<HeaderDraftCache>>;
   setProductionHeaders: Dispatch<SetStateAction<ProductionOrderHeader[]>>;
   setOrders: Dispatch<SetStateAction<ProductionOrder[]>>;
+  // Ma hang dang duoc xem tren sidebar - dung de biet dung Ma hang nao can
+  // doi Trang thai LSX khi bam nut nhanh (quickUpdateDeliveryStatus).
+  selectedItemSku: string | null;
   setSelectedOrderCode: (code: string | null) => void;
   setSelectedItemSku: (sku: string | null) => void;
   setRecentCreatedOrderCode: (code: string | null) => void;
@@ -58,6 +62,7 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
     setProductionHeaderDraftCache,
     setProductionHeaders,
     setOrders,
+    selectedItemSku,
     setSelectedOrderCode,
     setSelectedItemSku,
     setRecentCreatedOrderCode,
@@ -507,13 +512,41 @@ export function useProductionOrders(deps: ProductionOrdersDeps) {
   }
 
   // Trang thai LSX la truong nguoi dung doi thuong xuyen nen cho phep bam
-  // 1 nut la doi + luu ngay, khong can mo rong form roi bam Luu. Truyen
-  // thang draft moi (khong doc lai state) de tranh loi doc gia tri cu do
-  // setState chua kip render lai truoc khi goi ham luu.
+  // 1 nut la doi + luu ngay, khong can mo rong form roi bam Luu.
+  //
+  // Chi doi Trang thai LSX cua DUNG Ma hang dang xem (selectedItemSku),
+  // khong dung ca header - 1 LSX co the co nhieu Ma hang, tien do giao hang
+  // cua tung Ma hang doc lap (giong cach "Chot LSX" da lam voi status).
+  // LSX cu chua co danh sach Ma hang chinh thuc (items rong) thi van doi o
+  // header, vi luc do "Ma hang" chi la 1 pseudo-item suy ra tu chinh header.
   async function quickUpdateDeliveryStatus(status: string) {
     if (!editingProductionCode) return;
     const nextDraft = { ...productionHeaderDraft, deliveryStatus: status };
     setProductionHeaderDraft(nextDraft);
+
+    const header = productionHeaders.find((item) => item.code === editingProductionCode);
+    const targetSku = selectedItemSku || nextDraft.sku;
+
+    if (header && header.items.length > 0 && targetSku) {
+      setProductionHeaders((current) =>
+        current.map((item) =>
+          item.code === editingProductionCode
+            ? {
+                ...item,
+                items: item.items.map((orderItem) =>
+                  orderItem.sku === targetSku ? { ...orderItem, deliveryStatus: status } : orderItem
+                )
+              }
+            : item
+        )
+      );
+      if (isSupabaseConfigured) {
+        await updateProductionOrderItemDeliveryStatus(editingProductionCode, targetSku, status);
+        await reloadOperationalData();
+      }
+      return;
+    }
+
     await updateProductionOrderFromHeader(nextDraft, false);
   }
 

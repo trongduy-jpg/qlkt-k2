@@ -276,6 +276,7 @@ export function MaterialDashboard() {
     setProductionHeaderDraftCache,
     setProductionHeaders,
     setOrders,
+    selectedItemSku,
     setSelectedOrderCode,
     setSelectedItemSku,
     setRecentCreatedOrderCode,

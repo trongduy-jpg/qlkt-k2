@@ -4,7 +4,6 @@ import { DateInput, FieldShell, SelectControl, fieldControlClass } from "@/compo
 import { ProductionItemsEditor } from "@/components/production-items-editor";
 import type { MaterialMaster } from "@/lib/material-service";
 import {
-  productionOrderDeliveryStatusOptions,
   productionOrderDestinations,
   productionOrderSalesTypeOptions,
   type SelectOption
@@ -62,13 +61,6 @@ export function ProductionOrderInlineEditForm({
           <FieldShell label="Phân loại KH">
             <SelectControl value={draft.salesType} onChange={(value) => onDraftChange("salesType", value)}>
               {productionOrderSalesTypeOptions.map((item) => (
-                <option key={item.value} value={item.value}>{item.label}</option>
-              ))}
-            </SelectControl>
-          </FieldShell>
-          <FieldShell label="Trạng thái LSX">
-            <SelectControl value={draft.deliveryStatus} onChange={(value) => onDraftChange("deliveryStatus", value)}>
-              {productionOrderDeliveryStatusOptions.map((item) => (
                 <option key={item.value} value={item.value}>{item.label}</option>
               ))}
             </SelectControl>

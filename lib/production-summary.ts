@@ -81,7 +81,11 @@ function buildRowFromHeaderItem(
     materialSpec: pickText(item.materialSpec, header.materialSpec),
     plannedGoldAge: item.plannedGoldAge || header.plannedGoldAge,
     plannedMaterialType: pickText(item.plannedMaterialType, header.plannedMaterialType),
-    deliveryStatus: header.deliveryStatus,
+    // Trang thai LSX (giao hang) cua RIENG Ma hang nay. Uu tien
+    // item.deliveryStatus (doi tu sidebar ghi vao day); fallback ve
+    // header.deliveryStatus cho du lieu cu truoc migration 0026 (item chua
+    // co delivery_status).
+    deliveryStatus: pickText(item.deliveryStatus, header.deliveryStatus),
     orderMonth: header.orderMonth,
     salesType: header.salesType,
     customerName: header.customerName,

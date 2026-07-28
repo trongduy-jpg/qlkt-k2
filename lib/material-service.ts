@@ -45,7 +45,8 @@ export {
 export {
   loadProductionOrderItems,
   replaceProductionOrderItems,
-  updateProductionOrderItemStatus
+  updateProductionOrderItemStatus,
+  updateProductionOrderItemDeliveryStatus
 } from "@/lib/production-order-items-service";
 
 export {

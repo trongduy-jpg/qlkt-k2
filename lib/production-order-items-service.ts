@@ -26,7 +26,7 @@ export async function loadProductionOrderItems(): Promise<ProductionOrderItemRec
   const { data, error } = await supabase
     .from("production_order_items")
     .select(
-      "id, order_code, sku, product_name, quantity_piece, material_spec, planned_material, planned_gold_age, planned_material_type, planned_weight_gram, delivered_qty, completed_weight_gram, note, status, sort_order, created_at"
+      "id, order_code, sku, product_name, quantity_piece, material_spec, planned_material, planned_gold_age, planned_material_type, planned_weight_gram, delivered_qty, completed_weight_gram, note, status, delivery_status, sort_order, created_at"
     )
     .order("order_code", { ascending: true })
     .order("sort_order", { ascending: true });
@@ -54,6 +54,7 @@ export async function loadProductionOrderItems(): Promise<ProductionOrderItemRec
     completedWeightGram: Number(row.completed_weight_gram ?? 0),
     note: String(row.note ?? ""),
     status: row.status ? fromDbStatus(String(row.status)) : undefined,
+    deliveryStatus: row.delivery_status ? String(row.delivery_status) : undefined,
     sortOrder: Number(row.sort_order ?? 0),
     createdAt: String(row.created_at ?? "")
   }));
@@ -92,6 +93,7 @@ export async function replaceProductionOrderItems(orderCode: string, items: Prod
     completed_weight_gram: item.completedWeightGram || 0,
     note: item.note?.trim() || null,
     status: toDbStatus(item.status || "Đang xử lý"),
+    delivery_status: item.deliveryStatus || null,
     sort_order: item.sortOrder ?? index
   }));
 
@@ -123,5 +125,28 @@ export async function updateProductionOrderItemStatus(orderCode: string, sku: st
   if (error) {
     if (isMissingTableError(error.message) || isMissingColumnError(error.message)) return;
     throw new Error(`Không cập nhật được trạng thái Mã hàng ${trimmedSku}: ${error.message}`);
+  }
+}
+
+// Doi Trang thai LSX (giao hang) cua DUNG 1 Ma hang - cung ly do nhu
+// updateProductionOrderItemStatus o tren: tien do giao hang co the khac
+// nhau giua cac Ma hang cung 1 LSX. Neu chua chay migration 0026 (chua co
+// cot delivery_status) thi bo qua eim lang.
+export async function updateProductionOrderItemDeliveryStatus(orderCode: string, sku: string, deliveryStatus: string): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) return;
+
+  const trimmedCode = orderCode.trim();
+  const trimmedSku = sku.trim();
+  if (!trimmedCode || !trimmedSku) return;
+
+  const { error } = await supabase
+    .from("production_order_items")
+    .update({ delivery_status: deliveryStatus })
+    .eq("order_code", trimmedCode)
+    .eq("sku", trimmedSku);
+
+  if (error) {
+    if (isMissingTableError(error.message) || isMissingColumnError(error.message)) return;
+    throw new Error(`Không cập nhật được Trạng thái LSX của Mã hàng ${trimmedSku}: ${error.message}`);
   }
 }
