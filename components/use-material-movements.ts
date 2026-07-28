@@ -291,7 +291,8 @@ export function useMaterialMovements({
   }
 
   function removeOrder(id: string) {
-    const target = orders.find((order) => order.id === id);
+    const targetIndex = orders.findIndex((order) => order.id === id);
+    const target = targetIndex >= 0 ? orders[targetIndex] : undefined;
     if (target && isClosedStatus(target.status)) {
       const detail = `Không thể xóa giao dịch ${target.code} vì LSX đã chốt`;
       pushAudit("blocked_delete_movement", detail);
@@ -300,12 +301,28 @@ export function useMaterialMovements({
     }
 
     setOrders((current) => current.filter((order) => order.id !== id));
-    if (target) pushAudit("delete_movement", `Xóa giao dịch ${target.code} - ${target.worker}`);
 
-    void deleteMaterialMovement(id).catch((error) => {
-      setRemoteError(error instanceof Error ? error.message : "Không xóa được giao dịch");
-    });
-    if (target) void createAuditLog("delete_movement", `Xóa giao dịch ${target.code} - ${target.worker}`, id);
+    void (async () => {
+      try {
+        await deleteMaterialMovement(id);
+      } catch (error) {
+        if (target) {
+          setOrders((current) => {
+            if (current.some((order) => order.id === id)) return current;
+            const restoredOrders = [...current];
+            restoredOrders.splice(Math.min(Math.max(targetIndex, 0), restoredOrders.length), 0, target);
+            return restoredOrders;
+          });
+        }
+        setRemoteError(error instanceof Error ? error.message : "Không xóa được giao dịch");
+        return;
+      }
+
+      if (target) {
+        pushAudit("delete_movement", `Xóa giao dịch ${target.code} - ${target.worker}`);
+        void createAuditLog("delete_movement", `Xóa giao dịch ${target.code} - ${target.worker}`, id);
+      }
+    })();
   }
 
   // Mo 1 dong da co san de sua (bam tu bang NK NVL hoac tu danh sach tho
