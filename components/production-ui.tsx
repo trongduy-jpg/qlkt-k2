@@ -90,14 +90,14 @@ export function DrawerHeaderMeta({
   };
 
   return (
-    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+    <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
       {items.map((item) => (
         <div
           key={item.label}
-          className={`min-w-0 rounded-md border px-3 py-2 ${toneClass[item.tone ?? "default"]}`}
+          className={`min-w-0 rounded-md border px-2.5 py-1.5 ${toneClass[item.tone ?? "default"]}`}
         >
           <div className="text-[10px] font-semibold uppercase tracking-wide opacity-70">{item.label}</div>
-          <div className="mt-0.5 truncate text-sm font-semibold">{item.value || "-"}</div>
+          <div className="truncate text-sm font-semibold">{item.value || "-"}</div>
         </div>
       ))}
     </div>

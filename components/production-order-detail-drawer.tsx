@@ -68,15 +68,13 @@ export function ProductionOrderDetailDrawer({
       >
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line bg-white px-5 py-4">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brass">Chi tiết LSX</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-brass">LSX</p>
             <h3 className="font-display mt-1 truncate text-2xl font-semibold text-ink">{summary.code}</h3>
-            <p className="mt-1 text-sm leading-5 text-zinc-600">
-              {isEditing
-                ? isClosedSelected
-                  ? "LSX đã chốt, các trường bên dưới đang bị khoá để bảo vệ số liệu."
-                  : "Chỉnh sửa thông tin gốc của LSX, sau đó lưu để đồng bộ lại danh sách."
-                : detail.productName || "Chọn thao tác tiếp theo cho LSX đang xem."}
-            </p>
+            {isEditing && isClosedSelected ? (
+              <p className="mt-1 text-sm leading-5 text-zinc-600">
+                LSX đã chốt, các trường bên dưới đang bị khoá để bảo vệ số liệu.
+              </p>
+            ) : null}
             <DrawerHeaderMeta
               items={[
                 { label: "Mã hàng", value: detail.sku || "Chưa cập nhật" },

@@ -549,7 +549,7 @@ function WorkerBoxDetail({
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase text-brass">Chi tiết dòng tồn</p>
+          <p className="text-xs font-semibold uppercase text-brass">Dòng tồn</p>
           <h3 className="mt-1 text-lg font-bold text-ink">{line.workerName}</h3>
           <p className="mt-1 text-sm text-zinc-600">
             {line.stageCode} - {line.stageName} · {line.materialName}

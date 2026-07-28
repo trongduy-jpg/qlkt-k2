@@ -183,17 +183,10 @@ export function MaterialMovementDrawer({
       >
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-line bg-white px-5 py-4">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brass">
-              {isEditing ? "Sửa giao dịch NVL" : "Thêm giao dịch NVL"}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-brass">Giao dịch NVL</p>
             <h3 className="font-display mt-1 truncate text-2xl font-semibold text-ink">
               {isEditing ? draft.code || "Giao dịch NVL" : "Giao dịch mới"}
             </h3>
-            <p className="mt-1 text-sm leading-5 text-zinc-600">
-              {isEditing
-                ? "Cập nhật phát sinh NVL theo đúng LSX, mã hàng, công đoạn và thợ phụ trách."
-                : "Tạo phát sinh NVL mới, sau đó hệ thống sẽ đồng bộ về nhật ký và chi tiết LSX."}
-            </p>
             <DrawerHeaderMeta
               items={[
                 { label: "Mã hàng", value: selectedItemSku || "Chưa chọn", tone: selectedItemSku ? "default" : "amber" },

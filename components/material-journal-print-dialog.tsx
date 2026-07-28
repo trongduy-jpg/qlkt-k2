@@ -441,7 +441,7 @@ export function MaterialJournalPrintDialog({
       <div className="flex max-h-[86vh] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-line bg-white shadow-2xl">
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-brass">In PDF Nhật ký NVL</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-brass">In PDF</p>
             <h3 className="font-display mt-1 text-2xl font-semibold text-ink">Thiết lập bản in</h3>
             <p className="mt-1 text-sm text-zinc-600">Chọn kiểu báo cáo và các trường cần in, sau đó lưu bằng Save as PDF.</p>
           </div>
