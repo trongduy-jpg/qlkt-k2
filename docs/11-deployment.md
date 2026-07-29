@@ -75,8 +75,8 @@ On Windows use `npm.cmd` — PowerShell execution policy often blocks `npm.ps1`.
 | `npm.cmd run build` | production build (`next build`) — the release gate |
 | `npm.cmd run start` | serve the built app locally |
 | `npm.cmd run typecheck` | `tsc --noEmit` |
-| `npm.cmd run test` | `vitest run` (59 tests) |
-| `npm.cmd run lint` | `next lint` — **currently non-functional, no ESLint config exists (L-12)** |
+| `npm.cmd run test` | `vitest run` (85 tests) |
+| `npm.cmd run lint` | `next lint` (`eslint.config.mjs`, `next/core-web-vitals`) — currently **0 errors, 0 warnings**; a mandatory gate per `13-definition-of-done.md` |
 | `npm.cmd run db:reset` | `node tools/reset-supabase-data.mjs` |
 | `npm.cmd run db:seed:master` | `node tools/seed-supabase-master-data.mjs` |
 
@@ -90,10 +90,11 @@ sequenceDiagram
     participant G as GitHub (main)
     participant V as Vercel
 
+    D->>L: npm.cmd run lint
     D->>L: npm.cmd run typecheck
     D->>L: npm.cmd run test
     D->>L: npm.cmd run build
-    Note over D,L: all three must pass — see 13-definition-of-done.md
+    Note over D,L: all four must pass — see 13-definition-of-done.md
     opt migration included in the change
         D->>SQL: paste supabase/migrations/00NN_*.sql, run
         D->>SQL: notify pgrst, 'reload schema';
@@ -176,7 +177,7 @@ Both are therefore unsafe to rely on as written — see `14-known-limitations.md
 3. **Always run `notify pgrst, 'reload schema';`** after DDL.
 4. **Apply migrations before deploying dependent code.**
 5. **Verify both env vars exist in production** — their absence disables authentication.
-6. **Run typecheck + test + build before any push.**
+6. **Run lint + typecheck + test + build before any push.**
 7. **Do not commit or push without an explicit instruction.**
 8. Migrations are append-only; the next file is `0027_*.sql`.
 
@@ -202,10 +203,9 @@ At minimum, `app_users` must contain each intended user's email or nobody can lo
 
 - **Migrations are entirely manual** with no applied-state tracking; environments can silently
   diverge, and the app degrades quietly rather than failing when they do (L-05).
-- **L-12** `npm run lint` has no configuration, so the documented lint step is a no-op.
 - Missing env vars turn authentication off instead of failing the deployment.
 - **L-19** both maintenance scripts use the anon key and are unreliable/harmful as written.
-- No CI pipeline: `typecheck`/`test`/`build` are run locally by convention only; nothing
+- No CI pipeline: `lint`/`typecheck`/`test`/`build` are run locally by convention only; nothing
   prevents pushing a broken commit.
 - No staging environment defined; `main` deploys straight to production.
 - No health check, error tracking (Sentry or equivalent), or uptime monitoring.
@@ -215,14 +215,13 @@ At minimum, `app_users` must contain each intended user's email or nobody can lo
 
 ## Future improvements
 
-1. **Add GitHub Actions CI** running `typecheck`, `test`, and `build` on every PR — the single
-   highest-value operational improvement.
+1. **Add GitHub Actions CI** running `lint`, `typecheck`, `test`, and `build` on every PR — the
+   single highest-value operational improvement.
 2. Adopt the Supabase CLI (`supabase migration up`) or add a small runner plus a
    `schema_migrations` table so applied state is knowable.
 3. Fail the build when `NEXT_PUBLIC_SUPABASE_*` are missing in a production environment.
 4. Rewrite `tools/*.mjs` to require a service-role key from a non-`NEXT_PUBLIC` env var, and
    refuse to run without it.
-5. Add an ESLint config so the lint step becomes meaningful (see `09-coding-standard.md`).
-6. Introduce a staging Supabase project and a Vercel preview environment bound to it.
-7. Add error tracking and a `/api/health`-equivalent status surface (or reuse
+5. Introduce a staging Supabase project and a Vercel preview environment bound to it.
+6. Add error tracking and a `/api/health`-equivalent status surface (or reuse
    `loadDatabaseHealth` on the dashboard).

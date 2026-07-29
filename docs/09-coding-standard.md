@@ -44,6 +44,39 @@ React components and local helpers.
 a union, so status literals are unchecked. Compare against the exported option arrays
 (`statusOptions`, `movementLossStatusOptions`, …) rather than writing literals inline.
 
+### Linting
+
+ESLint **is configured and the baseline is clean**: `eslint.config.mjs` (flat config, using
+`FlatCompat` to extend `next/core-web-vitals` only), run via `npm.cmd run lint` (`next lint`).
+The current baseline is **0 errors and 0 warnings**, and `lint` is a **mandatory** step in the
+completion gate (`13-definition-of-done.md`).
+
+**The clean baseline is suppression-assisted, not suppression-free.** The codebase contains
+**7 active `// eslint-disable-next-line react-hooks/exhaustive-deps` suppressions across 5
+files** — each one is silencing a real `exhaustive-deps` warning, so removing any of them
+re-surfaces it:
+
+| File | Count |
+|---|---|
+| `components/material-dashboard.tsx` | 3 |
+| `components/material-movement-drawer.tsx` | 1 |
+| `components/use-local-storage-persistence.ts` | 1 |
+| `components/use-selected-production-order.ts` | 1 |
+| `components/worker-box-view.tsx` | 1 |
+
+Only **one** of the seven — the mount-only data-load `useEffect` in
+`components/material-dashboard.tsx` — was added deliberately and reviewed (by task
+`tasks/backlog/007-medium-priority.md`); it carries a comment explaining that the effect must
+run exactly once per session, because adding the reported dependencies would refire it,
+re-trigger Supabase loads, and overwrite the in-progress draft. **The other 6 predate that task
+and were never audited by it — all 6 are bare, with no explanatory comment**, so their
+intent is undocumented and they should not be assumed correct. Auditing them is outstanding
+work (see `14-known-limitations.md` L-12).
+
+Because the baseline is clean, **any warning your change introduces is a regression** — fix it
+rather than leaving it, and never add a blanket suppression to silence it. If a suppression is
+genuinely required, follow the reviewed example: one line, rule-specific, with a stated reason.
+
 ### Naming
 
 | Kind | Convention | Examples from code |
@@ -209,16 +242,11 @@ Vietnamese display values via `toDbStatus`/`fromDbStatus`.
 
 ## Known limitations
 
-- **L-12 — ESLint is configured and runs, but is not fully clean and is not yet a mandatory
-  gate.** `eslint.config.mjs` exists (flat config, `FlatCompat` wrapping `next/core-web-vitals`
-  only), and `npm.cmd run lint` executes successfully. It currently reports 0 errors and 2
-  warnings — an unused `eslint-disable` directive in `components/auth-context.tsx`, and an
-  `react-hooks/exhaustive-deps` warning in `components/material-dashboard.tsx`. `lint` is not
-  yet part of the mandatory checklist in `13-definition-of-done.md`, so every convention in
-  this document is still upheld primarily by review, with lint as a partial, not-yet-enforced
-  check.
 - No Prettier configuration; formatting is by convention (2-space indent, double quotes,
   semicolons, trailing commas omitted in most places).
+- ESLint enforces only the `next/core-web-vitals` baseline. It does **not** check the naming
+  conventions, layer-import boundaries, or `any`-avoidance rules in this document — those are
+  still upheld by review only.
 - `Status = string` defeats type checking on the most important discriminator in the domain.
 - `production-helpers.ts` is a grab-bag name that violates the "name by intent" rule.
 - Two `any` casts remain in the loaders.
@@ -228,13 +256,9 @@ Vietnamese display values via `toDbStatus`/`fromDbStatus`.
 
 ## Future improvements
 
-1. **Resolve the 2 remaining lint warnings** (`react-hooks/exhaustive-deps` in
-   `components/material-dashboard.tsx`, the stale `eslint-disable` in
-   `components/auth-context.tsx`) and then wire `npm run lint` into the completion gate in
-   `13-definition-of-done.md`.
-2. Add Prettier with a shared config to remove formatting debate.
-3. Convert `Status` to a union and derive option arrays from it.
-4. Extract the loss calculation into one exported function in
+1. Add Prettier with a shared config to remove formatting debate.
+2. Convert `Status` to a union and derive option arrays from it.
+3. Extract the loss calculation into one exported function in
    `lib/production-business-rules.ts` and have all three call sites use it.
-5. Split `production-helpers.ts` into `status-helpers.ts` and `format-helpers.ts`.
-6. Add an ESLint rule (or CI check) enforcing the layer import boundaries.
+4. Split `production-helpers.ts` into `status-helpers.ts` and `format-helpers.ts`.
+5. Add an ESLint rule (or CI check) enforcing the layer import boundaries.

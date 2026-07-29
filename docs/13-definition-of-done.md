@@ -25,7 +25,9 @@ and UI changes, the reporting contract, and what explicitly does *not* count as 
 
 ```mermaid
 flowchart TD
-    A["Implementation complete<br/>within allowed paths"] --> B["npm.cmd run typecheck"]
+    A["Implementation complete<br/>within allowed paths"] --> L["npm.cmd run lint"]
+    L -->|fail| A
+    L -->|pass| B["npm.cmd run typecheck"]
     B -->|fail| A
     B -->|pass| C["npm.cmd run test"]
     C -->|fail| A
@@ -44,8 +46,11 @@ flowchart TD
 ### Mandatory checklist — every change
 
 - [ ] **Scope respected** — only files in the task's *Files allowed to modify* list were touched.
+- [ ] **`npm.cmd run lint` passes** (`next lint`, `next/core-web-vitals`) — **zero errors and
+      zero warnings**. The baseline is clean, so any new warning is a regression introduced by
+      this change.
 - [ ] **`npm.cmd run typecheck` passes** (`tsc --noEmit`, strict mode, zero errors).
-- [ ] **`npm.cmd run test` passes** — all **59** tests green. Output was actually read.
+- [ ] **`npm.cmd run test` passes** — all **85** tests green. Output was actually read.
 - [ ] **`npm.cmd run build` passes** (`next build` completes with exit code 0).
 - [ ] **No new `any`, `@ts-ignore`, or non-null assertion** introduced (current baseline per
       `09-coding-standard.md`: 2 `any`, 3 non-null assertions `!`).
@@ -149,8 +154,9 @@ failing — so an unapplied migration produces corrupt-looking data rather than 
 
 - **The gate is not enforced by anything.** There is no CI, no pre-commit hook, no branch
   protection — it holds only because agents and reviewers follow it.
-- **`npm run lint` is part of no checklist because it cannot run** — no ESLint config exists
-  (L-12). Static analysis contributes nothing today.
+- **Lint enforcement, like the rest of this gate, relies on discipline** — `npm.cmd run lint`
+  is now in the mandatory checklist above and its baseline is clean, but nothing prevents
+  pushing a commit that skips it.
 - **No coverage floor**, so a change can add untested code and still pass.
 - **No automated UI verification** — the UI checklist items are all manual, and 0 % of
   components have tests.
@@ -162,12 +168,11 @@ failing — so an unapplied migration produces corrupt-looking data rather than 
 
 ## Future improvements
 
-1. **Add GitHub Actions** running typecheck + test + build on every PR, turning this document
-   from convention into enforcement — the highest-leverage change available.
-2. Add an ESLint config (plus `eslint-plugin-jsx-a11y`) and add `lint` to the checklist.
-3. Add `@vitest/coverage-v8` with a floor on `lib/`, and fail the gate on regression.
-4. Add a schema-conformance test asserting every column in `MOVEMENT_SELECT_COLUMNS` exists in
+1. **Add GitHub Actions** running lint + typecheck + test + build on every PR, turning this
+   document from convention into enforcement — the highest-leverage change available.
+2. Add `@vitest/coverage-v8` with a floor on `lib/`, and fail the gate on regression.
+3. Add a schema-conformance test asserting every column in `MOVEMENT_SELECT_COLUMNS` exists in
    the migrations.
-5. Introduce a PR template mirroring this checklist so review evidence is recorded in git.
-6. Record review acceptance by moving the task file to `tasks/done/` in the same commit as the
+4. Introduce a PR template mirroring this checklist so review evidence is recorded in git.
+5. Record review acceptance by moving the task file to `tasks/done/` in the same commit as the
    change, giving an auditable trail.

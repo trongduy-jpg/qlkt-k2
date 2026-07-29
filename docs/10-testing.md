@@ -1,7 +1,7 @@
 # 10 — Testing
 
 > **Generated from source code.** Test names below are the literal `describe`/`it` strings.
-> Counts are actual: **59 tests, 23 describe blocks, 3 files.**
+> Counts are actual: **85 tests, 25 describe blocks, 4 files.**
 
 ---
 
@@ -48,20 +48,21 @@ npm.cmd run typecheck                             # tsc --noEmit
 ### What the node environment implies
 
 Because the environment is `node` and no DOM library is installed, **only pure functions are
-testable today**. That is exactly why all three test files target `lib/` modules that import
+testable today**. That is exactly why all four test files target `lib/` modules that import
 neither React nor Supabase — the layer discipline in `09-coding-standard.md` is what makes the
 suite possible.
 
 ```mermaid
 flowchart LR
-    subgraph T["Tested — 59 tests"]
+    subgraph T["Tested — 85 tests"]
         A["production-business-rules.ts"]
         B["production-summary.ts"]
         C["production-workflow.ts"]
+        E2["production-helpers.ts<br/>(validateMovementDraft only)"]
     end
     subgraph U["Untested"]
         D["production-mappers.ts"]
-        E["production-helpers.ts"]
+        E["production-helpers.ts<br/>(everything else)"]
         F["worker-box-service.ts"]
         G["use-cases/material-movement-drafts.ts"]
         H["production-journal-options.ts"]
@@ -114,6 +115,19 @@ flowchart LR
 Note the emphasis: **six of the sixteen `buildOrderSummaries`/workflow tests exist specifically
 to protect multi-SKU isolation and item→header fallback** — historically the most bug-prone area.
 
+#### `lib/production-helpers.test.ts` — 26 tests, 2 describes
+
+Covers `validateMovementDraft` only; no other export of `production-helpers.ts` is tested.
+
+| Describe | Covers |
+|---|---|
+| `validateMovementDraft — numeric field validation` | Parametrized across `issued`, `returned`, `transferred`, `goldAge`: rejects `NaN`, `Infinity`, `-Infinity`, and negative values; accepts `0`. Plus regression cases: `transferred === undefined` and `goldAge === undefined` accepted (both optional in the domain type); `returned > issued` accepted (no comparison rule exists); the default `createEmptyOrder()` `Treo nợ` draft raises no numeric error |
+| `validateMovementDraft — existing required-field checks (hoi quy)` | An empty draft still reports its missing required string fields; a fully valid draft returns `[]` |
+
+The regression cases exist to pin down what validation deliberately does **not** reject — see
+`01-business-rules.md` Rule 10 and the deferred decisions in
+`tasks/backlog/003-high-priority.md`.
+
 ### Uncovered behavior — explicit list
 
 Nothing below has any automated test:
@@ -127,7 +141,10 @@ Nothing below has any automated test:
   weights, period defaults), `convertToPureGoldWeight`, `buildDocumentNo`,
   `getNextDocumentSequence`, `normalizeStageForStorage`, `toIsoDate`.
 - The whole status machine: `isClosedStatus`, `getSummaryStatus`, `isSingleWorkerStage`.
-- `validateMovementDraft` — all eight required-field rules.
+- `validateMovementDraft`'s **eight required-string-field rules individually** — the suite
+  asserts only that an empty draft reports missing fields and a valid draft reports none; it
+  does not pin down each field's message separately. (Its numeric rules *are* covered — see
+  the inventory above.)
 - All of `lib/production-mappers.ts` (357 lines): `mergeMovementWithContext`,
   `mergeProductionHeaderWithDraft`, `mergeItemsStatusFromHeader`,
   `mapRemoteHeaderToProductionHeader`, factories.
@@ -148,8 +165,8 @@ end-to-end flow.
 Observed and worth keeping:
 - One test file per `lib/` module, named `<module>.test.ts`, colocated in `lib/`.
 - A local `makeX(overrides: Partial<T>): T` factory at the top of the file
-  (`makeOrder`, `makeHeader`, `makeSummary`, `makeMovement`) so each test states only what
-  matters.
+  (`makeOrder`, `makeHeader`, `makeSummary`, `makeMovement`, `makeValidDraft`) so each test
+  states only what matters.
 - `describe` = the function under test; `it` = a Vietnamese sentence describing the business
   behavior (matching how the team talks about the domain).
 - Assert on observable output, not internal calls.
@@ -189,7 +206,7 @@ test Supabase project, no seeded test schema, and no migration test — so schem
 
 ## Known limitations
 
-- **L-13** — coverage is narrow: 3 of ~45 `lib`/`components` modules, ~0 % of the UI, and the
+- **L-13** — coverage is narrow: 4 of ~45 `lib`/`components` modules, ~0 % of the UI, and the
   loss formula itself is untested.
 - No coverage measurement or threshold configured, so regressions in coverage are invisible.
 - `environment: "node"` means components cannot be tested without adding jsdom +
@@ -198,8 +215,9 @@ test Supabase project, no seeded test schema, and no migration test — so schem
   entirely unverified.
 - No E2E test, so the single-mount routing model and drawer flows are only manually validated.
 - No test asserts that TypeScript's `Status` values match the DB's `toDbStatus` mapping.
-- `next lint` now runs (`eslint.config.mjs`) but reports 2 unresolved warnings and is not yet
-  part of the completion gate — see `14-known-limitations.md` L-12.
+- `next lint` is configured (`eslint.config.mjs`) and clean, but it only enforces the
+  `next/core-web-vitals` baseline — it catches no business-logic or data-correctness defect, so
+  it complements the test suite rather than compensating for the coverage gaps above.
 
 ## Future improvements
 
