@@ -134,7 +134,7 @@ export function useMaterialMovements({
   ): Promise<ProductionOrder | null> {
     const missingFields = validateMovementDraft(inputOrder);
     if (missingFields.length > 0) {
-      setRemoteError(`Chưa thể lưu giao dịch. Vui lòng bổ sung: ${missingFields.join(", ")}.`);
+      setRemoteError(`Chưa thể lưu giao dịch. Vui lòng kiểm tra lại: ${missingFields.join(", ")}.`);
       return null;
     }
     const normalizedDraft = applyProductionBusinessRules(inputOrder, orders);

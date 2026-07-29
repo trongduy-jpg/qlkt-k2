@@ -51,10 +51,11 @@ Chi tiết nằm trong `supabase/README.md`.
 - Ghi audit log demo.
 - Export JSON.
 
-## Tài liệu nghiệp vụ
+## Tài liệu
 
-- `docs/00-mvp-scope.md`: phạm vi MVP.
-- `docs/03-quy-trinh-nghiep-vu.md`: luồng nghiệp vụ cần chốt.
+Xem `docs/00-project-overview.md` — tài liệu chính thức, sinh từ code hiện tại (16 file,
+`docs/00-project-overview.md` → `docs/15-future-roadmap.md`). Tài liệu cũ (đặc tả/phân tích
+ban đầu) được lưu tham khảo tại `docs/legacy/`, không còn là nguồn xác thực.
 
 ## Deploy Vercel
 
