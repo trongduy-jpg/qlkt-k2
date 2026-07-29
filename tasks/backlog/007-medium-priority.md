@@ -1,3 +1,9 @@
+> **STATUS: ✅ COMPLETED — CLOSED.** All acceptance criteria satisfied; lint is clean
+> (0 errors, 0 warnings) and is now a mandatory gate in `docs/13-definition-of-done.md`.
+> See "Task status" below for the full verification record. The "Goal", "Business value", and
+> "Current implementation" sections below describe the **pre-task baseline**, not the current
+> state.
+
 # Goal
 
 Add a real ESLint configuration to the repository so that `npm run lint` actually lints the
@@ -5,11 +11,14 @@ code, instead of being a defined-but-non-functional script.
 
 # Business value
 
-`package.json` defines `"lint": "next lint"` and `eslint-config-next` is installed, but no
-`.eslintrc*` or `eslint.config.*` file exists anywhere in the repository — so the lint command
-currently has nothing to run against. Every convention documented in
-`docs/09-coding-standard.md` (naming, layer-import boundaries, `any` avoidance, etc.) is today
-enforced only by manual review. Adding a working lint config turns already-written
+*(Historical — this describes the pre-task problem, which no longer exists. See the STATUS
+banner above for the current state.)*
+
+At the time this task was written, `package.json` defined `"lint": "next lint"` and
+`eslint-config-next` was installed, but **no** `.eslintrc*` or `eslint.config.*` file existed
+anywhere in the repository — so the lint command had nothing to run against. Every convention
+documented in `docs/09-coding-standard.md` (naming, layer-import boundaries, `any` avoidance,
+etc.) was enforced only by manual review. Adding a working lint config turns already-written
 conventions into an automatically-checkable gate, catching regressions before they reach
 review — a low-cost, high-leverage quality investment.
 
@@ -56,64 +65,76 @@ review — a low-cost, high-leverage quality investment.
 
 - [x] **`npm.cmd run lint` runs and either passes cleanly or fails with a small, reviewed,
       intentional set of remaining warnings (not silently suppressed).** `eslint.config.mjs`
-      exists, `npm.cmd run lint` executes, and reports **0 errors, 2 warnings**. Both warnings
-      have been reviewed and are recorded below, not silently suppressed.
+      exists and `npm.cmd run lint` passes **completely clean — 0 errors, 0 warnings**.
 - [x] **The lint config is committed and applies to the whole repository.** `eslint.config.mjs`
-      exists at the repo root using `FlatCompat` + `next/core-web-vitals` only, with no
-      path/file exclusions narrowing its scope.
-- [ ] **`docs/13-definition-of-done.md` lists `lint` as part of the mandatory checklist.**
-      **NOT DONE.** `lint` is intentionally not yet in the mandatory checklist, because the 2
-      warnings below are still unresolved — making it mandatory before that would gate every
-      future task on warnings this task did not clear.
-- [ ] **`docs/09-coding-standard.md` and `docs/14-known-limitations.md` no longer describe L-12
-      as an open issue.** **PARTIALLY DONE.** Both docs were updated to reflect that ESLint now
-      runs (no longer "no config exists"), but L-12 is still documented as an **open, partially
-      resolved** issue — it is not marked closed, since 2 warnings remain and the mandatory gate
-      is not yet wired in.
+      at the repo root uses `FlatCompat` + `next/core-web-vitals` only, with no path/file
+      exclusions narrowing its scope.
+- [x] **`docs/13-definition-of-done.md` lists `lint` as part of the mandatory checklist.**
+      `npm.cmd run lint` is now the first step in the gate flowchart and a mandatory checklist
+      item, recording the clean 0-error/0-warning baseline so that any new warning reads as a
+      regression introduced by that change.
+- [x] **`docs/09-coding-standard.md` and `docs/14-known-limitations.md` no longer describe L-12
+      as an open issue.** L-12 is marked **RESOLVED (narrow sense)** in
+      `14-known-limitations.md` (both the register entry and the severity diagram), and
+      `09-coding-standard.md` gained a "Linting" section documenting the clean baseline, the
+      mandatory gate, and the full suppression inventory. `10-testing.md` was also updated to
+      stop describing lint as non-functional.
 
-### Remaining warnings (as of the current lint run)
+### Warnings — both resolved
 
-| # | File | Rule | Description |
+| # | File | Rule | Resolution |
 |---|---|---|---|
-| 1 | `components/auth-context.tsx:63` | (stale suppression) | Unused `eslint-disable-next-line react-hooks/exhaustive-deps` directive — the rule no longer reports anything at that line, so the comment is dead. |
-| 2 | `components/material-dashboard.tsx:211` | `react-hooks/exhaustive-deps` | `useEffect` is missing dependencies (`reloadOperationalData`, `setDraft`, `setHasLoadedStorage`, `setIsLoadingRemote`, `setRemoteError`) on the app's intentional single-mount data-load effect. |
+| 1 | `components/auth-context.tsx` | (stale suppression) | **Removed** the dead `eslint-disable-next-line react-hooks/exhaustive-deps` comment above the auth-session mount-only effect. Comment-only change, no behavior change. |
+| 2 | `components/material-dashboard.tsx` | `react-hooks/exhaustive-deps` | **Targeted suppression added** on the mount-only data-load `useEffect`, with a comment explaining the effect must run exactly once per session. Analysis established that `reloadOperationalData` is recreated on every render (not memoized), so adding the reported dependencies would refire the effect on nearly every render — repeated Supabase loads, loading-state flicker, and overwriting the in-progress movement draft. Comment-only change, no behavior change. |
 
-### Remaining work — split by risk
+Both follow the pattern already documented in `docs/09-coding-standard.md` (React patterns):
+mount-once effects use `[]` plus a rule-specific `eslint-disable-next-line` with a stated
+reason. No dependency array, `useCallback`, hook structure, or blanket suppression was
+introduced.
 
-**Safe mechanical cleanup** (no design decision required):
-- Delete the stale `eslint-disable-next-line react-hooks/exhaustive-deps` comment in
-  `components/auth-context.tsx:63`. It suppresses nothing today; removing it changes no
-  behavior.
+### Scope note — suppressions this task did *not* touch
 
-**Human decision required** (not safe to automate):
-- `components/material-dashboard.tsx:211` — the effect's empty dependency array is a
-  **deliberate** design choice (data loads exactly once per session; see
-  `02-current-architecture.md`). Resolving the warning requires a human/product decision
-  between: (a) adding the missing dependencies (which could change load-once-per-session
-  behavior), or (b) adding an explicit, justified
-  `// eslint-disable-next-line react-hooks/exhaustive-deps` with a comment explaining why the
-  array is intentionally incomplete. Neither option should be applied without that decision,
-  per this task's original constraint against changing behavior or adding broad suppressions
-  without justification.
-- Once both warnings above are resolved, a follow-up edit to add `lint` to
-  `docs/13-definition-of-done.md`'s mandatory checklist and fully close L-12 in
-  `docs/09-coding-standard.md` / `docs/14-known-limitations.md`.
+This task added **exactly one** new suppression (the `material-dashboard.tsx` mount-only effect
+above) and removed one dead one. It did **not** audit the rest.
 
-### Task status: **Partially completed — remains open**
+The repository currently has **7 active `eslint-disable-next-line react-hooks/exhaustive-deps`
+suppressions across 5 files**: `material-dashboard.tsx` ×3, `material-movement-drawer.tsx`,
+`use-local-storage-persistence.ts`, `use-selected-production-order.ts`, `worker-box-view.tsx`.
+**6 of those 7 predate this task**, are all bare with no explanatory comment, and were neither
+reviewed nor justified here — the clean 0-warning baseline depends on them, so removing any one
+re-surfaces a real warning.
 
-The core deliverable (a working ESLint config wired into `npm run lint`) is done and verified.
-The task is **not closed**, because two of the four original acceptance criteria depend on the
-2 remaining warnings being resolved first — closing this task now would mean claiming full
-completion against acceptance criteria that are not yet satisfied. Recommended handling: keep
-this task open (or split the two remaining items into a small new follow-up task) rather than
-mark it done.
+Auditing those 6 is deliberately **out of scope** for this task and is recorded as residual
+technical debt in `docs/14-known-limitations.md` (L-12). Do not read this task's closure as an
+endorsement of them.
+
+### Final verified command results
+
+| Command | Result |
+|---|---|
+| `npm.cmd run lint` | **0 errors, 0 warnings** — "✔ No ESLint warnings or errors" |
+| `npm.cmd run typecheck` | **pass** — `tsc --noEmit`, zero errors |
+| `npm.cmd run test` | **pass — 85 tests**, 4 test files |
+| `npm.cmd run build` | **pass** — `next build` exit 0, all 10 routes generated, no lint output |
+
+### Task status: **Completed — closed**
+
+All four acceptance criteria are satisfied: the ESLint config exists and applies repo-wide,
+`npm.cmd run lint` passes with a fully clean baseline, `lint` is a mandatory gate in
+`13-definition-of-done.md`, and L-12 is marked resolved in `14-known-limitations.md`. No
+remaining work and no deferred decisions belong to this task.
+
+Deliberately **not** claimed by this task: ESLint enforces only the `next/core-web-vitals`
+baseline, so it does not check this repo's naming, layer-import, or `any`-avoidance conventions.
+That was never in scope here and remains a separate improvement idea recorded in
+`09-coding-standard.md`'s "Future improvements".
 
 # Testing Checklist
 
-- [x] `npm.cmd run lint` — executes; reports 0 errors, 2 warnings (see table above).
+- [x] `npm.cmd run lint` — passes, 0 errors and 0 warnings.
 - [x] `npm.cmd run typecheck` — passes.
 - [x] `npm.cmd run test` — passes, 85 tests.
-- [x] `npm.cmd run build` — passes (warnings print but do not fail the build).
+- [x] `npm.cmd run build` — passes.
 
 # Estimated Complexity
 S

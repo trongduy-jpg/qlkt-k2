@@ -115,7 +115,7 @@ Before reporting a task implemented, all three must actually be executed and pas
 
 ```bash
 npm.cmd run typecheck     # tsc --noEmit
-npm.cmd run test          # vitest run — 59 tests
+npm.cmd run test          # vitest run — 85 tests across 4 test files
 npm.cmd run build         # next build
 ```
 

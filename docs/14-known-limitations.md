@@ -49,7 +49,7 @@ flowchart LR
     subgraph Q["🔵 Quality / ops"]
         L07["L-07 all modules<br/>always mounted"]
         L08["L-08 accessibility"]
-        L12["L-12 lint not clean"]
+        L12["L-12 no ESLint<br/>✅ RESOLVED"]
         L13["L-13 test coverage"]
     end
 ```
@@ -211,26 +211,45 @@ across navigation — but it will not scale as data grows.
   validation messages — are not announced.
 - Sidebar has no `aria-current`; tables use `<th>` without `scope`.
 
-#### L-12 — ESLint runs but is not fully clean, and is not yet a mandatory gate
-`eslint.config.mjs` exists (flat config, `FlatCompat` wrapping `next/core-web-vitals` only), so
-`npm.cmd run lint` executes successfully. It currently reports **0 errors and 2 warnings**:
-- `components/auth-context.tsx` — unused `eslint-disable-next-line` directive (rule
-  `react-hooks/exhaustive-deps` no longer reports anything at that line)
-- `components/material-dashboard.tsx` — `react-hooks/exhaustive-deps` missing-dependency
-  warning on the intentionally-empty-dependency single-mount data-load effect (see
-  `02-current-architecture.md`)
+#### L-12 — ~~No ESLint configuration exists~~ **RESOLVED (narrow sense)**
+**Resolved in the narrow sense that ESLint is now configured, clean, and mandatory:**
+`eslint.config.mjs` exists (flat config, `FlatCompat` extending `next/core-web-vitals` only),
+`npm.cmd run lint` runs via `next lint` with a baseline of **0 errors and 0 warnings**, and
+`lint` is a **mandatory** step in the completion gate (`13-definition-of-done.md`). The
+original defect — no config, lint a no-op — no longer exists.
 
-Neither warning has been resolved — the `material-dashboard.tsx` one concerns a deliberate
-design choice (load-once-per-session), so fixing it is a design decision, not a mechanical
-cleanup. `lint` is **not yet added to the mandatory checklist in `13-definition-of-done.md`**,
-so this limitation remains partially open until both warnings are resolved and the gate is
-made mandatory.
+**The clean baseline is suppression-assisted.** It includes **7 active
+`// eslint-disable-next-line react-hooks/exhaustive-deps` suppressions across 5 files**
+(`material-dashboard.tsx` ×3, `material-movement-drawer.tsx`, `use-local-storage-persistence.ts`,
+`use-selected-production-order.ts`, `worker-box-view.tsx`) — each silences a real
+`exhaustive-deps` warning. Exactly **one** was added and reviewed deliberately: the mount-only
+data-load `useEffect` in `components/material-dashboard.tsx`, which carries a comment
+explaining that the effect must run exactly once per session (adding the reported dependencies
+would refire it on nearly every render, causing repeated Supabase loads and overwriting the
+in-progress movement draft). **The remaining 6 predate that work, are all bare with no
+explanatory comment, and have never been audited.**
+
+This does **not** reopen L-12 — the configuration defect is genuinely fixed. Treat the 6
+unaudited suppressions as **residual technical debt**: each hides a dependency-array
+correctness question that may be deliberate or may be a latent stale-closure bug, and none is
+documented. A future audit item, not a regression (see `15-future-roadmap.md` R-10 for the
+still-open enforcement work).
+
+Also residual (tracked in `09-coding-standard.md`, not as a limitation here): ESLint enforces
+only the Next.js/React/a11y baseline, so this document's naming, layer-import, and
+`any`-avoidance conventions are still review-enforced.
 
 #### L-13 — Narrow test coverage
-59 tests across **3 of ~45** `lib`/`components` modules. Untested: the loss formula,
-`validateMovementDraft`, the whole status machine, all of `production-mappers.ts` (357 lines),
-all of `worker-box-service.ts` (328 lines), all 10 services, all 28 components, all 6 hooks. No
+85 tests across **4 of ~45** `lib`/`components` modules. Still untested: the loss formula, the
+whole status machine, all of `production-mappers.ts` (357 lines), all of
+`worker-box-service.ts` (328 lines), all 10 services, all 28 components, all 6 hooks. No
 coverage threshold, no integration tests, no E2E. Details in `10-testing.md`.
+
+`validateMovementDraft` is now **partially** covered — its numeric rules (`NaN`, `Infinity`,
+negative values) are tested in `lib/production-helpers.test.ts`, but its eight
+required-string-field rules are only asserted in aggregate. The count rising from 59 to 85 does
+not resolve this limitation: the additional tests all target one function, so the breadth
+problem (whole layers with zero coverage) is unchanged.
 
 #### L-14 — Six oversized files
 `material-movement-drawer.tsx` (962), `material-dashboard.tsx` (884), `worker-box-view.tsx` (682),

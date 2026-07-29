@@ -33,7 +33,7 @@ feature, and where nothing currently prevents a regression from shipping.
 ```mermaid
 flowchart TD
     P0["P0 — Correctness<br/>L-01, L-05"] --> P1["P1 — Security<br/>L-02, L-03, L-20, L-19"]
-    P1 --> P2["P2 — Enforcement<br/>CI, ESLint, coverage"]
+    P1 --> P2["P2 — Enforcement<br/>CI, coverage<br/>(ESLint ✅ done)"]
     P2 --> P3["P3 — Complete the features<br/>L-10, L-11, L-06, L-22"]
     P3 --> P4["P4 — Quality & scale<br/>L-07, L-08, L-13, L-14, L-16, L-17"]
     P0 -.->|"L-09 needs a<br/>business decision"| BD["Business input required"]
@@ -122,15 +122,21 @@ role checks remain advisory only, and this should be stated to users rather than
 #### R-9 · GitHub Actions CI — makes `13-definition-of-done.md` real
 **Effort: S · Highest leverage item in the whole list**
 
-Run `typecheck`, `test`, and `build` on every PR and on `main`. Today the gate is convention
-only; nothing prevents a failing commit from deploying.
+Run `lint`, `typecheck`, `test`, and `build` on every PR and on `main`. Today the gate is
+convention only; nothing prevents a failing commit from deploying.
 
-#### R-10 · ESLint config + coverage floor — resolves **L-12**, mitigates **L-13**
+#### R-10 · ~~ESLint config~~ **DONE** + coverage floor — **L-12 resolved**, mitigates **L-13**
 **Effort: S**
 
-Add `eslint.config.mjs` (`next/core-web-vitals` + `eslint-plugin-jsx-a11y`) so `npm run lint`
-does something, then add `@vitest/coverage-v8` with a floor on `lib/`. Consider a lint rule (or
-a small script) enforcing the layer import boundaries from `09-coding-standard.md`.
+**ESLint part: completed** (task `007`). `eslint.config.mjs` exists — flat config using
+`FlatCompat` to extend `next/core-web-vitals` — `npm.cmd run lint` passes with **0 errors and 0
+warnings**, and `lint` is now a mandatory gate in `13-definition-of-done.md`. L-12 is resolved
+(see `14-known-limitations.md`). Note `eslint-plugin-jsx-a11y` needed no separate install —
+`eslint-config-next` already bundles it.
+
+**Still open:** add `@vitest/coverage-v8` with a floor on `lib/`, and consider a lint rule (or a
+small script) enforcing the layer import boundaries from `09-coding-standard.md` — the baseline
+ruleset does not check them.
 
 #### R-11 · Test the untested core — addresses **L-13**
 **Effort: M**
@@ -225,7 +231,7 @@ Primary targets, by item: `lib/production-business-rules.ts` (R-1) ·
 `lib/material-movements-service.ts` + `lib/production-order-items-service.ts` (R-2) ·
 `components/use-material-movements.ts` (R-3) · `lib/auth-service.ts` +
 `components/auth-gate.tsx` (R-6) · `tools/*.mjs` (R-7) · `.github/workflows/` — **does not exist
-yet** (R-9) · `eslint.config.mjs` — **does not exist yet** (R-10) ·
+yet** (R-9) · `eslint.config.mjs` — **exists, R-10's ESLint half is done** ·
 `lib/worker-box-service.ts` + `lib/worker-box-data.ts` (R-12) ·
 `components/price-table-view.tsx` (R-14) · `lib/audit-log-service.ts` +
 `components/audit-log-view.tsx` (R-15) · `components/production-ui.tsx` (R-17)
