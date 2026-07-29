@@ -60,7 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => listener.subscription.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function signOut() {
