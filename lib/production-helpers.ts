@@ -23,6 +23,15 @@ export function formatGram(value: number) {
   return `${value.toLocaleString("vi-VN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}g`;
 }
 
+// Chan NaN/Infinity/-Infinity/so am cho cac truong so luong va tuoi vang.
+// Gia tri 0 va undefined (vd transferred, goldAge khong nhap) van hop le -
+// khong duoc coi la invalid, de khong pha vo hanh vi mac dinh hien tai
+// (draft Treo no mac dinh issued/returned/transferred = 0, goldAge fallback
+// ve 1 khi falsy o production-business-rules.ts).
+function isInvalidNumeric(value: number): boolean {
+  return !Number.isFinite(value) || value < 0;
+}
+
 export function validateMovementDraft(draft: ProductionOrder) {
   const missing: string[] = [];
   if (!draft.code.trim()) missing.push("Mã LSX");
@@ -33,6 +42,10 @@ export function validateMovementDraft(draft: ProductionOrder) {
   if (!draft.worker?.trim()) missing.push("Thợ phụ trách");
   if (!draft.stageStatus?.trim()) missing.push("Trạng thái công đoạn");
   if (!draft.status?.trim()) missing.push("Trạng thái tính hao");
+  if (isInvalidNumeric(draft.issued)) missing.push("Xuất");
+  if (isInvalidNumeric(draft.returned)) missing.push("Nhập");
+  if (draft.transferred != null && isInvalidNumeric(draft.transferred)) missing.push("Chuyển");
+  if (draft.goldAge != null && isInvalidNumeric(draft.goldAge)) missing.push("Tuổi vàng");
   return missing;
 }
 
