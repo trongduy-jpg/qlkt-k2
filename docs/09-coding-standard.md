@@ -209,11 +209,14 @@ Vietnamese display values via `toDbStatus`/`fromDbStatus`.
 
 ## Known limitations
 
-- **L-12 — there is no ESLint configuration file in the repository.** `package.json` defines
-  `"lint": "next lint"` and `eslint-config-next` is installed, but no `.eslintrc*` or
-  `eslint.config.*` exists anywhere. The documented lint command therefore has nothing to run,
-  and no automated style enforcement exists — every convention in this document is upheld by
-  review only.
+- **L-12 — ESLint is configured and runs, but is not fully clean and is not yet a mandatory
+  gate.** `eslint.config.mjs` exists (flat config, `FlatCompat` wrapping `next/core-web-vitals`
+  only), and `npm.cmd run lint` executes successfully. It currently reports 0 errors and 2
+  warnings — an unused `eslint-disable` directive in `components/auth-context.tsx`, and an
+  `react-hooks/exhaustive-deps` warning in `components/material-dashboard.tsx`. `lint` is not
+  yet part of the mandatory checklist in `13-definition-of-done.md`, so every convention in
+  this document is still upheld primarily by review, with lint as a partial, not-yet-enforced
+  check.
 - No Prettier configuration; formatting is by convention (2-space indent, double quotes,
   semicolons, trailing commas omitted in most places).
 - `Status = string` defeats type checking on the most important discriminator in the domain.
@@ -225,8 +228,10 @@ Vietnamese display values via `toDbStatus`/`fromDbStatus`.
 
 ## Future improvements
 
-1. **Add an ESLint config** (`eslint.config.mjs` with `next/core-web-vitals`) plus
-   `eslint-plugin-jsx-a11y`, and wire `npm run lint` into the completion gate.
+1. **Resolve the 2 remaining lint warnings** (`react-hooks/exhaustive-deps` in
+   `components/material-dashboard.tsx`, the stale `eslint-disable` in
+   `components/auth-context.tsx`) and then wire `npm run lint` into the completion gate in
+   `13-definition-of-done.md`.
 2. Add Prettier with a shared config to remove formatting debate.
 3. Convert `Status` to a union and derive option arrays from it.
 4. Extract the loss calculation into one exported function in

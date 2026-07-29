@@ -198,7 +198,8 @@ test Supabase project, no seeded test schema, and no migration test — so schem
   entirely unverified.
 - No E2E test, so the single-mount routing model and drawer flows are only manually validated.
 - No test asserts that TypeScript's `Status` values match the DB's `toDbStatus` mapping.
-- `next lint` cannot run (no ESLint config — L-12), so static analysis adds nothing.
+- `next lint` now runs (`eslint.config.mjs`) but reports 2 unresolved warnings and is not yet
+  part of the completion gate — see `14-known-limitations.md` L-12.
 
 ## Future improvements
 
