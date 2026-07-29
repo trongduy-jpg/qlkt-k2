@@ -208,6 +208,11 @@ export function MaterialDashboard() {
     }
 
     void loadRemoteData();
+    // Deps rong la co y: effect nay chi duoc chay DUNG 1 LAN moi session.
+    // reloadOperationalData khong on dinh identity (tao lai moi render), nen
+    // neu them vao deps thi effect se chay lai lien tuc - goi lap Supabase,
+    // nhay loading, va ghi de material/worker/stage cua draft dang soan.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Bang NK NVL chi hien 1 dong/LSX (cong doan hien tai = khau xa nhat da
