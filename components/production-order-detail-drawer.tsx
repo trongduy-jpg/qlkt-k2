@@ -243,7 +243,7 @@ export function ProductionOrderDetailDrawer({
 
               {isClosedStatus(summary.status) ? (
                 <div className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-700">
-                  LSX đã chốt nên đang khóa thêm/sửa/xóa giao dịch để bảo vệ số liệu kế toán. Nếu có phát sinh mới, bấm "Mở lại LSX" để chỉnh sửa, sau đó chốt lại.
+                  LSX đã chốt nên đang khóa thêm/sửa/xóa giao dịch để bảo vệ số liệu kế toán. Nếu có phát sinh mới, bấm &quot;Mở lại LSX&quot; để chỉnh sửa, sau đó chốt lại.
                 </div>
               ) : null}
             </div>

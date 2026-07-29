@@ -49,7 +49,7 @@ flowchart LR
     subgraph Q["🔵 Quality / ops"]
         L07["L-07 all modules<br/>always mounted"]
         L08["L-08 accessibility"]
-        L12["L-12 no ESLint"]
+        L12["L-12 lint not clean"]
         L13["L-13 test coverage"]
     end
 ```
@@ -211,10 +211,20 @@ across navigation — but it will not scale as data grows.
   validation messages — are not announced.
 - Sidebar has no `aria-current`; tables use `<th>` without `scope`.
 
-#### L-12 — No ESLint configuration exists
-`package.json` defines `"lint": "next lint"` and installs `eslint-config-next`, but there is
-**no `.eslintrc*` or `eslint.config.*` anywhere** in the repository. The documented lint command
-has nothing to run, and no automated style or a11y enforcement exists.
+#### L-12 — ESLint runs but is not fully clean, and is not yet a mandatory gate
+`eslint.config.mjs` exists (flat config, `FlatCompat` wrapping `next/core-web-vitals` only), so
+`npm.cmd run lint` executes successfully. It currently reports **0 errors and 2 warnings**:
+- `components/auth-context.tsx` — unused `eslint-disable-next-line` directive (rule
+  `react-hooks/exhaustive-deps` no longer reports anything at that line)
+- `components/material-dashboard.tsx` — `react-hooks/exhaustive-deps` missing-dependency
+  warning on the intentionally-empty-dependency single-mount data-load effect (see
+  `02-current-architecture.md`)
+
+Neither warning has been resolved — the `material-dashboard.tsx` one concerns a deliberate
+design choice (load-once-per-session), so fixing it is a design decision, not a mechanical
+cleanup. `lint` is **not yet added to the mandatory checklist in `13-definition-of-done.md`**,
+so this limitation remains partially open until both warnings are resolved and the gate is
+made mandatory.
 
 #### L-13 — Narrow test coverage
 59 tests across **3 of ~45** `lib`/`components` modules. Untested: the loss formula,
