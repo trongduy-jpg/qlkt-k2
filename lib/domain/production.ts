@@ -21,6 +21,13 @@ export type ProductionOrder = {
   productName?: string;
   material: string;
   worker: string;
+  // Khoa ngoai that cua master data (material_movements.material_id /
+  // worker_id - da la NOT NULL FK tu migration 0001). Chi duoc dien o
+  // duong doc BINH THUONG; o duong fallback rut gon (schema cache thieu
+  // cot) se la undefined. Luu y: duong GHI van resolve material/worker
+  // theo TEN hien thi - xem tasks/backlog/009-low-priority.md.
+  materialId?: string;
+  workerId?: string;
   stage: string;
   stageStatus?: string;
   destination?: string;

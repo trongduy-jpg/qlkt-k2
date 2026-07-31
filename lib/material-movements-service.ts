@@ -19,6 +19,8 @@ const materialCodeByName: Record<string, string> = {
 const MOVEMENT_SELECT_COLUMNS = `
   id,
   order_id,
+  material_id,
+  worker_id,
   process_name,
   occurred_date,
   destination,
