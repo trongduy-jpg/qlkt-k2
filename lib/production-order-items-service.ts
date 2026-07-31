@@ -1,6 +1,6 @@
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { fromDbStatus, toDbStatus } from "@/lib/supabase-mappers";
-import type { Status } from "@/lib/domain/production";
+import type { LossStatus } from "@/lib/domain/production";
 import type { ProductionOrderItem, ProductionOrderItemRecord } from "@/lib/material-service-types";
 
 // Tang "Ma hang (line item)": 1 LSX co the co nhieu Ma hang, moi Ma hang
@@ -109,7 +109,7 @@ export async function replaceProductionOrderItems(orderCode: string, items: Prod
 // co the o trang thai khac nhau (VD Ma hang A da chot, Ma hang B con dang
 // xu ly). Neu chua chay migration 0024 (chua co cot status) thi bo qua
 // eim lang - fallback ve status cua header nhu truoc.
-export async function updateProductionOrderItemStatus(orderCode: string, sku: string, status: Status): Promise<void> {
+export async function updateProductionOrderItemStatus(orderCode: string, sku: string, status: LossStatus): Promise<void> {
   if (!isSupabaseConfigured || !supabase) return;
 
   const trimmedCode = orderCode.trim();

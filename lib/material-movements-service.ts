@@ -1,5 +1,5 @@
 import { productionOrders } from "@/lib/demo-data";
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import { movementRowToProductionOrder, toDbStatus, type MovementRow } from "@/lib/supabase-mappers";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { buildWorkerCode } from "@/lib/workers-service";
@@ -385,7 +385,7 @@ export async function updateMaterialMovement(order: ProductionOrder): Promise<Pr
   return mergeMovementResult(order, data);
 }
 
-export async function updateMaterialMovementStatus(id: string, status: Status) {
+export async function updateMaterialMovementStatus(id: string, status: LossStatus) {
   if (!isSupabaseConfigured || !supabase) return;
 
   const { error } = await supabase

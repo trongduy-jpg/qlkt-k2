@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import { fromDbStatus, toDbStatus } from "@/lib/supabase-mappers";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import type { ProductionOrderHeaderInput, ProductionOrderHeaderRecord } from "@/lib/material-service-types";
@@ -202,7 +202,7 @@ export async function updateProductionOrderHeader(orderCode: string, input: Prod
   return { ...input, id: result.data.id as string };
 }
 
-export async function updateProductionOrderStatus(orderCode: string, status: Status) {
+export async function updateProductionOrderStatus(orderCode: string, status: LossStatus) {
   if (!isSupabaseConfigured || !supabase) return;
 
   const { error } = await supabase

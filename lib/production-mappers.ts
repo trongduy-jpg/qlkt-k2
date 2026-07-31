@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import { pickNumber, pickText } from "@/lib/production-helpers";
 import {
   buildProductionOrderCode,
@@ -42,7 +42,7 @@ export function itemFromHeaderPrimary(header: {
   plannedMaterialType?: string;
   completedWeightGram?: number;
   deliveredQty?: number;
-  status?: Status;
+  status?: LossStatus;
 }): ProductionOrderItem {
   return {
     ...createEmptyProductionOrderItem(),

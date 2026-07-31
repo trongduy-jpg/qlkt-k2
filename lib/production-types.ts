@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import type { ProductionOrderItem } from "@/lib/material-service-types";
 
 // Cac kieu du lieu dung chung cho man Lenh san xuat / Nhat ky NVL.
@@ -55,14 +55,14 @@ export type OrderSummary = {
   convertedReturnWeight?: number;
   note?: string;
   createdAt?: string;
-  headerStatus?: Status;
+  headerStatus?: LossStatus;
   parentOrderCode?: string;
   movementCount: number;
   issued: number;
   returned: number;
   powder: number;
   loss: number;
-  status: Status;
+  status: LossStatus;
   workers: string[];
   materials: string[];
 };
@@ -111,7 +111,7 @@ export type ProductionOrderHeader = {
   convertedIssueWeight: number;
   convertedReturnWeight: number;
   note: string;
-  status: Status;
+  status: LossStatus;
   createdAt: string;
   parentOrderCode: string;
   // Danh sach Ma hang cua LSX. 1 LSX co the co nhieu Ma hang, moi Ma hang
@@ -133,7 +133,7 @@ export type PendingJournalRow = {
   occurredDate?: string;
   lossPeriod?: string;
   nxtPeriod?: string;
-  status: Status;
+  status: LossStatus;
   deliveryStatus?: string;
   summary: OrderSummary;
 };

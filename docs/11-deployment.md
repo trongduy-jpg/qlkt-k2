@@ -75,7 +75,7 @@ On Windows use `npm.cmd` — PowerShell execution policy often blocks `npm.ps1`.
 | `npm.cmd run build` | production build (`next build`) — the release gate |
 | `npm.cmd run start` | serve the built app locally |
 | `npm.cmd run typecheck` | `tsc --noEmit` |
-| `npm.cmd run test` | `vitest run` (85 tests) |
+| `npm.cmd run test` | `vitest run` (95 tests) |
 | `npm.cmd run lint` | `next lint` (`eslint.config.mjs`, `next/core-web-vitals`) — currently **0 errors, 0 warnings**; a mandatory gate per `13-definition-of-done.md` |
 | `npm.cmd run db:reset` | `node tools/reset-supabase-data.mjs` |
 | `npm.cmd run db:seed:master` | `node tools/seed-supabase-master-data.mjs` |

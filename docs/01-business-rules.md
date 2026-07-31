@@ -293,8 +293,13 @@ tolerance, whether zero quantities or `goldAge = 0` should ever be rejected, and
 3. **`powder` is always `0` in application writes.** Do not add a UI field for it without
    resolving Rule 1 first.
 4. **Weights are 4-decimal.** All rounding uses `.toFixed(4)`.
-5. **`Status` is typed `string`, not a union** (`lib/domain/production.ts:3`) — the compiler
-   will not catch a typo in a status literal. Compare against the exported option arrays.
+5. **Loss status is a real union.** `LOSS_STATUSES` (`as const`) and the derived `LossStatus`
+   in `lib/domain/production.ts` are the single source of truth for the four values, so a
+   mistyped loss-status literal is now a compile error. `statusOptions` is derived from it.
+   **`stageStatus` and `deliveryStatus` remain typed `string`** — both are persisted raw with
+   no CHECK constraint and their live-database vocabularies are unverified, so narrowing them
+   is deferred (see `tasks/backlog/008-low-priority.md`). For those two, still compare against
+   the exported option arrays rather than inventing a literal.
 6. **Item status wins over header status.** Never read `header.status` directly for display.
 
 ## Related source code
@@ -322,7 +327,8 @@ tolerance, whether zero quantities or `goldAge = 0` should ever be rejected, and
 - Rule 1's formula has three implementations; they can drift independently.
 - Two contradicting purity tables exist; the unused one is wrong.
 - No numeric validation at all in `validateMovementDraft`.
-- `Status = string` gives no compile-time safety.
+- `stageStatus` and `deliveryStatus` are still `string` — no compile-time safety on those two
+  axes (loss status is now the `LossStatus` union).
 - Compensation/settlement maths (loss-vs-norm, VND amounts) is **entirely absent** despite
   being central to the business problem.
 - Closing an LSX does **not** block adding new movements to it — only editing and deleting
@@ -332,7 +338,8 @@ tolerance, whether zero quantities or `goldAge = 0` should ever be rejected, and
 
 1. Reconcile loss into **one** implementation and make app and DB agree (decide whether
    `transferred` or `powder` is correct with the accounting team).
-2. Convert `Status` to a real union type and derive the option arrays from it.
+2. ~~Convert loss `Status` to a real union and derive the option arrays from it~~ **done**
+   (`LossStatus` + derived `statusOptions`). Remaining: `stageStatus` / `deliveryStatus`.
 3. Add numeric guards to `validateMovementDraft` (non-negative, `returned <= issued + tolerance`,
    `goldAge > 0`).
 4. Delete the unused `goldAgeOptions` table to remove the ambiguity.

@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import type { ProductionOrderItem } from "@/lib/material-service-types";
 import { getSummaryStatus, pickNumber, pickText } from "@/lib/production-helpers";
 import { normalizeStageCode } from "@/lib/production-business-rules";
@@ -36,7 +36,7 @@ function summarizeMovements(movements: ProductionOrder[]) {
   const latest = sorted[0];
   const workers: string[] = [];
   const materials: string[] = [];
-  const statuses: Status[] = [];
+  const statuses: LossStatus[] = [];
   let issued = 0;
   let returned = 0;
   let powder = 0;
@@ -291,7 +291,7 @@ export type LossReportRow = {
   loss: number;
   convertedLoss: number;
   worker: string;
-  status: Status;
+  status: LossStatus;
 };
 
 // Gop theo Khau + Tho + Loai vang/NVL + Trang thai: bang hao hut la tong

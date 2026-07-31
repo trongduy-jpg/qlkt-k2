@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { ProductionOrder } from "@/lib/domain/production";
 
 export const kpis = [
   { label: "Giá 24K đã duyệt", value: "15.407.000", unit: "VND/chỉ", trend: "Kỳ 05/2026" },
@@ -19,7 +19,7 @@ export const productionOrders: ProductionOrder[] = [
     returned: 22.89,
     powder: 0,
     loss: 0.11,
-    status: "Xác định" as Status
+    status: "Xác định"
   },
   {
     id: "mov-002",
@@ -32,7 +32,7 @@ export const productionOrders: ProductionOrder[] = [
     returned: 39.86,
     powder: 0.42,
     loss: 1.22,
-    status: "Treo nợ" as Status
+    status: "Treo nợ"
   },
   {
     id: "mov-003",
@@ -45,7 +45,7 @@ export const productionOrders: ProductionOrder[] = [
     returned: 17.98,
     powder: 0.08,
     loss: 0.19,
-    status: "Đang xử lý" as Status
+    status: "Đang xử lý"
   },
   {
     id: "mov-004",
@@ -58,7 +58,7 @@ export const productionOrders: ProductionOrder[] = [
     returned: 75.91,
     powder: 0.13,
     loss: 0.16,
-    status: "Đã chốt" as Status
+    status: "Đã chốt"
   }
 ];
 

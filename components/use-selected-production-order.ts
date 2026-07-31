@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
 import { selectMovementsForOrder } from "@/lib/production-summary";
 import { buildSelectedOrderDetail, type SelectedOrderDetail } from "@/lib/production-workflow";
@@ -36,7 +36,7 @@ export type UseSelectedProductionOrderDeps = {
   buildProductionHeaderDraftFromSummary: (summary: OrderSummary) => HeaderDraft;
   setRecentCreatedOrderCode: (code: string | null) => void;
   setQuery: (value: string) => void;
-  setStatus: (value: Status | "Tất cả") => void;
+  setStatus: (value: LossStatus | "Tất cả") => void;
   setActiveModule: (label: string) => void;
   reloadOperationalData: () => Promise<unknown>;
   pushAudit: (action: string, detail: string) => void;

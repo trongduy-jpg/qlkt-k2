@@ -65,7 +65,7 @@ import {
   kpis,
   priceRows
 } from "@/lib/demo-data";
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import {
   journalStages,
   mainJournalStageCodes,
@@ -571,7 +571,7 @@ export function MaterialDashboard() {
     worker: string;
     issued: number;
     returned: number;
-    status: Status;
+    status: LossStatus;
   }) {
     if (!stageEntryOrderSummary) return;
     if (!input.worker.trim()) {

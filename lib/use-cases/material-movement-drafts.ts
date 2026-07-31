@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import { createEmptyOrder, mergeMovementWithContext } from "@/lib/production-mappers";
 import { normalizeStageCode } from "@/lib/production-business-rules";
 import { pickNumber, pickText } from "@/lib/production-helpers";
@@ -85,7 +85,7 @@ export function buildMovementDraftFromSummary({
 export function buildSeedMovementFromSummary(
   summary: OrderSummary,
   header?: ProductionOrderHeader,
-  status: Status = "Đang xử lý"
+  status: LossStatus = "Đang xử lý"
 ): ProductionOrder {
   const baseDraft = mergeMovementWithContext(createEmptyOrder(), undefined, header);
 

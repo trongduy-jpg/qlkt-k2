@@ -5,10 +5,14 @@ import { isSingleWorkerStage } from "@/lib/production-business-rules";
 import { fieldControlClass } from "@/components/production-ui";
 import type { StageOption } from "@/lib/production-summary";
 import type { OrderSummary } from "@/lib/production-types";
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+// `Status` (alias deprecated cua LossStatus) van duoc import vi assertion o
+// input trang thai ben duoi duoc giu nguyen CO Y - xem
+// tasks/backlog/008-low-priority.md (quyet dinh ve gia tri UI khong hop le
+// con dang cho).
+import type { LossStatus, ProductionOrder, Status } from "@/lib/domain/production";
 import type { WorkerMaster } from "@/lib/material-service";
 
-type StageEntryDraft = { worker: string; issued: number; returned: number; status: Status };
+type StageEntryDraft = { worker: string; issued: number; returned: number; status: LossStatus };
 
 type StageEntryViewProps = {
   isVisible: boolean;
@@ -22,7 +26,7 @@ type StageEntryViewProps = {
   entriesByStage: Record<string, ProductionOrder[]>;
   workers: WorkerMaster[];
   lossStatusOptions: Array<{ value: string; label: string }>;
-  onRecord: (input: { stage: string; worker: string; issued: number; returned: number; status: Status }) => void;
+  onRecord: (input: { stage: string; worker: string; issued: number; returned: number; status: LossStatus }) => void;
   onDeleteEntry: (id: string) => void;
 };
 

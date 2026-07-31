@@ -240,16 +240,17 @@ only the Next.js/React/a11y baseline, so this document's naming, layer-import, a
 `any`-avoidance conventions are still review-enforced.
 
 #### L-13 — Narrow test coverage
-85 tests across **4 of ~45** `lib`/`components` modules. Still untested: the loss formula, the
+95 tests across **5 of ~45** `lib`/`components` modules. Still untested: the loss formula, the
 whole status machine, all of `production-mappers.ts` (357 lines), all of
 `worker-box-service.ts` (328 lines), all 10 services, all 28 components, all 6 hooks. No
 coverage threshold, no integration tests, no E2E. Details in `10-testing.md`.
 
 `validateMovementDraft` is now **partially** covered — its numeric rules (`NaN`, `Infinity`,
 negative values) are tested in `lib/production-helpers.test.ts`, but its eight
-required-string-field rules are only asserted in aggregate. The count rising from 59 to 85 does
-not resolve this limitation: the additional tests all target one function, so the breadth
-problem (whole layers with zero coverage) is unchanged.
+required-string-field rules are only asserted in aggregate. The count rising from 59 → 85 → 95
+does not resolve this limitation: each increase added tests for one narrow function
+(`validateMovementDraft`, then the `LOSS_STATUSES` vocabulary and its DB mapping), so the
+breadth problem — whole layers, most services, and all UI with zero coverage — is unchanged.
 
 #### L-14 — Six oversized files
 `material-movement-drawer.tsx` (962), `material-dashboard.tsx` (884), `worker-box-view.tsx` (682),

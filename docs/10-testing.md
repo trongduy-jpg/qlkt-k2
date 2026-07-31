@@ -1,7 +1,7 @@
 # 10 — Testing
 
 > **Generated from source code.** Test names below are the literal `describe`/`it` strings.
-> Counts are actual: **85 tests, 25 describe blocks, 4 files.**
+> Counts are actual: **95 tests, 30 describe blocks, 5 files.**
 
 ---
 
@@ -48,21 +48,24 @@ npm.cmd run typecheck                             # tsc --noEmit
 ### What the node environment implies
 
 Because the environment is `node` and no DOM library is installed, **only pure functions are
-testable today**. That is exactly why all four test files target `lib/` modules that import
+testable today**. That is exactly why all five test files target `lib/` modules that import
 neither React nor Supabase — the layer discipline in `09-coding-standard.md` is what makes the
 suite possible.
 
 ```mermaid
 flowchart LR
-    subgraph T["Tested — 85 tests"]
+    subgraph T["Tested — 95 tests"]
         A["production-business-rules.ts"]
         B["production-summary.ts"]
         C["production-workflow.ts"]
         E2["production-helpers.ts<br/>(validateMovementDraft only)"]
+        E3["domain/production.ts<br/>(LOSS_STATUSES vocabulary)"]
+        E4["supabase-mappers.ts<br/>(status mapping only)"]
     end
     subgraph U["Untested"]
         D["production-mappers.ts"]
         E["production-helpers.ts<br/>(everything else)"]
+        E5["supabase-mappers.ts<br/>(row → domain mapping)"]
         F["worker-box-service.ts"]
         G["use-cases/material-movement-drafts.ts"]
         H["production-journal-options.ts"]
@@ -128,6 +131,24 @@ The regression cases exist to pin down what validation deliberately does **not**
 `01-business-rules.md` Rule 10 and the deferred decisions in
 `tasks/backlog/003-high-priority.md`.
 
+#### `lib/domain/production.test.ts` — 10 tests, 5 describes
+
+Covers the **loss-status vocabulary and its database mapping only**. It asserts nothing about
+`stageStatus`, `deliveryStatus`, price-approval status, or any other export of
+`lib/domain/production.ts`.
+
+| Describe | Covers |
+|---|---|
+| `LOSS_STATUSES` | the array equals exactly `["Đang xử lý", "Treo nợ", "Xác định", "Đã chốt"]` in that order; length is 4 (so an added, removed, reordered, or edited value fails) |
+| `statusOptions` | equals exactly `["Tất cả", "Đang xử lý", "Treo nợ", "Xác định", "Đã chốt"]` — pins the sentinel-first order; length is `LOSS_STATUSES.length + 1`, catching a second sentinel |
+| `statusClass` | a truthy class exists for each of the four values (iterates `LOSS_STATUSES`, so a future 5th value forces an entry) |
+| `isClosedStatus` | `"Đã chốt"` → `true`; the other three → `false` |
+| `toDbStatus / fromDbStatus` | each value maps to its snake_case code; `fromDbStatus(toDbStatus(s)) === s` round-trips for all four; unknown DB input (`"khong_biet"`, `""`) falls back to `"Đang xử lý"`; an invalid outgoing value falls back to `"dang_xu_ly"` |
+
+The last case needs a deliberate test-only `as LossStatus` cast, because the outgoing fallback is
+unreachable through the type system — it exists to pin the runtime coercion so a future refactor
+does not delete it. See `tasks/backlog/008-low-priority.md`.
+
 ### Uncovered behavior — explicit list
 
 Nothing below has any automated test:
@@ -140,7 +161,8 @@ Nothing below has any automated test:
 - `applyProductionBusinessRules` (document-number generation, `powder = 0` forcing, converted
   weights, period defaults), `convertToPureGoldWeight`, `buildDocumentNo`,
   `getNextDocumentSequence`, `normalizeStageForStorage`, `toIsoDate`.
-- The whole status machine: `isClosedStatus`, `getSummaryStatus`, `isSingleWorkerStage`.
+- Most of the status machine: `getSummaryStatus` and `isSingleWorkerStage` are untested.
+  (`isClosedStatus` is now covered for all four loss statuses — the only exception here.)
 - `validateMovementDraft`'s **eight required-string-field rules individually** — the suite
   asserts only that an empty draft reports missing fields and a valid draft reports none; it
   does not pin down each field's message separately. (Its numeric rules *are* covered — see
@@ -206,7 +228,7 @@ test Supabase project, no seeded test schema, and no migration test — so schem
 
 ## Known limitations
 
-- **L-13** — coverage is narrow: 4 of ~45 `lib`/`components` modules, ~0 % of the UI, and the
+- **L-13** — coverage is narrow: 5 of ~45 `lib`/`components` modules, ~0 % of the UI, and the
   loss formula itself is untested.
 - No coverage measurement or threshold configured, so regressions in coverage are invisible.
 - `environment: "node"` means components cannot be tested without adding jsdom +
@@ -224,8 +246,9 @@ test Supabase project, no seeded test schema, and no migration test — so schem
 1. **Test the loss formula first** — extract it into one function in
    `lib/production-business-rules.ts` and cover it, including the `transferred` vs `powder`
    question (L-01).
-2. Cover `validateMovementDraft`, `isClosedStatus`, `getSummaryStatus`, and
-   `applyProductionBusinessRules`.
+2. Cover `getSummaryStatus` and `applyProductionBusinessRules`. (`validateMovementDraft` and
+   `isClosedStatus` are now covered; `validateMovementDraft`'s eight required-string-field rules
+   are still only asserted in aggregate.)
 3. Cover `lib/worker-box-service.ts` — 328 lines of reporting arithmetic with zero tests.
 4. Cover `lib/production-mappers.ts`, especially the draft-merge precedence rules.
 5. Add jsdom + `@testing-library/react` and test the two highest-risk components:
