@@ -1,11 +1,13 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import { LOSS_STATUSES, type LossStatus, type ProductionOrder } from "@/lib/domain/production";
 
 // Hang so va ham thuan (khong phu thuoc React) dung chung cho man
 // Lenh san xuat / Nhat ky NVL. Tach ra khoi material-dashboard.tsx.
 
-export const statusOptions: Array<Status | "Tất cả"> = ["Tất cả", "Đang xử lý", "Treo nợ", "Xác định", "Đã chốt"];
+// Suy ra tu LOSS_STATUSES de dropdown va kieu khong the lech nhau.
+// Thu tu phai giu nguyen: sentinel "Tat ca" dung dau, roi 4 trang thai.
+export const statusOptions: Array<LossStatus | "Tất cả"> = ["Tất cả", ...LOSS_STATUSES];
 
-export const statusClass: Record<Status, string> = {
+export const statusClass: Record<LossStatus, string> = {
   "Đang xử lý": "bg-sky-50 text-sky-700 ring-sky-200",
   "Treo nợ": "bg-amber-50 text-amber-800 ring-amber-200",
   "Xác định": "bg-emerald-50 text-emerald-700 ring-emerald-200",
@@ -73,13 +75,13 @@ export function pickNumber(...values: Array<number | null | undefined>) {
   return 0;
 }
 
-export function getSummaryStatus(statuses: Status[]): Status {
+export function getSummaryStatus(statuses: LossStatus[]): LossStatus {
   if (statuses.includes("Treo nợ")) return "Treo nợ";
   if (statuses.includes("Đang xử lý")) return "Đang xử lý";
   if (statuses.every((item) => item === "Đã chốt")) return "Đã chốt";
   return "Xác định";
 }
 
-export function isClosedStatus(status: Status) {
+export function isClosedStatus(status: LossStatus) {
   return status === "Đã chốt";
 }

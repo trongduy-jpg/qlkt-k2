@@ -40,9 +40,17 @@ Observed discipline is high:
 Explicit return types are used on exported pure functions; inferred returns are accepted on
 React components and local helpers.
 
-**Known weakness:** `Status` is declared `= string` (`lib/domain/production.ts:3`) rather than
-a union, so status literals are unchecked. Compare against the exported option arrays
-(`statusOptions`, `movementLossStatusOptions`, …) rather than writing literals inline.
+**Status typing:** loss status is a real union — `LOSS_STATUSES` (`as const`) and the derived
+`LossStatus` in `lib/domain/production.ts` are the single source of truth, and `statusOptions`
+is derived from it so the type and the dropdown cannot drift. `Status` survives only as a
+`@deprecated` alias for `LossStatus` while the remaining importers migrate; prefer `LossStatus`
+in new code.
+
+**Remaining weakness:** `stageStatus` and `deliveryStatus` are still `string` — both are
+persisted raw with no CHECK constraint, so narrowing them is deferred until their live
+vocabularies are verified (`tasks/backlog/008-low-priority.md`). For those two, compare against
+the exported option arrays (`movementStageStatusOptions`,
+`productionOrderDeliveryStatusOptions`) rather than writing literals inline.
 
 ### Linting
 
@@ -247,7 +255,8 @@ Vietnamese display values via `toDbStatus`/`fromDbStatus`.
 - ESLint enforces only the `next/core-web-vitals` baseline. It does **not** check the naming
   conventions, layer-import boundaries, or `any`-avoidance rules in this document — those are
   still upheld by review only.
-- `Status = string` defeats type checking on the most important discriminator in the domain.
+- `stageStatus` / `deliveryStatus` are still `string`, so those two status axes have no
+  compile-time checking (loss status is now the `LossStatus` union).
 - `production-helpers.ts` is a grab-bag name that violates the "name by intent" rule.
 - Two `any` casts remain in the loaders.
 - The loss formula is duplicated three times, contradicting rule 2 above — a known debt, not a
@@ -257,7 +266,9 @@ Vietnamese display values via `toDbStatus`/`fromDbStatus`.
 ## Future improvements
 
 1. Add Prettier with a shared config to remove formatting debate.
-2. Convert `Status` to a union and derive option arrays from it.
+2. ~~Convert loss `Status` to a union~~ **done** (`LossStatus`, derived `statusOptions`).
+   Remaining: narrow `stageStatus` / `deliveryStatus` once their live vocabularies are verified,
+   then drop the deprecated `Status` alias.
 3. Extract the loss calculation into one exported function in
    `lib/production-business-rules.ts` and have all three call sites use it.
 4. Split `production-helpers.ts` into `status-helpers.ts` and `format-helpers.ts`.

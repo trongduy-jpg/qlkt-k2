@@ -98,16 +98,27 @@ worker may return a *different* product code than was issued (e.g. after joining
 
 `MovementType` (`:1`) = `"issue" | "return" | "transfer" | "adjustment"`.
 
-### ⚠ `Status` is not a union
+### Loss status is a union; stage/delivery status are not
 
 ```ts
-// lib/domain/production.ts:3
-export type Status = string;
+// lib/domain/production.ts
+export const LOSS_STATUSES = ["Đang xử lý", "Treo nợ", "Xác định", "Đã chốt"] as const;
+export type LossStatus = (typeof LOSS_STATUSES)[number];
+
+/** @deprecated Use `LossStatus`. */
+export type Status = LossStatus;
 ```
 
-There is **no compile-time protection** against a mistyped status literal. The de-facto
-vocabulary lives in `statusOptions` (`lib/production-helpers.ts:6`). Always compare against
-the exported option arrays; never invent a literal.
+`LOSS_STATUSES` is the single source of truth for the loss-status vocabulary — `statusOptions`
+(`lib/production-helpers.ts`) is derived from it, so the type and the dropdown cannot drift, and
+a mistyped loss-status literal is a compile error. `Status` remains only as a temporary
+deprecated alias while the remaining importers migrate.
+
+**⚠ `stageStatus` and `deliveryStatus` are still typed `string`.** Both are persisted raw
+(no translation layer, no CHECK constraint on the column), so the live database may hold values
+outside their documented four-value option lists. Narrowing them is deferred until those
+vocabularies are verified against real data — see `tasks/backlog/008-low-priority.md`. For those
+two fields, always compare against the exported option arrays; never invent a literal.
 
 ### `ProductionOrderHeader` — the LSX
 
@@ -250,7 +261,8 @@ Row↔domain conversion: `lib/supabase-mappers.ts` (121 lines), including
 ## Known limitations
 
 - `ProductionOrder` is misnamed; renaming it is a large but valuable refactor.
-- `Status = string` provides no type safety across ~15 call sites.
+- `stageStatus` / `deliveryStatus` provide no type safety (still `string`); loss status is now
+  the `LossStatus` union. The deprecated `Status` alias is still exported.
 - `ProductionOrderHeader` duplicates primary-item fields, so two sources of truth exist for
   `sku`/`productName` on a single-item LSX.
 - Movements bind to master data by **display name**, so renaming a worker or material
@@ -263,7 +275,8 @@ Row↔domain conversion: `lib/supabase-mappers.ts` (121 lines), including
 
 1. Rename `ProductionOrder` → `MaterialMovement` (and `orders` → `movements`) in one
    mechanical pass; this removes the single biggest comprehension barrier.
-2. Make `Status` a union and derive `statusOptions` from it.
+2. ~~Make loss `Status` a union and derive `statusOptions` from it~~ **done** (`LossStatus`).
+   Remaining: `stageStatus` / `deliveryStatus` unions, pending live-data verification.
 3. Reference master data by id on movements, keeping display names denormalized for history.
 4. Drop the duplicated primary-item fields from `ProductionOrderHeader`.
 5. Delete `PendingJournalRow` if it is genuinely unused.

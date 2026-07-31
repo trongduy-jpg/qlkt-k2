@@ -1,24 +1,29 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 
-const statusToDb: Record<Status, string> = {
+const statusToDb: Record<LossStatus, string> = {
   "Đang xử lý": "dang_xu_ly",
   "Treo nợ": "treo_no",
   "Xác định": "xac_dinh",
   "Đã chốt": "da_chot"
 };
 
-const statusFromDb: Record<string, Status> = {
+// Key van la `string` (khong phai LossStatus): ham nay nhan gia tri tho tu DB,
+// co the la ma cu/khong xac dinh, nen phai tra cuu duoc moi chuoi.
+const statusFromDb: Record<string, LossStatus> = {
   dang_xu_ly: "Đang xử lý",
   treo_no: "Treo nợ",
   xac_dinh: "Xác định",
   da_chot: "Đã chốt"
 };
 
-export function toDbStatus(status: Status) {
+// Hai fallback duoi day la CO Y va van cham duoc luc runtime (row cu trong DB,
+// hoac gia tri di qua cac assertion o bien UI). Khong duoc xoa du TypeScript
+// coi nhu khong the xay ra.
+export function toDbStatus(status: LossStatus) {
   return statusToDb[status] ?? "dang_xu_ly";
 }
 
-export function fromDbStatus(status: string): Status {
+export function fromDbStatus(status: string): LossStatus {
   return statusFromDb[status] ?? "Đang xử lý";
 }
 

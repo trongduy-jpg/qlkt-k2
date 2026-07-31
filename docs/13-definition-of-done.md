@@ -50,7 +50,8 @@ flowchart TD
       zero warnings**. The baseline is clean, so any new warning is a regression introduced by
       this change.
 - [ ] **`npm.cmd run typecheck` passes** (`tsc --noEmit`, strict mode, zero errors).
-- [ ] **`npm.cmd run test` passes** — all **85** tests green. Output was actually read.
+- [ ] **`npm.cmd run test` passes** — all tests pass under `npm.cmd run test`. Output was
+      actually read, not assumed.
 - [ ] **`npm.cmd run build` passes** (`next build` completes with exit code 0).
 - [ ] **No new `any`, `@ts-ignore`, or non-null assertion** introduced (current baseline per
       `09-coding-standard.md`: 2 `any`, 3 non-null assertions `!`).

@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 import { pickNumber, pickText } from "@/lib/production-helpers";
 import { extractOrderCodeMonth, normalizeStageCode, toIsoDate } from "@/lib/production-business-rules";
 import type { OrderSummary, ProductionOrderHeader } from "@/lib/production-types";
@@ -22,7 +22,7 @@ export type ProductionSummaryFilters = {
 
 export type JournalOrderFilters = {
   query: string;
-  status: Status | "Tất cả";
+  status: LossStatus | "Tất cả";
   stage?: string;
   nxtPeriod?: string;
   lossPeriod?: string;
@@ -51,7 +51,7 @@ export type SelectedOrderDetail = {
   sku: string;
   productName: string;
   deliveryStatus: string;
-  operationalStatus: Status;
+  operationalStatus: LossStatus;
   customerName: string;
   qtyPiece: number | null;
   salesType: string;

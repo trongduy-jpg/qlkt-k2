@@ -1,4 +1,4 @@
-import type { ProductionOrder, Status } from "@/lib/domain/production";
+import type { LossStatus, ProductionOrder } from "@/lib/domain/production";
 
 export type HaoHutRule = "truc_tiep" | "kiem_soat_rui_ro" | "binh_thuong";
 
@@ -92,7 +92,7 @@ export function getNextDocumentSequence(orders: ProductionOrder[], dateString: s
   return orders.filter((order) => order.documentNo?.startsWith(compactDate)).length + 1;
 }
 
-export function getCarryOverLossPeriod(occurredDate: string, status: Status) {
+export function getCarryOverLossPeriod(occurredDate: string, status: LossStatus) {
   const currentMonth = toMonthCode(occurredDate);
   const day = Number(occurredDate.slice(8, 10));
 
@@ -212,7 +212,7 @@ export function isSingleWorkerStage(stageCode: string) {
   return SINGLE_WORKER_STAGE_CODES.includes(normalizeStageCode(stageCode));
 }
 
-export function shouldForceDirectCharge(stage: string, status: Status, stageRules?: Record<string, HaoHutRule>) {
+export function shouldForceDirectCharge(stage: string, status: LossStatus, stageRules?: Record<string, HaoHutRule>) {
   return status === "Xác định" && resolveStageRule(normalizeStageCode(stage), stageRules) !== "truc_tiep";
 }
 
