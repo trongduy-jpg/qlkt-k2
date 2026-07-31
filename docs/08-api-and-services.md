@@ -100,6 +100,15 @@ Consequences to know (source: `lib/material-movements-service.ts`):
 - Master data is matched **by display name**, not id — function `getMaterialId`
   (`:215-231` at time of writing).
 
+**Reads now surface the master-data ids, writes still do not use them.** `material_movements`
+has stored `material_id` / `worker_id` as `not null` foreign keys since migration `0001`, and
+`MOVEMENT_SELECT_COLUMNS` now selects both, so `movementRowToProductionOrder` populates
+`ProductionOrder.materialId` / `.workerId`. This is read-only: **`getMaterialId` and
+`upsertWorker` are unchanged and still resolve master data by `materials.name` /
+`workers.full_name`**, and nothing writes those id fields back from the domain object. Switching
+the write path (and the UI option values) to ids is deferred — see
+`tasks/backlog/009-low-priority.md`.
+
 #### LSX headers — `lib/production-orders-service.ts`
 
 | Function | Signature |
@@ -248,6 +257,12 @@ Each service owns one table, except `material-movements-service.ts`, which also 
 `production_orders`, `materials`, and `workers`. Column lists are centralized as constants
 `MOVEMENT_SELECT_COLUMNS` and `MOVEMENT_SELECT_COLUMNS_FALLBACK` near the top of
 `material-movements-service.ts`. See `05-database.md`.
+
+`MOVEMENT_SELECT_COLUMNS` includes the master-data foreign keys `material_id` and `worker_id`
+(alongside `order_id`). `MOVEMENT_SELECT_COLUMNS_FALLBACK` **intentionally omits them** — it is
+the reduced degraded select used when PostgREST reports a missing column, so
+`ProductionOrder.materialId` / `.workerId` are `undefined` on that path and every consumer must
+treat them as optional.
 
 ## Known limitations
 

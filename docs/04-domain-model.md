@@ -85,7 +85,7 @@ Fields group into six clusters (`lib/domain/production.ts:5-48`):
 | Cluster | Fields |
 |---|---|
 | Identity | `id`, `orderId`, `code` (Mã LSX), `sku`, `itemSku`, `productName` |
-| Context | `material`, `worker`, `stage`, `stageStatus`, `destination`, `occurredDate` |
+| Context | `material`, `worker`, `materialId?`, `workerId?`, `stage`, `stageStatus`, `destination`, `occurredDate` |
 | Documents | `documentNo`, `documentInNo`, `documentLineNo`, `movementType`, `qtyPiece` |
 | Issue block | `issueDate`, `issueSku`, `issueProductName`, `issueQtyPiece` |
 | Return block | `returnDate`, `returnSku`, `returnProductName`, `returnQtyPiece` |
@@ -97,6 +97,27 @@ The separate **issue** and **return** blocks (added by migration `0025`) exist b
 worker may return a *different* product code than was issued (e.g. after joining or cutting).
 
 `MovementType` (`:1`) = `"issue" | "return" | "transfer" | "adjustment"`.
+
+### `materialId?` / `workerId?` — read-only master-data foreign keys
+
+`material_movements` has stored `material_id` and `worker_id` as **`not null` foreign keys**
+since migration `0001`, but the read path used to select only the joined display names and
+discard the ids. Both are now surfaced on the domain object:
+
+- **Populated only on the normal (full) read path** — `MOVEMENT_SELECT_COLUMNS` in
+  `lib/material-movements-service.ts` selects `material_id` / `worker_id`.
+- **`undefined` on the degraded fallback path** — `MOVEMENT_SELECT_COLUMNS_FALLBACK`
+  intentionally omits them (see L-05), so any consumer must treat them as optional. They are
+  never coerced to `""`.
+- **Writes still resolve master data by display name.** `getMaterialId` and `upsertWorker`
+  (`lib/material-movements-service.ts`) match on `materials.name` / `workers.full_name` exactly
+  as before — these fields are **not** yet the write reference, and nothing persists them from the
+  domain object. Treat them as read-only hints.
+
+Because renames are in-place (`update … .eq("id", id)` in `workers-service.ts` /
+`materials-service.ts`) and reads join for the *current* name, a rename does **not** orphan
+historical movements. Remaining work and the open product decisions are tracked in
+`tasks/backlog/009-low-priority.md`.
 
 ### Loss status is a union; stage/delivery status are not
 

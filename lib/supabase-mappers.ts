@@ -30,6 +30,9 @@ export function fromDbStatus(status: string): LossStatus {
 export type MovementRow = {
   id: string;
   order_id?: string | null;
+  // Optional/nullable vi duong fallback rut gon KHONG select 2 cot nay.
+  material_id?: string | null;
+  worker_id?: string | null;
   process_name: string;
   occurred_date?: string | null;
   destination?: string | null;
@@ -88,6 +91,10 @@ export function movementRowToProductionOrder(row: MovementRow): ProductionOrder 
     productName: row.production_orders?.product_name ?? "",
     material: row.materials?.name ?? "",
     worker: row.workers?.full_name ?? "",
+    // `?? undefined` (KHONG phai `?? ""` nhu orderId o tren): id thieu/null
+    // phai la undefined that, tranh de "" bi hieu nham la id hop le.
+    materialId: row.material_id ?? undefined,
+    workerId: row.worker_id ?? undefined,
     stage: row.process_name,
     occurredDate: row.occurred_date ?? "",
     destination: row.destination ?? "",
