@@ -592,23 +592,36 @@ function WorkerBoxDetail({
         </button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Metric label="Năm theo dõi" value={formatWorkerBoxYearLabel(previewLine.periodCode)} />
-        <Metric label="Tháng báo cáo" value={formatWorkerBoxMonthLabel(previewLine.periodCode)} />
-        <Metric label="Trạng thái soát xét" value={reviewStatusLabel(previewLine.reviewStatus)} />
-        <Metric label="Kim loại" value={metalLabel(previewLine.metalCode)} />
-        <Metric label="Tuổi vàng" value={previewLine.goldAgeCode} />
-        <Metric label="Tên thợ" value={`${previewLine.workerCode} - ${previewLine.workerName}`} />
-        <Metric label="Mã công đoạn" value={previewLine.stageCode} />
-        <Metric label="Tên công đoạn" value={previewLine.stageName} />
-        <Metric label="Tồn đầu kỳ" value={formatGram(previewLine.openingConvertedGram)} />
-        <Metric label="Nhập trong kỳ" value={formatGram(previewLine.importConvertedGram)} />
-        <Metric label="Xuất trong kỳ" value={formatGram(previewLine.exportConvertedGram)} />
-        {canShowMachinePowder ? <Metric label="Tồn bột máy" value={formatGram(previewLine.machinePowderConvertedGram)} /> : null}
-        <Metric label="Tồn sổ sách" value={formatGram(previewLine.bookClosingConvertedGram)} />
-        <Metric label="Tồn thực tế" value={formatGram(previewLine.physicalConvertedGram)} />
-        <Metric label="Chênh lệch" value={formatGram(previewLine.diffConvertedGram)} tone={previewLine.diffConvertedGram < 0 ? "bad" : "good"} />
-        <Metric label="Định mức ký quỹ" value={formatGram(previewLine.depositNormConvertedGram)} />
+      <div className="space-y-3">
+        <DetailSection
+          title="Thông tin kỳ & vật liệu"
+          items={[
+            ["Năm theo dõi", formatWorkerBoxYearLabel(previewLine.periodCode)],
+            ["Tháng báo cáo", formatWorkerBoxMonthLabel(previewLine.periodCode)],
+            ["Trạng thái soát xét", reviewStatusLabel(previewLine.reviewStatus)],
+            ["Kim loại", metalLabel(previewLine.metalCode)],
+            ["Tuổi vàng", previewLine.goldAgeCode]
+          ]}
+        />
+        <DetailSection
+          title="Thợ & công đoạn"
+          items={[
+            ["Tên thợ", `${previewLine.workerCode} - ${previewLine.workerName}`],
+            ["Mã công đoạn", previewLine.stageCode],
+            ["Tên công đoạn", previewLine.stageName]
+          ]}
+        />
+        <DetailSection
+          title="Biến động trong kỳ"
+          items={[
+            ["Tồn đầu kỳ", formatGram(previewLine.openingConvertedGram)],
+            ["Nhập trong kỳ", formatGram(previewLine.importConvertedGram)],
+            ["Xuất trong kỳ", formatGram(previewLine.exportConvertedGram)],
+            ...(canShowMachinePowder
+              ? ([["Tồn bột máy", formatGram(previewLine.machinePowderConvertedGram)]] as Array<[string, string]>)
+              : [])
+          ]}
+        />
       </div>
 
       <div className="rounded-md border border-line bg-paper p-3">
@@ -675,6 +688,26 @@ function Metric({
     <div className="rounded-md bg-paper p-3">
       <p className="text-xs uppercase text-zinc-500">{label}</p>
       <p className={`mt-1 font-bold ${toneClass}`}>{value}</p>
+    </div>
+  );
+}
+
+// Nhom cac truong thong tin chi doc thanh 1 khoi co tieu de, moi truong 1
+// dong ngang (nhan trai - gia tri phai) thay vi o vuong rieng - gon hon
+// nhieu ve chieu cao so voi grid o vuong, giup nguoi dung thay het thong
+// tin ma khong phai cuon qua nhieu trong panel "Dong ton".
+function DetailSection({ title, items }: { title: string; items: Array<[string, string]> }) {
+  return (
+    <div className="rounded-md border border-line bg-white p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{title}</p>
+      <div className="mt-2 divide-y divide-line/60">
+        {items.map(([label, value]) => (
+          <div key={label} className="flex items-center justify-between gap-3 py-2 text-sm">
+            <span className="text-zinc-500">{label}</span>
+            <span className="text-right font-semibold text-ink">{value}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
