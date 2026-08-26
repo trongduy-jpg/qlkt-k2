@@ -8,6 +8,7 @@ import {
   FileWarning,
   History,
   ListChecks,
+  MessageSquareWarning,
   Scale,
   Settings2,
   X
@@ -23,6 +24,7 @@ const navItems = [
   ["Tồn hộp thợ", Boxes],
   ["Báo cáo hao hụt", FileWarning],
   ["Audit log", History],
+  ["Phản hồi người dùng", MessageSquareWarning],
   ["Cấu hình", Settings2]
 ] as const;
 
@@ -36,6 +38,7 @@ type AppShellProps = {
   onClearRemoteError: () => void;
   onSelectModule: (label: string) => void;
   onSignOut: () => void;
+  onOpenFeedback: () => void;
 };
 
 export function AppShell({
@@ -47,9 +50,10 @@ export function AppShell({
   children,
   onClearRemoteError,
   onSelectModule,
-  onSignOut
+  onSignOut,
+  onOpenFeedback
 }: AppShellProps) {
-  const visibleNavItems = isAdmin ? navItems : navItems.filter(([label]) => label !== "Cấu hình");
+  const visibleNavItems = isAdmin ? navItems : navItems.filter(([label]) => label !== "Cấu hình" && label !== "Phản hồi người dùng");
 
   return (
     <main className="min-h-screen">
@@ -128,6 +132,16 @@ export function AppShell({
           </div>
         </section>
       </div>
+
+      <button
+        type="button"
+        className="fixed bottom-6 right-6 z-[90] flex items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-zinc-800"
+        onClick={onOpenFeedback}
+        title="Góp ý / Báo lỗi"
+      >
+        <MessageSquareWarning size={16} />
+        Góp ý
+      </button>
     </main>
   );
 }

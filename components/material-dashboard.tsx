@@ -56,7 +56,10 @@ import { useMaterialMovements } from "@/components/use-material-movements";
 import { useOperationalData } from "@/components/use-operational-data";
 import { useProductionOrders } from "@/components/use-production-orders";
 import { useSelectedProductionOrder } from "@/components/use-selected-production-order";
+import { useFeedback } from "@/components/use-feedback";
 import { AppShell } from "@/components/app-shell";
+import { FeedbackModal } from "@/components/feedback-modal";
+import { FeedbackAdminView } from "@/components/feedback-admin-view";
 import { DashboardOverviewView } from "@/components/dashboard-overview-view";
 import { PriceTableView } from "@/components/price-table-view";
 import { WorkerBoxView } from "@/components/worker-box-view";
@@ -622,6 +625,7 @@ export function MaterialDashboard() {
   const isReport = activeModule === "Báo cáo hao hụt";
   const isWorkerBox = activeModule === "Tồn hộp thợ";
   const isAudit = activeModule === "Audit log";
+  const isFeedbackAdmin = activeModule === "Phản hồi người dùng";
   const isSettings = activeModule === "Cấu hình";
   const draftOrderSummary = orderSummaries.find((summary) => summary.code === draft.code.trim());
   const isDraftForClosedOrder = Boolean(draftOrderSummary && isClosedStatus(draftOrderSummary.status));
@@ -644,6 +648,21 @@ export function MaterialDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSettings, isAdmin]);
 
+  const {
+    feedbackList,
+    isFeedbackModalOpen,
+    setIsFeedbackModalOpen,
+    reloadFeedback,
+    submitFeedback,
+    changeFeedbackStatus
+  } = useFeedback();
+
+  useEffect(() => {
+    if (!isFeedbackAdmin || !isAdmin || !isSupabaseConfigured) return;
+    reloadFeedback().catch((error) => setRemoteError(error instanceof Error ? error.message : "Không tải được danh sách phản hồi"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFeedbackAdmin, isAdmin]);
+
   return (
     <AppShell
       activeModule={activeModule}
@@ -654,6 +673,7 @@ export function MaterialDashboard() {
       onClearRemoteError={() => setRemoteError(null)}
       onSelectModule={setActiveModule}
       onSignOut={signOut}
+      onOpenFeedback={() => setIsFeedbackModalOpen(true)}
     >
 
       <DashboardOverviewView
@@ -829,6 +849,8 @@ export function MaterialDashboard() {
 
           <AuditLogView isVisible={isAudit} events={auditEvents} />
 
+          <FeedbackAdminView isVisible={isFeedbackAdmin} feedbackList={feedbackList} onChangeStatus={changeFeedbackStatus} />
+
           <div className={`${isPricing || isSettings ? "unified-stack" : "hidden"} pb-8 pt-5`}>
             <PriceTableView isVisible={isPricing} rows={priceRows} />
 
@@ -884,6 +906,24 @@ export function MaterialDashboard() {
             </MasterDataProvider>
           </div>
       {renderProductionFormOverlay()}
+
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        contextModule={activeModule}
+        onClose={() => setIsFeedbackModalOpen(false)}
+        onSubmit={async ({ type, content }) => {
+          if (!appUser) {
+            throw new Error("Bạn cần đăng nhập để gửi phản hồi.");
+          }
+          await submitFeedback({
+            createdById: appUser.id,
+            createdByEmail: appUser.email,
+            type,
+            content,
+            contextModule: activeModule
+          });
+        }}
+      />
     </AppShell>
   );
 }

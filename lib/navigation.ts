@@ -7,6 +7,7 @@ export const appModuleSlugs = {
   "Tồn hộp thợ": "/ton-hop-tho",
   "Báo cáo hao hụt": "/bao-cao-hao-hut",
   "Audit log": "/audit-log",
+  "Phản hồi người dùng": "/phan-hoi",
   "Cấu hình": "/cau-hinh"
 } as const;
 
