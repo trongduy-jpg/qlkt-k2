@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { DateInput, FieldShell, SelectControl, fieldControlClass } from "@/components/production-ui";
+import { DateInput, FieldShell, MonthInput, SelectControl, fieldControlClass } from "@/components/production-ui";
 import { ProductionItemsEditor } from "@/components/production-items-editor";
 import { deliveryStatusClass } from "@/lib/production-helpers";
 import type { MaterialMaster } from "@/lib/material-service";
@@ -146,12 +146,7 @@ function OrderIdentitySection({
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-3">
           <FieldShell label="Tháng">
-            <input
-              className={fieldControlClass}
-              type="month"
-              value={draft.orderMonth}
-              onChange={(event) => onDraftChange("orderMonth", event.target.value)}
-            />
+            <MonthInput value={draft.orderMonth} onChange={(value) => onDraftChange("orderMonth", value)} />
           </FieldShell>
         </div>
         <div className="col-span-12 md:col-span-6 xl:col-span-3">

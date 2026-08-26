@@ -7,6 +7,7 @@ import {
   DrawerHeaderMeta,
   DrawerSection,
   FieldShell,
+  MonthInput,
   SearchableSelect,
   SelectControl,
   fieldControlClass
@@ -939,20 +940,10 @@ function StageEntryFields({
           </div>
           <div className={`mt-3 ${balancedTwoColumnGrid}`}>
             <FieldShell label="Tháng tính hao" hint="Kỳ dùng để quyết toán hao hụt.">
-              <input
-                className={fieldControlClass}
-                type="month"
-                value={values.lossPeriod ?? ""}
-                onChange={(event) => onFieldChange("lossPeriod", event.target.value)}
-              />
+              <MonthInput value={values.lossPeriod ?? ""} onChange={(value) => onFieldChange("lossPeriod", value)} />
             </FieldShell>
             <FieldShell label="Tháng NXT" hint="Kỳ dùng cho báo cáo nhập xuất tồn.">
-              <input
-                className={fieldControlClass}
-                type="month"
-                value={values.nxtPeriod ?? ""}
-                onChange={(event) => onFieldChange("nxtPeriod", event.target.value)}
-              />
+              <MonthInput value={values.nxtPeriod ?? ""} onChange={(value) => onFieldChange("nxtPeriod", value)} />
             </FieldShell>
           </div>
         </div>

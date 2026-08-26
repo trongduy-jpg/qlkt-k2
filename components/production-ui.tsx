@@ -54,6 +54,46 @@ export function DateInput({
   );
 }
 
+// <input type="month"> hien thi theo dinh dang cua trinh duyet/he dieu
+// hanh (VD Chrome en-US ra "August 2026" bang chu, khong phai so) - lech
+// voi cach app hien thi ngay/thang o moi noi khac (dd/mm/yy toan bang so,
+// xem DateInput o tren). Component nay dung chung 1 ky thuat voi DateInput:
+// giu nguyen input month goc (an di, van bat lich chon thang native) va
+// phu 1 lop text hien dung mm/yyyy len tren, dam bao dong bo bat ke ngon
+// ngu/vung cua trinh duyet nguoi dung.
+export function MonthInput({
+  value,
+  onChange,
+  disabled
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}) {
+  const [year, month] = value ? value.split("-") : ["", ""];
+  const displayLabel = year && month ? `${month}/${year}` : "";
+
+  return (
+    <div className="relative">
+      <div
+        className={`${fieldControlClass} pointer-events-none flex items-center justify-between ${
+          displayLabel ? "text-ink" : "text-zinc-400"
+        }`}
+      >
+        <span>{displayLabel || "mm/yyyy"}</span>
+        <Calendar size={15} className="text-zinc-400" />
+      </div>
+      <input
+        type="month"
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.value)}
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+      />
+    </div>
+  );
+}
+
 export function FieldShell({
   label,
   hint,
