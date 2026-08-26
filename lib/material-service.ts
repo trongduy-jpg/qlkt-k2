@@ -54,6 +54,7 @@ export {
   createMaterialMovement,
   updateMaterialMovement,
   updateMaterialMovementStatus,
+  updateMaterialMovementStageStatus,
   deleteMaterialMovement
 } from "@/lib/material-movements-service";
 

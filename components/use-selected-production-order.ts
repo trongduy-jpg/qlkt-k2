@@ -9,6 +9,7 @@ import { isClosedStatus } from "@/lib/production-helpers";
 import {
   createAuditLog,
   createMaterialMovement,
+  updateMaterialMovementStageStatus,
   updateProductionOrderItemStatus,
   updateProductionOrderStatus
 } from "@/lib/material-service";
@@ -171,6 +172,12 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
     }
 
     try {
+      // Danh sach cac dong cong doan (giao dich NVL) thuc su thuoc LSX/Ma
+      // hang dang chot - dung de cascade doi stageStatus ben duoi. Neu LSX
+      // chua co giao dich nao, tao 1 dong seed truoc roi coi no la dong duy
+      // nhat can cascade (khong dung selectedOrderMovements o day vi no la
+      // snapshot cu, chua thay dong seed vua tao trong cung lan goi nay).
+      let movementsToCascade = selectedOrderMovements;
       if (selectedOrderMovements.length === 0) {
         const seedMovement = buildSeedMovementFromSummary(
           selectedOrderSummary,
@@ -181,6 +188,7 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
         setSelectedOrderCode(savedSeed.code);
         setSelectedItemSku(savedSeed.itemSku || savedSeed.sku || null);
         setQuery(savedSeed.code);
+        movementsToCascade = [savedSeed];
       }
 
       // Chi doi trang thai cua DUNG Ma hang dang xem, khong dung ca header -
@@ -201,6 +209,15 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
         })
       );
 
+      // Chot LSX truoc day chi doi trang thai header/Ma hang, khong dung
+      // cham gi den cac dong cong doan da ghi trong Nhat ky NVL - user thay
+      // "cong doan khong cap nhat gi het" sau khi chot. Cascade sang
+      // stageStatus = "Hoan thanh" cho moi dong cong doan cua Ma hang nay.
+      const cascadeIds = new Set(movementsToCascade.map((movement) => movement.id));
+      setOrders((current) =>
+        current.map((order) => (cascadeIds.has(order.id) ? { ...order, stageStatus: "Hoàn thành" } : order))
+      );
+
       if (isSupabaseConfigured) {
         const header = productionHeaders.find((item) => item.code === selectedOrderSummary.code);
         if (header && header.items.length > 0) {
@@ -208,6 +225,9 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
         } else {
           await updateProductionOrderStatus(selectedOrderSummary.code, "Đã chốt");
         }
+        await Promise.all(
+          movementsToCascade.map((movement) => updateMaterialMovementStageStatus(movement.id, "Hoàn thành"))
+        );
         await reloadOperationalData();
       }
 
@@ -218,7 +238,7 @@ export function useSelectedProductionOrder(deps: UseSelectedProductionOrderDeps)
       setSelectedOrderCode(selectedOrderSummary.code);
       setSelectedItemSku(selectedOrderSummary.sku || null);
       pushAudit("close_production_order", `Chốt LSX ${selectedOrderSummary.code} - Mã hàng ${targetSku}`);
-      await createAuditLog("close_production_order", `Chốt LSX ${selectedOrderSummary.code}`, selectedOrderMovements[0]?.id);
+      await createAuditLog("close_production_order", `Chốt LSX ${selectedOrderSummary.code}`, movementsToCascade[0]?.id);
     } catch (error) {
       setRemoteError(error instanceof Error ? error.message : "Không chốt được LSX");
     }

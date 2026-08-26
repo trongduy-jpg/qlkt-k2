@@ -398,6 +398,24 @@ export async function updateMaterialMovementStatus(id: string, status: LossStatu
   if (error) throw new Error(`Cannot update status: ${error.message}`);
 }
 
+// Dung khi Chot LSX: doi trang thai TUNG cong doan (stageStatus) cua cac
+// giao dich da ghi nhan sang "Hoan thanh" - khac voi updateMaterialMovementStatus
+// (doi status/LossStatus dung de quyet toan hao hut). Truoc day Chot LSX chi
+// doi trang thai header/Ma hang ("Da chot"), khong dung cham gi den cac
+// dong cong doan da ghi trong Nhat ky NVL, khien user thay "cong doan
+// khong cap nhat gi het" sau khi chot.
+export async function updateMaterialMovementStageStatus(id: string, stageStatus: string) {
+  if (!isSupabaseConfigured || !supabase) return;
+
+  const { error } = await supabase
+    .from("material_movements")
+    .update({ stage_status: stageStatus })
+    .eq("id", id);
+
+  if (isMissingColumnError(error?.message)) return;
+  if (error) throw new Error(`Cannot update stage status: ${error.message}`);
+}
+
 export async function deleteMaterialMovement(id: string) {
   if (!isSupabaseConfigured || !supabase) return;
 
