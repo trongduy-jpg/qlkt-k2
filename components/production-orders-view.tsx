@@ -130,24 +130,27 @@ export function ProductionOrdersView({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-600">
-          <span>
-            Tổng LSX: <strong className="font-semibold text-ink">{productionOverview.total}</strong>
+        <div className="flex flex-wrap items-center gap-2 border-t border-line pt-4">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-medium text-zinc-600">
+            Tổng LSX <strong className="font-semibold text-ink">{productionOverview.total}</strong>
           </span>
-          <span className="text-line">·</span>
-          <span>
-            Đang xử lý: <strong className="font-semibold text-ink">{productionOverview.inProgressCount}</strong>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-medium text-zinc-600">
+            Đang xử lý <strong className="font-semibold text-ink">{productionOverview.inProgressCount}</strong>
           </span>
-          <span className="text-line">·</span>
-          <span>
-            Quá hạn deadline:{" "}
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${
+              productionOverview.overdueCount > 0 ? "bg-red-50 text-red-700" : "bg-paper text-zinc-600"
+            }`}
+          >
+            Quá hạn deadline{" "}
             <strong className={`font-semibold ${productionOverview.overdueCount > 0 ? "text-red-700" : "text-ink"}`}>
               {productionOverview.overdueCount}
             </strong>
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="rounded-md border border-line/60 bg-paper/60 p-2">
+          <div className="flex flex-wrap items-center gap-2">
           <select
             className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
             value={productionDeliveryStatus}
@@ -202,7 +205,7 @@ export function ProductionOrdersView({
         </div>
 
         {isFilterExpanded ? (
-          <div className="grid gap-2 md:grid-cols-4">
+          <div className="mt-2 grid gap-2 border-t border-line/60 pt-2 md:grid-cols-4">
             <select
               className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
               value={productionDestinationFilter}
@@ -258,8 +261,9 @@ export function ProductionOrdersView({
             </select>
           </div>
         ) : null}
+        </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 border-t border-line pt-4">
           <div className="flex items-center justify-between">
             <div>
               <h4 className="text-sm font-bold text-ink">Danh sách lệnh sản xuất</h4>
