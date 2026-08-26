@@ -406,7 +406,6 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
             <table className="min-w-[1200px] w-full text-sm">
               <thead>
                 <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
-                  <th className="px-3 py-3">Tháng</th>
                   <th className="px-3 py-3">Trạng thái soát xét</th>
                   <th className="px-3 py-3">Kim loại</th>
                   <th className="px-3 py-3">Tuổi vàng</th>
@@ -428,7 +427,6 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
                     className={`cursor-pointer border-b border-line/70 hover:bg-paper ${selectedId === line.id ? "bg-emerald-50/70" : ""}`}
                     onClick={() => selectLine(line)}
                   >
-                    <td className="px-3 py-3">{formatWorkerBoxMonthLabel(line.periodCode)}</td>
                     <td className="px-3 py-3">
                       <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${reviewStatusClass(line.reviewStatus)}`}>
                         {reviewStatusLabel(line.reviewStatus)}
@@ -454,7 +452,7 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
                   </tr>
                 )) : (
                   <tr>
-                    <td className="px-3 py-10 text-center text-sm text-zinc-500" colSpan={13}>
+                    <td className="px-3 py-10 text-center text-sm text-zinc-500" colSpan={12}>
                       Chưa có dữ liệu tồn hợp thợ để hiển thị.
                     </td>
                   </tr>
