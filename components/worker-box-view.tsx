@@ -558,15 +558,18 @@ function WorkerBoxDetail({
         </button>
       </div>
 
-      <div className="rounded-md border border-emerald-200 bg-emerald-50/40 p-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Nhập đối soát</p>
-            <p className="mt-1 text-sm text-zinc-700">
-              Tồn sổ sách = Tồn đầu kỳ + Nhập trong kỳ - Xuất trong kỳ.
-            </p>
+      <div className="rounded-md border border-line bg-white p-3">
+        <div className="flex items-start justify-between gap-3 border-b border-line/70 pb-3">
+          <div className="flex items-start gap-2">
+            <span className="mt-0.5 size-1.5 shrink-0 rounded-full bg-jade" aria-hidden />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Nhập đối soát</p>
+              <p className="mt-1 text-sm text-zinc-600">
+                Tồn sổ sách = Tồn đầu kỳ + Nhập trong kỳ - Xuất trong kỳ.
+              </p>
+            </div>
           </div>
-          <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${reviewStatusClass(previewLine.reviewStatus)}`}>
+          <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-semibold ring-1 ${reviewStatusClass(previewLine.reviewStatus)}`}>
             {reviewStatusLabel(previewLine.reviewStatus)}
           </span>
         </div>
@@ -575,13 +578,13 @@ function WorkerBoxDetail({
           <NumberField label="Tồn thực tế" value={physicalInput} onChange={setPhysicalInput} />
           <NumberField label="Định mức ký quỹ" value={depositInput} onChange={setDepositInput} />
         </div>
-        <div className="mt-3 grid gap-2 rounded-md border border-emerald-100 bg-white/80 p-3 text-sm sm:grid-cols-3">
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
           <Metric label="Tồn sổ sách" value={formatGram(previewLine.bookClosingConvertedGram)} />
           <Metric label="Chênh lệch" value={formatGram(previewLine.diffConvertedGram)} tone={previewLine.diffConvertedGram < 0 ? "bad" : "good"} />
           <Metric label="Vượt định mức" value={formatGram(Math.max(0, previewLine.riskDiffConvertedGram))} tone={previewLine.riskDiffConvertedGram > 0 ? "bad" : "good"} />
         </div>
         {canShowMachinePowder ? (
-          <p className="mt-2 text-xs text-zinc-600">Tồn bột máy chỉ áp dụng cho khâu BAO/KBI, hệ thống lấy bằng chênh lệch quy đổi.</p>
+          <p className="mt-2 text-xs text-zinc-500">Tồn bột máy chỉ áp dụng cho khâu BAO/KBI, hệ thống lấy bằng chênh lệch quy đổi.</p>
         ) : null}
         <button
           className="mt-3 w-full rounded-md bg-jade px-3 py-2 text-sm font-semibold text-white hover:bg-jade/90"
