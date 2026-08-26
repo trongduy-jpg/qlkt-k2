@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Link2, Plus, Search, SlidersHorizontal } from "lucide-react";
-import { InfoMetric } from "@/components/production-ui";
 import type { OrderSummary } from "@/lib/production-types";
 import type { ProductionOverview } from "@/lib/production-workflow";
 import { orderRowKey } from "@/lib/production-summary";
@@ -87,6 +86,13 @@ export function ProductionOrdersView({
 }: ProductionOrdersViewProps) {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
+  const activeExtraFilterCount = [
+    productionDestinationFilter !== ALL_DESTINATIONS_FILTER,
+    productionCodeMonthFilter !== ALL_CODE_MONTHS_FILTER,
+    productionSalesType !== "Tất cả phân loại KH",
+    productionDeadlineFilter !== "Tất cả deadline"
+  ].filter(Boolean).length;
+
   function clearFilters() {
     onDeliveryStatusChange("Tất cả trạng thái LSX");
     onDestinationFilterChange(ALL_DESTINATIONS_FILTER);
@@ -124,14 +130,21 @@ export function ProductionOrdersView({
           </div>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-3">
-          <InfoMetric label="Tổng LSX" value={String(productionOverview.total)} />
-          <InfoMetric label="Đang xử lý" value={String(productionOverview.inProgressCount)} />
-          <InfoMetric
-            label="Quá hạn deadline"
-            value={String(productionOverview.overdueCount)}
-            tone={productionOverview.overdueCount > 0 ? "bad" : undefined}
-          />
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-600">
+          <span>
+            Tổng LSX: <strong className="font-semibold text-ink">{productionOverview.total}</strong>
+          </span>
+          <span className="text-line">·</span>
+          <span>
+            Đang xử lý: <strong className="font-semibold text-ink">{productionOverview.inProgressCount}</strong>
+          </span>
+          <span className="text-line">·</span>
+          <span>
+            Quá hạn deadline:{" "}
+            <strong className={`font-semibold ${productionOverview.overdueCount > 0 ? "text-red-700" : "text-ink"}`}>
+              {productionOverview.overdueCount}
+            </strong>
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -162,17 +175,34 @@ export function ProductionOrdersView({
           </div>
 
           <button
-            className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper"
+            className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold hover:bg-paper ${
+              isFilterExpanded ? "border-ink text-ink" : "border-line text-ink"
+            }`}
             type="button"
             onClick={() => setIsFilterExpanded((current) => !current)}
           >
             <SlidersHorizontal size={16} />
             Lọc thêm
+            {activeExtraFilterCount > 0 ? (
+              <span className="inline-flex size-5 items-center justify-center rounded-full bg-ink text-xs font-semibold text-white">
+                {activeExtraFilterCount}
+              </span>
+            ) : null}
           </button>
+
+          {activeExtraFilterCount > 0 ? (
+            <button
+              className="text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-ink"
+              type="button"
+              onClick={clearFilters}
+            >
+              Xóa tất cả bộ lọc
+            </button>
+          ) : null}
         </div>
 
         {isFilterExpanded ? (
-          <div className="grid gap-2 rounded-md border border-line bg-paper p-3 md:grid-cols-4">
+          <div className="grid gap-2 md:grid-cols-4">
             <select
               className="h-10 rounded-md border border-line bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-jade/30"
               value={productionDestinationFilter}
@@ -226,13 +256,6 @@ export function ProductionOrdersView({
               <option>7 ngày tới</option>
               <option>Chưa có deadline</option>
             </select>
-            <button
-              className="h-10 rounded-md border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-paper"
-              type="button"
-              onClick={clearFilters}
-            >
-              Xóa lọc
-            </button>
           </div>
         ) : null}
 
