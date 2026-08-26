@@ -56,33 +56,44 @@ export function DashboardOverviewView({
   onOpenJournal,
   onSelectProductionOrder
 }: DashboardOverviewViewProps) {
+  const allKpis: DashboardKpi[] = [
+    ...kpis,
+    {
+      label: "LSX đang xử lý",
+      value: String(productionOverview.inProgressCount),
+      unit: "lệnh",
+      trend: "Đang có phát sinh vận hành trong ngày."
+    },
+    {
+      label: "LSX quá hạn",
+      value: String(productionOverview.overdueCount),
+      unit: "lệnh",
+      trend: "Cần rà soát deadline và tiến độ giao hàng."
+    }
+  ];
+
   return (
     <>
-      <div className={`${isVisible ? "grid" : "hidden"} gap-4 py-5 sm:grid-cols-2 xl:grid-cols-4`}>
-        {kpis.map((item) => {
+      <div className={`${isVisible ? "grid" : "hidden"} gap-3 py-5 sm:grid-cols-2 xl:grid-cols-3`}>
+        {allKpis.map((item) => {
           const { icon: Icon, isWarning } = resolveKpiMeta(item.label);
           return (
-            <article
-              key={item.label}
-              className={`rounded-md border p-4 shadow-sm ${
-                isWarning ? "border-amber-200 bg-amber-50/60" : "border-line bg-white/92"
-              }`}
-            >
+            <article key={item.label} className="rounded-md border border-line bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-medium text-zinc-600">{item.label}</p>
                 <Icon size={18} className={isWarning ? "text-amber-500" : "text-brass"} />
               </div>
               <div className="mt-3 flex items-end gap-2">
-                <strong className={`text-2xl font-bold ${isWarning ? "text-amber-900" : "text-ink"}`}>{item.value}</strong>
+                <strong className={`text-2xl font-bold ${isWarning ? "text-amber-700" : "text-ink"}`}>{item.value}</strong>
                 <span className="pb-1 text-sm text-zinc-500">{item.unit}</span>
               </div>
-              <p className={`mt-3 text-xs font-medium ${isWarning ? "text-amber-700" : "text-zinc-500"}`}>{item.trend}</p>
+              <p className="mt-3 text-xs font-medium text-zinc-500">{item.trend}</p>
             </article>
           );
         })}
       </div>
 
-      <section className={`${isVisible ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
+      <section className={`${isVisible ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white p-4 shadow-sm`}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <h3 className="text-base font-bold text-ink">Bảng điều hành hôm nay</h3>
@@ -104,21 +115,8 @@ export function DashboardOverviewView({
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-md border border-sky-200 bg-sky-50/70 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-sky-700">LSX đang xử lý</p>
-              <p className="mt-2 text-2xl font-bold text-sky-900">{productionOverview.inProgressCount}</p>
-              <p className="mt-2 text-sm text-zinc-700">Các lệnh đang có phát sinh vận hành trong ngày.</p>
-            </div>
-            <div className="rounded-md border border-rose-200 bg-rose-50/70 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-rose-700">LSX quá hạn</p>
-              <p className="mt-2 text-2xl font-bold text-rose-900">{productionOverview.overdueCount}</p>
-              <p className="mt-2 text-sm text-zinc-700">Cần rà soát deadline và tiến độ giao hàng.</p>
-            </div>
-          </div>
-
-          <div className="grid gap-3 xl:grid-cols-2">
-            <div className="rounded-md border border-line bg-paper p-4">
+          <div className="grid gap-3 border-t border-line pt-4 xl:grid-cols-2">
+            <div>
               <div className="flex items-center justify-between gap-3">
                 <h4 className="text-sm font-bold text-ink">Giao dịch NVL gần đây</h4>
                 <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
@@ -147,7 +145,7 @@ export function DashboardOverviewView({
               </div>
             </div>
 
-            <div className="rounded-md border border-line bg-paper p-4">
+            <div>
               <div className="flex items-center justify-between gap-3">
                 <h4 className="text-sm font-bold text-ink">LSX cần theo dõi</h4>
                 <button
