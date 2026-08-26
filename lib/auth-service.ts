@@ -22,6 +22,26 @@ export async function isEmailAllowed(email: string): Promise<boolean> {
   return Boolean(data);
 }
 
+// Dang nhap bang Google, khong can gui link qua email. Khong kiem tra
+// isEmailAllowed truoc o day nhu sendMagicLink - vi Google OAuth la 1 popup
+// chuyen huong, khong biet truoc user se chon email nao cho toi khi ho quay
+// ve app voi session that. Whitelist van duoc dam bao: AuthProvider
+// (auth-context.tsx) da kiem tra app_users NGAY SAU KHI co session (moi
+// provider deu di qua cung 1 cong kiem tra do) - email khong nam trong
+// app_users se bi dang xuat lai ngay lap tuc du dang nhap Google thanh cong.
+export async function signInWithGoogle(): Promise<void> {
+  if (!isSupabaseConfigured || !supabase) throw new Error("Supabase chưa được cấu hình.");
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: typeof window !== "undefined" ? window.location.origin : undefined
+    }
+  });
+
+  if (error) throw new Error(`Không đăng nhập được bằng Google: ${error.message}`);
+}
+
 export async function sendMagicLink(email: string): Promise<void> {
   if (!isSupabaseConfigured || !supabase) throw new Error("Supabase chưa được cấu hình.");
 

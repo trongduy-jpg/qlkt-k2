@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { Gem, Mail } from "lucide-react";
-import { sendMagicLink } from "@/lib/auth-service";
+import { sendMagicLink, signInWithGoogle } from "@/lib/auth-service";
 
 export function LoginView({ deniedEmail }: { deniedEmail?: string | null }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -24,6 +25,20 @@ export function LoginView({ deniedEmail }: { deniedEmail?: string | null }) {
     }
   }
 
+  async function handleGoogleSignIn() {
+    setIsGoogleLoading(true);
+    setError(null);
+    try {
+      // Chuyen huong sang Google, tab hien tai se roi trang nen khong can
+      // tu tat isGoogleLoading o day - chi tat lai neu chinh Supabase tra
+      // ve loi truoc khi kip chuyen huong (VD chua bat provider Google).
+      await signInWithGoogle();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Không đăng nhập được bằng Google.");
+      setIsGoogleLoading(false);
+    }
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-paper px-4">
       <div className="w-full max-w-sm rounded-md border border-line bg-white p-8 shadow-sm">
@@ -37,7 +52,7 @@ export function LoginView({ deniedEmail }: { deniedEmail?: string | null }) {
 
         <h1 className="mt-6 text-lg font-bold text-ink">Đăng nhập</h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Nhập email đã được admin cấp quyền để nhận link đăng nhập.
+          Dùng Gmail công ty để vào thẳng hệ thống, hoặc nhập email đã được admin cấp quyền để nhận link đăng nhập.
         </p>
 
         {deniedEmail ? (
@@ -45,6 +60,27 @@ export function LoginView({ deniedEmail }: { deniedEmail?: string | null }) {
             Tài khoản <strong>{deniedEmail}</strong> không còn/chưa được cấp quyền truy cập hệ thống.
           </div>
         ) : null}
+
+        <button
+          className="mt-6 flex h-10 w-full items-center justify-center gap-2 rounded-md border border-line bg-white text-sm font-semibold text-ink hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60"
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={isGoogleLoading}
+        >
+          <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden>
+            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+            <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+            <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+          </svg>
+          {isGoogleLoading ? "Đang chuyển tới Google..." : "Đăng nhập bằng Google"}
+        </button>
+
+        <div className="mt-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+          <span className="h-px flex-1 bg-line" />
+          hoặc
+          <span className="h-px flex-1 bg-line" />
+        </div>
 
         {status === "sent" ? (
           <div className="mt-6 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
