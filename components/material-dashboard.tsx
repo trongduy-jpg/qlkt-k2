@@ -738,11 +738,6 @@ export function MaterialDashboard() {
               });
               setIsProductionFormOpen((current) => !current);
             }}
-            onShowAllOrders={() => {
-              setSelectedOrderCode(null);
-              setSelectedItemSku(null);
-              setIsProductionDetailOpen(false);
-            }}
             onSelectOrder={selectProductionOrder}
           />
 

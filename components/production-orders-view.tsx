@@ -34,7 +34,6 @@ type ProductionOrdersViewProps = {
   onCodeMonthFilterChange: (value: string) => void;
   onCustomerQueryChange: (value: string) => void;
   onCreateOrder: () => void;
-  onShowAllOrders: () => void;
   onSelectOrder: (code: string, itemSku?: string) => void;
 };
 
@@ -81,7 +80,6 @@ export function ProductionOrdersView({
   onCodeMonthFilterChange,
   onCustomerQueryChange,
   onCreateOrder,
-  onShowAllOrders,
   onSelectOrder
 }: ProductionOrdersViewProps) {
   const [isFilterExpanded, setIsFilterExpanded] = useState(false);
@@ -105,32 +103,18 @@ export function ProductionOrdersView({
   return (
     <section className={`${isVisible ? "block" : "hidden"} mb-5 rounded-md border border-line bg-white/94 p-4 shadow-sm`}>
       <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <p className="text-sm text-zinc-600">
-              Tạo LSX trước, sau đó mới ghi nhận xuất/nhập nguyên vật liệu trong Nhật ký NVL.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white"
-              type="button"
-              onClick={onCreateOrder}
-            >
-              <Plus size={16} />
-              Tạo LSX
-            </button>
-            <button
-              className="inline-flex items-center justify-center rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-ink"
-              type="button"
-              onClick={onShowAllOrders}
-            >
-              Xem tất cả LSX
-            </button>
-          </div>
+        <div className="flex justify-end">
+          <button
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white"
+            type="button"
+            onClick={onCreateOrder}
+          >
+            <Plus size={16} />
+            Tạo LSX
+          </button>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 border-t border-line pt-4">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-medium text-zinc-600">
             Tổng LSX <strong className="font-semibold text-ink">{productionOverview.total}</strong>
           </span>
@@ -264,11 +248,7 @@ export function ProductionOrdersView({
         </div>
 
         <div className="space-y-3 border-t border-line pt-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-sm font-bold text-ink">Danh sách lệnh sản xuất</h4>
-              <p className="mt-1 text-xs text-zinc-500">Bấm vào dòng để xem chi tiết.</p>
-            </div>
+          <div className="flex justify-end">
             <span className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-zinc-600">
               {filteredOrderSummaries.length} Mã hàng
             </span>
