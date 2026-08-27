@@ -403,21 +403,21 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
           </div>
 
           <div className="mt-4 overflow-x-auto">
-            <table className="min-w-[1200px] w-full text-sm">
+            <table className="min-w-[1560px] w-full text-sm">
               <thead>
                 <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
-                  <th className="px-3 py-3">Trạng thái soát xét</th>
-                  <th className="px-3 py-3">Kim loại</th>
-                  <th className="px-3 py-3">Tuổi vàng</th>
-                  <th className="px-3 py-3">Tên thợ</th>
-                  <th className="px-3 py-3">Công đoạn</th>
-                  <th className="px-3 py-3 text-right">Tồn đầu kỳ</th>
-                  <th className="px-3 py-3 text-right">Nhập trong kỳ</th>
-                  <th className="px-3 py-3 text-right">Xuất trong kỳ</th>
-                  <th className="px-3 py-3 text-right">Tồn sổ sách</th>
-                  <th className="px-3 py-3 text-right">Tồn thực tế</th>
-                  <th className="px-3 py-3 text-right">Chênh lệch</th>
-                  <th className="px-3 py-3 text-right">Định mức ký quỹ</th>
+                  <th className="whitespace-nowrap px-3 py-3">Trạng thái soát xét</th>
+                  <th className="whitespace-nowrap px-3 py-3">Kim loại</th>
+                  <th className="whitespace-nowrap px-3 py-3">Tuổi vàng</th>
+                  <th className="whitespace-nowrap px-3 py-3">Tên thợ</th>
+                  <th className="whitespace-nowrap px-3 py-3">Công đoạn</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-right">Tồn đầu kỳ</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-right">Nhập trong kỳ</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-right">Xuất trong kỳ</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-right">Tồn sổ sách</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-right">Tồn thực tế</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-right">Chênh lệch</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-right">Định mức ký quỹ</th>
                 </tr>
               </thead>
               <tbody>
