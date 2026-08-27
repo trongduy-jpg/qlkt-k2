@@ -112,11 +112,11 @@ export function DateInput({
   }
 
   const segmentClass =
-    "h-full w-full min-w-0 bg-transparent text-center text-sm text-ink outline-none placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:text-zinc-500";
+    "h-full shrink-0 bg-transparent p-0 text-left text-sm text-ink outline-none placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:text-zinc-500";
 
   return (
     <div
-      className={`${fieldControlClass} flex items-center gap-1 px-2 ${disabled ? "" : "focus-within:border-jade focus-within:ring-2 focus-within:ring-jade/25"}`}
+      className={`${fieldControlClass} flex items-center px-3 ${disabled ? "" : "focus-within:border-jade focus-within:ring-2 focus-within:ring-jade/25"}`}
     >
       <input
         ref={dayRef}
@@ -124,33 +124,36 @@ export function DateInput({
         inputMode="numeric"
         placeholder="dd"
         maxLength={2}
-        className={`${segmentClass} w-6`}
+        size={2}
+        className={`${segmentClass} w-[1.6em]`}
         value={day}
         disabled={disabled}
         onChange={(event) => handleDayChange(event.target.value)}
         onKeyDown={(event) => handleSegmentKeyDown(event, day, null)}
       />
-      <span className="text-zinc-300">/</span>
+      <span className="text-zinc-400">/</span>
       <input
         ref={monthRef}
         type="text"
         inputMode="numeric"
         placeholder="mm"
         maxLength={2}
-        className={`${segmentClass} w-6`}
+        size={2}
+        className={`${segmentClass} w-[1.6em]`}
         value={month}
         disabled={disabled}
         onChange={(event) => handleMonthChange(event.target.value)}
         onKeyDown={(event) => handleSegmentKeyDown(event, month, dayRef)}
       />
-      <span className="text-zinc-300">/</span>
+      <span className="text-zinc-400">/</span>
       <input
         ref={yearRef}
         type="text"
         inputMode="numeric"
         placeholder="yyyy"
         maxLength={4}
-        className={`${segmentClass} w-10`}
+        size={4}
+        className={`${segmentClass} w-[2.8em]`}
         value={year}
         disabled={disabled}
         onChange={(event) => handleYearChange(event.target.value)}
