@@ -64,7 +64,17 @@ export function useLocalStoragePersistence(deps: UseLocalStoragePersistenceDeps)
 
     if (savedProductionHeaders) {
       try {
-        setProductionHeaders(JSON.parse(savedProductionHeaders) as ProductionOrderHeader[]);
+        const parsedHeaders = JSON.parse(savedProductionHeaders) as ProductionOrderHeader[];
+        // Chuan hoa lai "items" cho tung LSX phuc hoi tu cache - cache co
+        // the duoc luu tu TRUOC KHI tinh nang "nhieu Ma hang/LSX" ra doi
+        // (truoc khi truong items ton tai), khien header.items la undefined
+        // va lam vo toan bo trang khi buildOrderSummaries doc
+        // header.items.length (xem production-summary.ts).
+        setProductionHeaders(
+          Array.isArray(parsedHeaders)
+            ? parsedHeaders.map((header) => ({ ...header, items: Array.isArray(header.items) ? header.items : [] }))
+            : []
+        );
       } catch {
         setProductionHeaders([]);
       }

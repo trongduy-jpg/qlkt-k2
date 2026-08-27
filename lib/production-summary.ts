@@ -198,7 +198,11 @@ export function buildOrderSummaries(orders: ProductionOrder[], productionHeaders
   const consumedMovementIds = new Set<string>();
 
   for (const header of productionHeaders) {
-    const items: ProductionOrderItem[] = header.items.length > 0 ? header.items : [{ sku: header.sku, productName: header.productName }];
+    // header.items co the undefined neu header den tu 1 nguon du lieu cu
+    // (VD cache localStorage tu truoc khi co tinh nang nhieu Ma hang/LSX) -
+    // fallback ve mang rong thay vi crash toan bo trang khi doc .length.
+    const headerItems = header.items ?? [];
+    const items: ProductionOrderItem[] = headerItems.length > 0 ? headerItems : [{ sku: header.sku, productName: header.productName }];
 
     for (const item of items) {
       const sku = item.sku.trim();
