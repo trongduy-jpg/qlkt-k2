@@ -4,7 +4,6 @@ import { Children, isValidElement, useEffect, useMemo, useRef, useState, type Re
 import { createPortal } from "react-dom";
 import { Calendar, Check, ChevronDown } from "lucide-react";
 import { hasMeaningfulDisplayValue } from "@/lib/production-helpers";
-import { formatDisplayDate } from "@/lib/production-business-rules";
 import type { SelectOption } from "@/lib/production-journal-options";
 
 // Cac primitive giao dien dung chung cho form/panel cua man san xuat.
@@ -18,12 +17,32 @@ import type { SelectOption } from "@/lib/production-journal-options";
 export const fieldControlClass =
   "h-11 w-full min-w-0 rounded-md border border-line bg-white px-3 text-sm text-ink outline-none transition-colors placeholder:text-zinc-400 focus:outline-none focus:border-jade focus:ring-2 focus:ring-jade/25 focus-visible:outline-none focus-visible:border-jade focus-visible:ring-2 focus-visible:ring-jade/25 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-500";
 
-// <input type="date"> hien thi theo dinh dang ngay/thang cua trinh duyet/
-// he dieu hanh (VD Chrome en-US ra mm/dd/yyyy), khong the ep bang CSS/HTML
-// nen dan den lech voi dd/mm/yy dung o khap cac bang trong app. Component
-// nay giu nguyen input date goc (an di, van bat lich chon ngay native) va
-// phu 1 lop text hien dung dd/mm/yy len tren bang formatDisplayDate - dam
-// bao dong bo bat ke ngon ngu/vung cua trinh duyet nguoi dung.
+// Truoc day DateInput phu 1 lop text hien dung dd/mm/yy len tren 1
+// <input type="date"> AN DI (opacity-0) de ep dinh dang, vi <input
+// type="date"> hien thi theo dinh dang trinh duyet/he dieu hanh (VD
+// Chrome en-US ra mm/dd/yyyy), khong the ep bang CSS/HTML. Van de: khi go
+// truc tiep, nguoi dung go vao input that nhung VO HINH - trinh duyet van
+// tu chia 3 vung ngay/thang/nam va nhay vung, nhung nguoi dung khong thay
+// vung nao dang duoc chon (khong co con tro), thanh ra cam giac "nhay lung
+// tung" khi go tay, dung bam icon lich thi khong sao vi do la 1 UI hien ro
+// rang. Component nay thay bang 3 o nhap thuc su nhin thay duoc (dd / mm /
+// yyyy), nguoi dung go so truc tiep vao dung o dang chon, tu nhay o khi du
+// 2 (hoac 4) chu so, Backspace o dau 1 o se lui ve o truoc. Icon lich van
+// mo lich chon native nhu cu (input type="date" chi phu dung vung icon).
+function parseIsoDateParts(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value ?? "");
+  if (!match) return { day: "", month: "", year: "" };
+  const [, year, month, day] = match;
+  return { day, month, year };
+}
+
+function clampSegment(digits: string, max: number) {
+  if (!digits) return "";
+  const num = Number(digits);
+  if (Number.isNaN(num)) return "";
+  return String(Math.min(num, max));
+}
+
 export function DateInput({
   value,
   onChange,
@@ -33,23 +52,122 @@ export function DateInput({
   onChange: (value: string) => void;
   disabled?: boolean;
 }) {
+  const initial = parseIsoDateParts(value);
+  const [day, setDay] = useState(initial.day);
+  const [month, setMonth] = useState(initial.month);
+  const [year, setYear] = useState(initial.year);
+
+  const dayRef = useRef<HTMLInputElement>(null);
+  const monthRef = useRef<HTMLInputElement>(null);
+  const yearRef = useRef<HTMLInputElement>(null);
+  const nativeDateRef = useRef<HTMLInputElement>(null);
+
+  // Dong bo lai 3 o khi value thay doi tu ben ngoai (VD chon qua lich,
+  // reset form) - khong dong bo khi nguoi dung dang go do (moi lan onChange
+  // that su nem ISO hop le thi 3 o da khop san, tranh vong lap khong can
+  // thiet va tranh "giat" con tro giua chung khi dang go).
+  useEffect(() => {
+    const parts = parseIsoDateParts(value);
+    setDay(parts.day);
+    setMonth(parts.month);
+    setYear(parts.year);
+  }, [value]);
+
+  function commitIfComplete(nextDay: string, nextMonth: string, nextYear: string) {
+    if (nextDay.length === 2 && nextMonth.length === 2 && nextYear.length === 4) {
+      onChange(`${nextYear}-${nextMonth}-${nextDay}`);
+    } else if (!nextDay && !nextMonth && !nextYear) {
+      onChange("");
+    }
+  }
+
+  function handleDayChange(raw: string) {
+    const digits = clampSegment(raw.replace(/\D/g, "").slice(0, 2), 31);
+    setDay(digits);
+    commitIfComplete(digits, month, year);
+    if (digits.length === 2) monthRef.current?.focus();
+  }
+
+  function handleMonthChange(raw: string) {
+    const digits = clampSegment(raw.replace(/\D/g, "").slice(0, 2), 12);
+    setMonth(digits);
+    commitIfComplete(day, digits, year);
+    if (digits.length === 2) yearRef.current?.focus();
+  }
+
+  function handleYearChange(raw: string) {
+    const digits = raw.replace(/\D/g, "").slice(0, 4);
+    setYear(digits);
+    commitIfComplete(day, month, digits);
+  }
+
+  function handleSegmentKeyDown(
+    event: React.KeyboardEvent<HTMLInputElement>,
+    currentValue: string,
+    previousRef: React.RefObject<HTMLInputElement | null> | null
+  ) {
+    if (event.key === "Backspace" && !currentValue && previousRef?.current) {
+      previousRef.current.focus();
+    }
+  }
+
+  const segmentClass =
+    "h-full w-full min-w-0 bg-transparent text-center text-sm text-ink outline-none placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:text-zinc-500";
+
   return (
-    <div className="relative">
-      <div
-        className={`${fieldControlClass} pointer-events-none flex items-center justify-between ${
-          value ? "text-ink" : "text-zinc-400"
-        }`}
-      >
-        <span>{value ? formatDisplayDate(value) : "dd/mm/yyyy"}</span>
-        <Calendar size={15} className="text-zinc-400" />
-      </div>
+    <div
+      className={`${fieldControlClass} flex items-center gap-1 px-2 ${disabled ? "" : "focus-within:border-jade focus-within:ring-2 focus-within:ring-jade/25"}`}
+    >
       <input
-        type="date"
-        value={value}
+        ref={dayRef}
+        type="text"
+        inputMode="numeric"
+        placeholder="dd"
+        maxLength={2}
+        className={`${segmentClass} w-6`}
+        value={day}
         disabled={disabled}
-        onChange={(event) => onChange(event.target.value)}
-        className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+        onChange={(event) => handleDayChange(event.target.value)}
+        onKeyDown={(event) => handleSegmentKeyDown(event, day, null)}
       />
+      <span className="text-zinc-300">/</span>
+      <input
+        ref={monthRef}
+        type="text"
+        inputMode="numeric"
+        placeholder="mm"
+        maxLength={2}
+        className={`${segmentClass} w-6`}
+        value={month}
+        disabled={disabled}
+        onChange={(event) => handleMonthChange(event.target.value)}
+        onKeyDown={(event) => handleSegmentKeyDown(event, month, dayRef)}
+      />
+      <span className="text-zinc-300">/</span>
+      <input
+        ref={yearRef}
+        type="text"
+        inputMode="numeric"
+        placeholder="yyyy"
+        maxLength={4}
+        className={`${segmentClass} w-10`}
+        value={year}
+        disabled={disabled}
+        onChange={(event) => handleYearChange(event.target.value)}
+        onKeyDown={(event) => handleSegmentKeyDown(event, year, monthRef)}
+      />
+      <div className="relative ml-auto flex shrink-0 items-center">
+        <Calendar size={15} className="pointer-events-none text-zinc-400" />
+        <input
+          ref={nativeDateRef}
+          type="date"
+          value={value}
+          disabled={disabled}
+          onChange={(event) => onChange(event.target.value)}
+          title="Mở lịch chọn ngày"
+          className="absolute inset-0 size-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+        />
+      </div>
     </div>
   );
 }
