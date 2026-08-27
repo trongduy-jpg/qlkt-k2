@@ -32,11 +32,19 @@ export async function loadProductionOrderItems(): Promise<ProductionOrderItemRec
     .order("sort_order", { ascending: true });
 
   if (error || !data) {
-    // Chua chay migration 0022 -> chua co bang: tra ve rong de app van chay
-    // (van dung du lieu Ma hang cu tren production_orders qua fallback o
-    // tang tong hop), thay vi lam vo toan bo man hinh.
-    if (isMissingTableError(error?.message)) return [];
-    throw new Error(`Không tải được danh sách Mã hàng của LSX: ${error?.message ?? "unknown error"}`);
+    // Truoc day chi bo qua eim lang khi thieu bang (migration 0022 chua
+    // chay), con moi loi khac (token het han, mat mang tam thoi, Supabase
+    // cham...) deu throw - vi ham nay chay chung trong 1 Promise.all() voi
+    // 7 request khac o use-operational-data.ts, 1 request loi la ca 8
+    // request bi huy theo, lam sap trang trang toan bo thay vi chi thieu
+    // mai phan Ma hang. Doi sang: MOI loi deu tra ve rong + log canh bao,
+    // de cac phan du lieu khac (LSX, NVL, tho...) van tai duoc binh thuong;
+    // nguoi dung chi thay LSX tam thoi thieu Ma hang chi tiet cho toi lan
+    // tai lai thanh cong tiep theo, thay vi ca ung dung khong dung duoc.
+    if (error && !isMissingTableError(error.message)) {
+      console.error(`Không tải được danh sách Mã hàng của LSX (bỏ qua, dùng danh sách rỗng): ${error.message}`);
+    }
+    return [];
   }
 
   return data.map((row: Record<string, unknown>) => ({
