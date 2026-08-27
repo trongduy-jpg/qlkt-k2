@@ -403,21 +403,21 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
           </div>
 
           <div className="mt-4 overflow-x-auto">
-            <table className="min-w-[1560px] w-full text-sm">
+            <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-line bg-transparent text-left text-[11px] uppercase tracking-wider text-zinc-500">
-                  <th className="whitespace-nowrap px-3 py-3">Trạng thái soát xét</th>
-                  <th className="whitespace-nowrap px-3 py-3">Kim loại</th>
-                  <th className="whitespace-nowrap px-3 py-3">Tuổi vàng</th>
-                  <th className="whitespace-nowrap px-3 py-3">Tên thợ</th>
-                  <th className="whitespace-nowrap px-3 py-3">Công đoạn</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-right">Tồn đầu kỳ</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-right">Nhập trong kỳ</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-right">Xuất trong kỳ</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-right">Tồn sổ sách</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-right">Tồn thực tế</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-right">Chênh lệch</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-right">Định mức ký quỹ</th>
+                  <th className="whitespace-nowrap px-2 py-3" title="Trạng thái soát xét">Soát xét</th>
+                  <th className="whitespace-nowrap px-2 py-3">Kim loại</th>
+                  <th className="whitespace-nowrap px-2 py-3">Tuổi vàng</th>
+                  <th className="whitespace-nowrap px-2 py-3">Tên thợ</th>
+                  <th className="whitespace-nowrap px-2 py-3">Công đoạn</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-right" title="Tồn đầu kỳ">Đầu kỳ</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-right" title="Nhập trong kỳ">Nhập kỳ</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-right" title="Xuất trong kỳ">Xuất kỳ</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-right" title="Tồn sổ sách">Sổ sách</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-right" title="Tồn thực tế">Thực tế</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-right">Chênh lệch</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-right" title="Định mức ký quỹ">Định mức KQ</th>
                 </tr>
               </thead>
               <tbody>
@@ -427,32 +427,32 @@ export function WorkerBoxView({ isVisible, useDemoData = true, lines = [] }: Wor
                     className={`cursor-pointer border-b border-line/70 hover:bg-paper ${selectedId === line.id ? "bg-emerald-50/70" : ""}`}
                     onClick={() => selectLine(line)}
                   >
-                    <td className="px-3 py-3">
+                    <td className="px-2 py-3">
                       <span className={`rounded-md px-2 py-1 text-xs font-semibold ring-1 ${reviewStatusClass(line.reviewStatus)}`}>
                         {reviewStatusLabel(line.reviewStatus)}
                       </span>
                     </td>
-                    <td className="px-3 py-3">{metalLabel(line.metalCode)}</td>
-                    <td className="px-3 py-3">{line.goldAgeCode}</td>
-                    <td className="px-3 py-3">
+                    <td className="px-2 py-3">{metalLabel(line.metalCode)}</td>
+                    <td className="px-2 py-3">{line.goldAgeCode}</td>
+                    <td className="px-2 py-3">
                       <div className="font-semibold text-ink">{line.workerName}</div>
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-2 py-3">
                       <div className="font-semibold text-ink">{line.stageCode}</div>
                     </td>
-                    <td className="px-3 py-3 text-right">{formatGram(line.openingConvertedGram)}</td>
-                    <td className="px-3 py-3 text-right">{formatGram(line.importConvertedGram)}</td>
-                    <td className="px-3 py-3 text-right">{formatGram(line.exportConvertedGram)}</td>
-                    <td className="px-3 py-3 text-right">{formatGram(line.bookClosingConvertedGram)}</td>
-                    <td className="px-3 py-3 text-right">{formatGram(line.physicalConvertedGram)}</td>
-                    <td className={`px-3 py-3 text-right font-semibold ${line.diffConvertedGram < 0 ? "text-red-700" : "text-emerald-700"}`}>
+                    <td className="px-2 py-3 text-right">{formatGram(line.openingConvertedGram)}</td>
+                    <td className="px-2 py-3 text-right">{formatGram(line.importConvertedGram)}</td>
+                    <td className="px-2 py-3 text-right">{formatGram(line.exportConvertedGram)}</td>
+                    <td className="px-2 py-3 text-right">{formatGram(line.bookClosingConvertedGram)}</td>
+                    <td className="px-2 py-3 text-right">{formatGram(line.physicalConvertedGram)}</td>
+                    <td className={`px-2 py-3 text-right font-semibold ${line.diffConvertedGram < 0 ? "text-red-700" : "text-emerald-700"}`}>
                       {formatGram(line.diffConvertedGram)}
                     </td>
-                    <td className="px-3 py-3 text-right">{formatGram(line.depositNormConvertedGram)}</td>
+                    <td className="px-2 py-3 text-right">{formatGram(line.depositNormConvertedGram)}</td>
                   </tr>
                 )) : (
                   <tr>
-                    <td className="px-3 py-10 text-center text-sm text-zinc-500" colSpan={12}>
+                    <td className="px-2 py-10 text-center text-sm text-zinc-500" colSpan={12}>
                       Chưa có dữ liệu tồn hợp thợ để hiển thị.
                     </td>
                   </tr>
